@@ -64,7 +64,7 @@ public class LenowoTweeks_Inspectors : LenowoTweak
 	public static ModConfigKey<bool> allowSearchingBlendshapes = new("Allow Seaching For Blendshapes", "Add a search bar in the BlendShapeWeights list UIX", false);
 
 	public static ModConfigKey<bool> enableAddChildrenBuilder = new("Enable Add Children Builder", "Enables a custom UIX panel for quickly creating UIX and Context Menu's", false);
-
+	public static ModConfigKey<bool> childrenBuilderOnlyUIX = new("Add Children Builder - Only UIX", "Allows the Add Children Builder to be active, but only if the slot is under a canvas. requires Add Children Buidler to be enabled.", false);
 	public static ModConfigKey<float> buttonMinHeightDefault = new("Button Min Height Default", "The default value for the min height property on the UIX Builder", 0f);
 
 	public static ModConfigKey<colorX> defaultUIXPanelColor = new("Default UIX Panel Color", "This controls the color that is used when creating a blank UIX panel", colorX.DarkGray);
@@ -80,7 +80,7 @@ public class LenowoTweeks_Inspectors : LenowoTweak
 				{ "Components", [ collapseComponents, collapsedComponentColor, expandedComponentColor, modifiedComponentHeaders, dynvarComponentHeaderName ]},
 				{ "Lists", [ listCollapsing, maxListElementsForAutoCollapse, bagCollapsing, maxBagElementsForAutoCollapse ]},
 				{ "Blendshapes", [ displayIndexWithBlendshape, allowSearchingBlendshapes ] },
-				{ "Actions", [ enableAddChildrenBuilder ] }
+				{ "Actions", [ enableAddChildrenBuilder, childrenBuilderOnlyUIX ] }
 			}
 		}
 	};

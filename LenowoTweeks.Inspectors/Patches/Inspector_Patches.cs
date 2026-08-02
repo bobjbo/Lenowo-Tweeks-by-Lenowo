@@ -43,31 +43,30 @@ public class WorkerInspector_Patches
 	{
 		SyncRef<Slot> ComponentView = __instance.ComponentView;
 
-		if (ComponentView.Target != null && !LenowoTweeks_Inspectors.enableAddChildrenBuilder.Value)
+		if (!LenowoTweeks_Inspectors.enableAddChildrenBuilder.Value && !LenowoTweeks_Inspectors.childrenBuilderOnlyUIX.Value) return true;
+		if (ComponentView.Target == null) return true;
+		if (LenowoTweeks_Inspectors.childrenBuilderOnlyUIX.Value)
 		{
-			ComponentView.Target.AddSlot(ComponentView.Target.Name + " - Child").CreateSpawnUndoPoint();
+			if (ComponentView.Target.GetComponentInParents<Canvas>() == null) return true;
 		}
-		else if (ComponentView.Target != null && LenowoTweeks_Inspectors.enableAddChildrenBuilder.Value)
-		{
-			Slot PanelRoot = __instance.LocalUserSpace.AddSlot("Add Child Dialog - " + __instance.LocalUser.UserName, false);
-			PanelRoot.LocalScale *= 0.0008f;
-			PanelRoot.GlobalPosition = eventData.globalPoint + __instance.Slot.Backward * 0.05f + __instance.Slot.Down * (250f * __instance.Slot.GlobalScale.Y);
-			PanelRoot.GlobalRotation = __instance.Slot.GlobalRotation;
-			UIBuilder ui = RadiantUI_Panel.SetupPanel(PanelRoot, "Add Child", new float2(500f, 500f), true, true);
-			RadiantUI_Constants.SetupEditorStyle(ui);
 
-			SetUIColor(ui, LenowoTweeks_Core.secondaryUIColor.Value);
+		Slot PanelRoot = __instance.LocalUserSpace.AddSlot("Add Child Dialog - " + __instance.LocalUser.UserName, false);
+		PanelRoot.LocalScale *= 0.0008f;
+		PanelRoot.GlobalPosition = eventData.globalPoint + __instance.Slot.Backward * 0.05f + __instance.Slot.Down * (250f * __instance.Slot.GlobalScale.Y);
+		PanelRoot.GlobalRotation = __instance.Slot.GlobalRotation;
+		UIBuilder ui = RadiantUI_Panel.SetupPanel(PanelRoot, "Add Child", new float2(500f, 500f), true, true);
+		RadiantUI_Constants.SetupEditorStyle(ui);
 
-			Slot UIVerticalLayout = ui.VerticalLayout(5, 10, Alignment.TopCenter, true, false).Slot;
-			UIVerticalLayout.Parent.AttachComponent<Mask>();
-			UIVerticalLayout.AttachComponent<ScrollRect>();
-			UIVerticalLayout.AttachComponent<ContentSizeFitter>().VerticalFit.Value = SizeFit.MinSize;
+		SetUIColor(ui, LenowoTweeks_Core.secondaryUIColor.Value);
 
-			ui.Style.MinHeight = 50;
+		Slot UIVerticalLayout = ui.VerticalLayout(5, 10, Alignment.TopCenter, true, false).Slot;
+		UIVerticalLayout.Parent.AttachComponent<Mask>();
+		UIVerticalLayout.AttachComponent<ScrollRect>();
+		UIVerticalLayout.AttachComponent<ContentSizeFitter>().VerticalFit.Value = SizeFit.MinSize;
 
-			LoadMainPage(ui, UIVerticalLayout, ComponentView, PanelRoot);
+		ui.Style.MinHeight = 50;
 
-		}
+		LoadMainPage(ui, UIVerticalLayout, ComponentView, PanelRoot);
 
 		return false;
 	}
