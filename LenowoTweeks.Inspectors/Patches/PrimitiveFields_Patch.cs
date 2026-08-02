@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Reflection;
 
 using Elements.Core;
@@ -578,6 +579,8 @@ public class PrimitiveFields_Patch
 		} catch { }
 	}
 
+	private static readonly MethodInfo ListOnChanges = AccessTools.Method(typeof(ListEditor), "OnChanges");
+
 	[HarmonyPostfix]
 	[HarmonyPatch(typeof(ListEditor), "Setup")]
 	public static void ListCollapseing(ListEditor __instance, SyncRef<ISyncList> ____targetList)
@@ -619,30 +622,202 @@ public class PrimitiveFields_Patch
 		int maxItemCount = LenowoTweeks_Inspectors.maxListElementsForAutoCollapse.Value;
 		VL.ActiveSelf = maxItemCount == -1 || listItemCount <= maxItemCount;
 
-		VL.ActiveSelf_Field.OnValueChange += v =>
+		VL.ActiveSelf_Field.OnValueChange += v => { ListOnChanges?.Invoke(__instance, new object[] { }); };
+
+		if (LenowoTweeks_Inspectors.allowSearchingBlendshapes.Value && __instance is BlendshapeWeightListEditor editor)
 		{
-			MethodInfo methodInfo = typeof(ListEditor).GetMethod("OnChanges", BindingFlags.NonPublic | BindingFlags.Instance);
-			var parameters = new object[] { };
-			methodInfo.Invoke(__instance, parameters);
-		};
+			Slot parent1 = Texts.Parent[1];
+			Slot parent2 =  Texts.Parent[2];
+			parent1.OrderOffset = 1;
+			parent2.OrderOffset = 2;
+
+			Slot root = Texts.Parent.AddSlot("BlendshapeSearch");
+			ValueField<string> field = root.AttachComponent<ValueField<string>>();
+			SyncMemberEditorBuilder.BuildField(field.Value, field.GetSyncMemberFieldInfo("Value"), root, null!);
+			TextEditor tEditor = root.GetComponentInChildren<TextEditor>();
+			tEditor?.FinishHandling.Value = TextEditor.FinishAction.NullOnWhitespace;
+			(tEditor?.Text.Target as Text)?.NullContent.Value = "<alpha=#88><i>Search blendshapes</closeall>";
+
+			field.Slot.ActiveSelf_Field.DriveFrom(VL.ActiveSelf_Field);
+			field.Value.OnValueChange += content =>
+			{
+				SkinnedMeshRenderer? meshRenderer;
+				if (editor.GetSyncMember("_targetList") is SyncRef<ISyncList> iList && iList.Target is { } list) //editor("_targetList")?.Target != null)
+				{
+					meshRenderer = (editor.GetSyncMember("_targetSkin") as SyncRef<SkinnedMeshRenderer>)?.Target;
+					List<Predicate<string>> scoreIndicators = new List<Predicate<string>>
+					{
+						text2 => text2.StartsWith(content, false, CultureInfo.CurrentCulture),
+						text2 => text2.StartsWith(content, true, CultureInfo.CurrentCulture),
+						text2 => text2.EndsWith(content, false, CultureInfo.CurrentCulture),
+						text2 => text2.EndsWith(content, true, CultureInfo.CurrentCulture),
+						text2 => text2.Contains(content, StringComparison.OrdinalIgnoreCase)
+					};
+					List<string> members = Pool.BorrowList<string>();
+					Dictionary<string, Slot> listLayoutElements = Pool.BorrowDictionary<string, Slot>();
+					if (string.IsNullOrWhiteSpace(content))
+					{
+						for (int i = 0; i < list.Count; i++)
+						{
+							int idx = i;
+							Slot slot = editor.Slot.FindChild(x => x.Tag == BlendshapeName(idx));
+							if (slot != null)
+							{
+								slot.ActiveSelf = true;
+								slot.OrderOffset = i;
+							}
+						}
+					}
+					else
+					{
+						for (int i = 0; i < list.Count; i++)
+						{
+							int idx = i;
+							string text2 = BlendshapeName(idx);
+							Slot slot = editor.Slot.FindChild(x => x.Tag == text2) ?? editor.Slot[idx];
+							bool matchesFilter = FindCondition(text2);
+							if (matchesFilter)
+							{
+								members.Add(text2);
+								listLayoutElements[text2] = slot;
+							}
+							slot.ActiveSelf = matchesFilter;
+							slot.Tag = text2;
+						}
+						if (members.Count > 0)
+						{
+							ScoreAndSort(members, scoreIndicators);
+							for (int i = 0; i < members.Count; i++)
+							{
+								listLayoutElements[members[i]].OrderOffset = i;
+							}
+						}
+					}
+					Pool.Return(ref members);
+					Pool.Return(ref listLayoutElements);
+				}
+				return;
+
+				string BlendshapeName(int index) => meshRenderer?.BlendShapeName(index) ?? index.ToString();
+
+				bool FindCondition(string text2) => text2.Contains(content, StringComparison.OrdinalIgnoreCase);
+				
+				static void ScoreAndSort(List<string> candidates, List<Predicate<string>> scoreIndicators)
+				{
+					candidates.Sort(delegate(string a, string b)
+					{
+						int scoreA = Score(a);
+						int scoreB = Score(b);
+
+						return scoreA == scoreB ? string.Compare(a, b, StringComparison.Ordinal) : scoreB.CompareTo(scoreA);
+
+						int Score(string value)
+						{
+							int score = 0;
+
+							for (int index = 0; index < scoreIndicators.Count; index++)
+							{
+								try
+								{
+									if (scoreIndicators[index](value))
+									{
+										score += 10 * (scoreIndicators.Count - index);
+									}
+								}
+								catch
+								{
+									// ignored
+								}
+							}
+
+							return score;
+						}
+					});
+				}
+			};
+		}
 	}
 
+	[HarmonyPostfix]
+	[HarmonyPatch(typeof(BlendshapeWeightListEditor), "GetElementName")]
+	public static void BlendShapeListNameChanger(ISyncList list, int index, ref string __result)
+	{
+		__result = (LenowoTweeks_Inspectors.displayIndexWithBlendshape.Value && __result != index.ToString() ? $"[{index}] " : "") + __result;
+	}
 
 	[HarmonyPrefix]
 	[HarmonyPatch(typeof(ListEditor), "OnChanges")]
 	public static bool ListNoLoady(ListEditor __instance)
 	{
-
 		Slot Panel = __instance.Slot.Parent;
-		if (!Panel.FindChild("Vertical Layout").ActiveSelf)
+		if (!(Panel.FindChild("Vertical Layout")?.ActiveSelf ?? false))
 		{
 			return false;
 		}
+
+		return true;
+	}
+
+	private static readonly MethodInfo BagOnChanges = AccessTools.Method(typeof(BagEditor), "OnChanges");
+
+	[HarmonyPostfix]
+	[HarmonyPatch(typeof(BagEditor), "Setup")]
+	public static void BagCollapseing(BagEditor __instance, SyncRef<ISyncBag> ____targetBag)
+	{
+		if (!LenowoTweeks_Inspectors.bagCollapsing.Value) return;
+		if (__instance.World.IsUserspace())
+		{
+			var parentDynSpace = __instance.Slot.GetComponentInParents<DynamicVariableSpace>();
+			if (parentDynSpace != null && parentDynSpace.SpaceName.Value == "Config") return;
+		}
 		if (__instance.Slot.GetComponentInParents<WorkerInspector>() == null)
 		{
-			return true;
+			return;
 		}
 
+		Slot Panel = __instance.Slot.Parent;
+		Slot Texts = Panel.FindChild("Text");
+		Button button = Texts.GetComponentOrAttach<Button>();
+		var colorDriver = button.ColorDrivers.Add();
+		colorDriver.NormalColor.Value = RadiantUI_Constants.TEXT_COLOR;
+		colorDriver.HighlightColor.Value = RadiantUI_Constants.LABEL_COLOR;
+		colorDriver.PressColor.Value = RadiantUI_Constants.HEADING_COLOR;
+		ButtonToggle bt = Texts.AttachComponent<ButtonToggle>();
+		BooleanValueDriver<string> bvd = Texts.AttachComponent<BooleanValueDriver<string>>();
+		Text TextText = Texts.GetComponent<Text>();
+		colorDriver.ColorDrive.Target = TextText.Color;
+		Slot VL = Panel.FindChild("Vertical Layout");
+		ValueCopy<bool> vc = VL.AttachComponent<ValueCopy<bool>>();
+		ValueCopy<bool> vc2 = Panel.FindChild("Button").AttachComponent<ValueCopy<bool>>();
+		string TextTextText = TextText.Content;
+
+		vc.Source.Target = VL.ActiveSelf_Field;
+		vc.Target.Target = bvd.State;
+		vc2.Source.Target = VL.ActiveSelf_Field;
+		vc2.Target.Target = vc2.Slot.ActiveSelf_Field;
+
+		bt.TargetValue.Target = VL.ActiveSelf_Field;
+		bvd.TargetField.Target = TextText.Content;
+		bvd.FalseValue.Value = TextTextText + " (↑↑↑)";
+		bvd.TrueValue.Value = TextTextText + " (↓↓↓)";
+		TextText.ParseRichText.Value = true;
+
+		int bagItemCount = ____targetBag.Target.Count;
+		int maxItemCount = LenowoTweeks_Inspectors.maxBagElementsForAutoCollapse.Value;
+		VL.ActiveSelf = maxItemCount == -1 || bagItemCount <= maxItemCount;
+
+		VL.ActiveSelf_Field.OnValueChange += v => { BagOnChanges?.Invoke(__instance, new object[] { }); };
+	}
+
+	[HarmonyPrefix]
+	[HarmonyPatch(typeof(BagEditor), "OnChanges")]
+	public static bool BagNoLoady(BagEditor __instance)
+	{
+		Slot Panel = __instance.Slot.Parent;
+		if (!(Panel.FindChild("Vertical Layout")?.ActiveSelf ?? false))
+		{
+			return false;
+		}
 
 		return true;
 	}

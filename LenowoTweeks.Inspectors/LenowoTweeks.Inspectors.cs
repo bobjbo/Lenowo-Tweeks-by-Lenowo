@@ -55,7 +55,13 @@ public class LenowoTweeks_Inspectors : LenowoTweak
 	public static ModConfigKey<string> dynvarComponentHeaderName = new("Dynvar Component Header Name", "Replaces ['Variable','Field','Reference'] with the provided text on dynamic variables in the component header (Formatted as 'Variable;Field;Reference')", "");
 
 	public static ModConfigKey<bool> listCollapsing = new("List Collapsing", "If lists should be able to collapse", true);
+	public static ModConfigKey<bool> bagCollapsing = new("Bag Collapsing", "If bags should be able to collapse", true);
+
 	public static ModConfigKey<int> maxListElementsForAutoCollapse = new("Max List Elements For Auto Collapse", "The maximum amount of list elements before it collapses by default. -1 to never collapse, -2 to always collapse.", 25);
+	public static ModConfigKey<int> maxBagElementsForAutoCollapse = new("Max Bag Elements For Auto Collapse", "The maximum amount of bag elements before it collapses by default. -1 to never collapse, -2 to always collapse.", 25);
+
+	public static ModConfigKey<bool> displayIndexWithBlendshape = new("Display Index With Blendshape", "If the index should be displayed with the blendshape name.", false);
+	public static ModConfigKey<bool> allowSearchingBlendshapes = new("Allow Seaching For Blendshapes", "Add a search bar in the BlendShapeWeights list UIX", false);
 
 	public static ModConfigKey<bool> enableAddChildrenBuilder = new("Enable Add Children Builder", "Enables a custom UIX panel for quickly creating UIX and Context Menu's", false);
 
@@ -72,7 +78,8 @@ public class LenowoTweeks_Inspectors : LenowoTweak
 			{
 				{ "Base", [ modifiedInspectorUIX, fieldNameMode, nohelp, expandedStringInputs, slotInspectorResetAll, defaultUIXPanelColor ] },
 				{ "Components", [ collapseComponents, collapsedComponentColor, expandedComponentColor, modifiedComponentHeaders, dynvarComponentHeaderName ]},
-				{ "Lists", [ listCollapsing, maxListElementsForAutoCollapse ]},
+				{ "Lists", [ listCollapsing, maxListElementsForAutoCollapse, bagCollapsing, maxBagElementsForAutoCollapse ]},
+				{ "Blendshapes", [ displayIndexWithBlendshape, allowSearchingBlendshapes ] },
 				{ "Actions", [ enableAddChildrenBuilder ] }
 			}
 		}

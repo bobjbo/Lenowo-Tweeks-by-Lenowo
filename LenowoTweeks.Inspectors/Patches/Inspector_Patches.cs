@@ -79,8 +79,9 @@ public class WorkerInspector_Patches
 		UIVerticalLayout.DestroyChildren();
 		var button = ui.Button("Add Child");
 
-		button.LocalPressed += (button, data) =>
+		button.IsPressed.OnValueChange += field =>
 		{
+			if (!field.Value) return;
 			ComponentView.Target.AddSlot(ComponentView.Target.Name + " - Child").CreateSpawnUndoPoint();
 			PanelRoot.Destroy();
 		};
@@ -89,8 +90,9 @@ public class WorkerInspector_Patches
 		{
 			var canvasButton = ui.Button("Add Canvas");
 
-			canvasButton.LocalPressed += (button, data) =>
+			canvasButton.IsPressed.OnValueChange += field =>
 			{
+				if (!field.Value) return;
 				Slot newCanvas = ComponentView.Target.AddSlot("Canvas");
 				newCanvas.LocalScale = new float3(0.0008f, 0.0008f, 0.0008f);
 				newCanvas.CreateSpawnUndoPoint();
@@ -109,8 +111,9 @@ public class WorkerInspector_Patches
 			{
 				var contextButton = ui.Button("Add Root Context Menu Item");
 
-				contextButton.LocalPressed += (button, data) =>
+				contextButton.IsPressed.OnValueChange += field =>
 				{
+					if (!field.Value) return;
 					Slot newButton = ComponentView.Target.AddSlot("Root Context Menu Item");
 					newButton.CreateSpawnUndoPoint();
 
@@ -127,8 +130,9 @@ public class WorkerInspector_Patches
 
 			var noncontextButton = ui.Button("Add Context Menu Item");
 
-			noncontextButton.LocalPressed += (button, data) =>
+			noncontextButton.IsPressed.OnValueChange += field =>
 			{
+				if (!field.Value) return;
 				Slot newButton = ComponentView.Target.AddSlot("Context Menu Item");
 				newButton.CreateSpawnUndoPoint();
 
@@ -141,8 +145,9 @@ public class WorkerInspector_Patches
 
 			var subMenuButton = ui.Button("Add Context Sub Menu");
 
-			subMenuButton.LocalPressed += (button, data) =>
+			subMenuButton.IsPressed.OnValueChange += field =>
 			{
+				if (!field.Value) return;
 				Slot newButton = ComponentView.Target.AddSlot("Context Sub Menu");
 				newButton.CreateSpawnUndoPoint();
 
@@ -164,8 +169,9 @@ public class WorkerInspector_Patches
 			{
 				var backButton = ui.Button("Add Context Back Button");
 
-				backButton.LocalPressed += (button, data) =>
+				backButton.IsPressed.OnValueChange += field =>
 				{
+					if (!field.Value) return;
 					Slot newButton = ComponentView.Target.AddSlot("Back");
 					newButton.CreateSpawnUndoPoint();
 
@@ -187,8 +193,9 @@ public class WorkerInspector_Patches
 		{
 			var emptyUIX = ui.Button("Add Empty UIX Slot");
 
-			emptyUIX.LocalPressed += (button, data) =>
+			emptyUIX.IsPressed.OnValueChange += field =>
 			{
+				if (!field.Value) return;
 				Slot newPanel = ComponentView.Target.AddSlot("Panel");
 				newPanel.CreateSpawnUndoPoint();
 
@@ -200,8 +207,9 @@ public class WorkerInspector_Patches
 
 			var image = ui.Button("Add Image");
 
-			image.LocalPressed += (button, data) =>
+			image.IsPressed.OnValueChange += field =>
 			{
+				if (!field.Value) return;
 				Slot newPanel = ComponentView.Target.AddSlot("Image");
 				newPanel.CreateSpawnUndoPoint();
 
@@ -214,8 +222,9 @@ public class WorkerInspector_Patches
 			SetUIColor(ui, LenowoTweeks_Core.secondaryUIColor.Value);
 			var UIXBuilderFolder = ui.Button("UIX Builder");
 
-			UIXBuilderFolder.LocalPressed += (button, data) =>
+			UIXBuilderFolder.IsPressed.OnValueChange += field =>
 			{
+				if (!field.Value) return;
 				LoadUIXBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot);
 			};
 
@@ -232,8 +241,9 @@ public class WorkerInspector_Patches
 		var backToMain = ui.Button("Back");
 		backToMain.Slot.GetComponent<Image>().Tint.Value = new colorX(1, 0, 0, 1);
 
-		backToMain.LocalPressed += (button, data) =>
+		backToMain.IsPressed.OnValueChange += field =>
 		{
+			if (!field.Value) return;
 			ui.NestInto(UIVerticalLayout);
 			LoadMainPage(ui, UIVerticalLayout, ComponentView, PanelRoot);
 		};
@@ -242,24 +252,27 @@ public class WorkerInspector_Patches
 		var layoutBuilderSubmenu = ui.Button("Layout Builder");
 
 
-		layoutBuilderSubmenu.LocalPressed += (button, data) =>
+		layoutBuilderSubmenu.IsPressed.OnValueChange += field =>
 		{
+			if (!field.Value) return;
 			LoadLayoutBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot);
 		};
 
 		var fieldsBuilder = ui.Button("Field Builder");
 
 
-		fieldsBuilder.LocalPressed += (button, data) =>
+		fieldsBuilder.IsPressed.OnValueChange += field =>
 		{
+			if (!field.Value) return;
 			LoadFieldBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot);
 		};
 
 		var componentBuilder = ui.Button("Components");
 
 
-		componentBuilder.LocalPressed += (button, data) =>
+		componentBuilder.IsPressed.OnValueChange += field =>
 		{
+			if (!field.Value) return;
 			LoadComponentAdder(ui, UIVerticalLayout, ComponentView, PanelRoot);
 		};
 
@@ -268,29 +281,33 @@ public class WorkerInspector_Patches
 
 		var scrollAreasSubmenu = ui.Button("Scroll Area");
 
-		scrollAreasSubmenu.LocalPressed += (button, data) =>
+		scrollAreasSubmenu.IsPressed.OnValueChange += field =>
 		{
+			if (!field.Value) return;
 			LoadBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot, "Scroll Rect");
 		};
 
 		var buttonButton = ui.Button("Button");
 
-		buttonButton.LocalPressed += (button, data) =>
+		buttonButton.IsPressed.OnValueChange += field =>
 		{
+			if (!field.Value) return;
 			LoadBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot, "Button");
 		};
 
 		var textButton = ui.Button("Text");
 
-		textButton.LocalPressed += (button, data) =>
+		textButton.IsPressed.OnValueChange += field =>
 		{
+			if (!field.Value) return;
 			LoadBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot, "Text");
 		};
 
 		var maskButton = ui.Button("Mask");
 
-		maskButton.LocalPressed += (button, data) =>
+		maskButton.IsPressed.OnValueChange += field =>
 		{
+			if (!field.Value) return;
 			LoadBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot, "Mask");
 		};
 
@@ -309,30 +326,34 @@ public class WorkerInspector_Patches
 
 		SetUIColor(ui, LenowoTweeks_Core.secondaryUIColor.Value);
 
-		backToUIXBuilder.LocalPressed += (button, data) =>
+		backToUIXBuilder.IsPressed.OnValueChange += field =>
 		{
+			if (!field.Value) return;
 			ui.NestInto(UIVerticalLayout);
 			LoadUIXBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot);
 		};
 
 		var LayyoutElementButton = ui.Button("Layout Element");
 
-		LayyoutElementButton.LocalPressed += (button, data) =>
+		LayyoutElementButton.IsPressed.OnValueChange += field =>
 		{
+			if (!field.Value) return;
 			AddFeature(ui, UIVerticalLayout, ComponentView, PanelRoot, "Layout Element");
 		};
 
 		var SpriteeProviderButton = ui.Button("Sprite Prvider");
 
-		SpriteeProviderButton.LocalPressed += (button, data) =>
+		SpriteeProviderButton.IsPressed.OnValueChange += field =>
 		{
+			if (!field.Value) return;
 			AddFeature(ui, UIVerticalLayout, ComponentView, PanelRoot, "Sprite Provider");
 		};
 
 		var GradientImageButton = ui.Button("Gradient Image");
 
-		GradientImageButton.LocalPressed += (button, data) =>
+		GradientImageButton.IsPressed.OnValueChange += field =>
 		{
+			if (!field.Value) return;
 			AddFeature(ui, UIVerticalLayout, ComponentView, PanelRoot, "Gradient Image");
 		};
 	}
@@ -345,8 +366,9 @@ public class WorkerInspector_Patches
 		var backToUIXBuilder = ui.Button("Back");
 		backToUIXBuilder.Slot.GetComponent<Image>().Tint.Value = new colorX(1, 0, 0, 1);
 
-		backToUIXBuilder.LocalPressed += (button, data) =>
+		backToUIXBuilder.IsPressed.OnValueChange += field =>
 		{
+			if (!field.Value) return;
 			ui.NestInto(UIVerticalLayout);
 			LoadUIXBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot);
 		};
@@ -355,24 +377,27 @@ public class WorkerInspector_Patches
 
 		var VerticalLayoutButton = ui.Button("Vertical Layout");
 
-		VerticalLayoutButton.LocalPressed += (button, data) =>
+		VerticalLayoutButton.IsPressed.OnValueChange += field =>
 		{
+			if (!field.Value) return;
 			ui.NestInto(UIVerticalLayout);
 			LoadBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot, "Vertical Layout");
 		};
 
 		var HorizontalLayoutButton = ui.Button("Horizontal Layout");
 
-		HorizontalLayoutButton.LocalPressed += (button, data) =>
+		HorizontalLayoutButton.IsPressed.OnValueChange += field =>
 		{
+			if (!field.Value) return;
 			ui.NestInto(UIVerticalLayout);
 			LoadBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot, "Horizontal Layout");
 		};
 
 		var OverlappingLayoutButton = ui.Button("Overlapping Layout");
 
-		OverlappingLayoutButton.LocalPressed += (button, data) =>
+		OverlappingLayoutButton.IsPressed.OnValueChange += field =>
 		{
+			if (!field.Value) return;
 			ui.NestInto(UIVerticalLayout);
 			LoadBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot, "Overlapping Layout");
 		};
@@ -388,8 +413,9 @@ public class WorkerInspector_Patches
 		var backToUIXBuilder = ui.Button("Back");
 		backToUIXBuilder.Slot.GetComponent<Image>().Tint.Value = new colorX(1, 0, 0, 1);
 
-		backToUIXBuilder.LocalPressed += (button, data) =>
+		backToUIXBuilder.IsPressed.OnValueChange += field =>
 		{
+			if (!field.Value) return;
 			ui.NestInto(UIVerticalLayout);
 			LoadUIXBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot);
 		};
@@ -398,40 +424,45 @@ public class WorkerInspector_Patches
 
 		var VerticalLayoutButton = ui.Button("Text Field");
 
-		VerticalLayoutButton.LocalPressed += (button, data) =>
+		VerticalLayoutButton.IsPressed.OnValueChange += field =>
 		{
+			if (!field.Value) return;
 			ui.NestInto(UIVerticalLayout);
 			LoadBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot, "String Field");
 		};
 
 		var HorizontalLayoutButton = ui.Button("Bool Field");
 
-		HorizontalLayoutButton.LocalPressed += (button, data) =>
+		HorizontalLayoutButton.IsPressed.OnValueChange += field =>
 		{
+			if (!field.Value) return;
 			ui.NestInto(UIVerticalLayout);
 			LoadBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot, "Bool Field");
 		};
 
 		var OverlappingLayoutButton = ui.Button("Float Field");
 
-		OverlappingLayoutButton.LocalPressed += (button, data) =>
+		OverlappingLayoutButton.IsPressed.OnValueChange += field =>
 		{
+			if (!field.Value) return;
 			ui.NestInto(UIVerticalLayout);
 			LoadBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot, "Float Field");
 		};
 
 		var FloatSlider = ui.Button("Slider");
 
-		FloatSlider.LocalPressed += (button, data) =>
+		FloatSlider.IsPressed.OnValueChange += field =>
 		{
+			if (!field.Value) return;
 			ui.NestInto(UIVerticalLayout);
 			LoadBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot, "Slider");
 		};
 
 		var ReferenceField = ui.Button("Reference Field");
 
-		ReferenceField.LocalPressed += (button, data) =>
+		ReferenceField.IsPressed.OnValueChange += field =>
 		{
+			if (!field.Value) return;
 			ui.NestInto(UIVerticalLayout);
 			LoadBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot, "Reference Field");
 		};
@@ -449,8 +480,9 @@ public class WorkerInspector_Patches
 		var backToLLayouts = ui.Button("Back");
 		backToLLayouts.Slot.GetComponent<Image>().Tint.Value = new colorX(1, 0, 0, 1);
 
-		backToLLayouts.LocalPressed += (button, data) =>
+		backToLLayouts.IsPressed.OnValueChange += field =>
 		{
+			if (!field.Value) return;
 			ui.NestInto(UIVerticalLayout);
 			if (builderType == "Vertical Layout" || builderType == "Horizontal Layout" || builderType == "Overlapping Layout")
 			{
@@ -651,8 +683,9 @@ public class WorkerInspector_Patches
 
 		ui.Text("Build!!").Slot.Parent = bg.Slot;
 
-		bg.LocalPressed += (button, data) =>
+		bg.IsPressed.OnValueChange += f =>
 		{
+			if (!f.Value) return;
 			Slot NewSlot = ComponentView.Target.AddSlot(builderType);
 
 			if (builderType == "Vertical Layout" || builderType == "Horizontal Layout")

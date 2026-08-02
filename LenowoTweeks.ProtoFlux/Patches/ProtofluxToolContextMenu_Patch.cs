@@ -67,7 +67,7 @@ public class ProtofluxToolContextMenu_Patch
 					var fluxVisual = targetNode.GetVisual();
 					if (fluxVisual != null)
 					{
-						setUser = fluxVisual.AllocatingUser();
+						setUser = fluxVisual.GetAllocatingUser();
 					}
 				}
 

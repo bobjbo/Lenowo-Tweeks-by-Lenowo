@@ -32,8 +32,7 @@ public static class Helpers
 
 		if (!runMode.HasFlag(RunMode.AllowRemoved) && (element.IsRemoved || targetSlot.IsRemoved)) return false;
 
-		element.ReferenceID.ExtractIDs(out var position, out var user);
-		User allocatingUser = element.World.GetUserByAllocationID(user);
+		User allocatingUser = element.GetAllocatingUser();
 
 		if (runMode.HasFlag(RunMode.ElementAllocating))
 		{
@@ -42,12 +41,11 @@ public static class Helpers
 		}
 		if (runMode.HasFlag(RunMode.SlotAllocating))
 		{
-			if (allocatingUser == null || position < allocatingUser.AllocationIDStart)
+			if (allocatingUser == null)
 			{
-				targetSlot.ReferenceID.ExtractIDs(out var position2, out var user2);
-				User instanceAllocUser = element.World.GetUserByAllocationID(user2);
+				User instanceAllocUser = targetSlot.GetAllocatingUser();
 				if (runMode.HasFlag(RunMode.AllowNonAllocating) && instanceAllocUser == null) return true;
-				if (instanceAllocUser == null || position2 < instanceAllocUser.AllocationIDStart || instanceAllocUser != targetSlot.LocalUser)
+				if (instanceAllocUser == null || instanceAllocUser != targetSlot.LocalUser)
 				{
 					return false;
 				}
@@ -57,14 +55,6 @@ public static class Helpers
 
 		return false;
 	}
-
-	public static User AllocatingUser(this Worker worker)
-	{
-		worker.ReferenceID.ExtractIDs(out var position2, out var user2);
-		User user = worker.World.GetUserByAllocationID(user2);
-		return user;
-	}
-
 
 	public static Slot GetModSharedSlot(User runner)
 	{
@@ -283,11 +273,7 @@ public static class Helpers
 	// root should be an object that you are ok with being overridden
 	public static async Task CloudSpawn(Uri uri, Slot root)
 	{
-		string file = await root.Engine.AssetManager.GatherAssetFile(uri, 100f);
-
-		DataTreeDictionary loadNode = DataTreeConverter.Load(file);
-		root.LoadObject(loadNode, null);
-
-		await new Updates(6);
+		await root.LoadObjectAsync(uri);
+		root.GetComponent<InventoryItem>()?.Unpack();
 	}
 }
