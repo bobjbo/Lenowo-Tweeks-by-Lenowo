@@ -323,7 +323,7 @@ public class WorkerInspector_Patches
 		var backToUIXBuilder = ui.Button("Back");
 		backToUIXBuilder.Slot.GetComponent<Image>().Tint.Value = new colorX(1, 0, 0, 1);
 
-		SetUIColor(ui, LenowoTweeks_Core.secondaryUIColor.Value);
+		SetUIColor(ui, LenowoTweeks_Core.primaryUIColor.Value);
 
 		backToUIXBuilder.IsPressed.OnValueChange += field =>
 		{
@@ -332,17 +332,17 @@ public class WorkerInspector_Patches
 			LoadUIXBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot);
 		};
 
-		var LayyoutElementButton = ui.Button("Layout Element");
+		var LayoutElementButton = ui.Button("Layout Element");
 
-		LayyoutElementButton.IsPressed.OnValueChange += field =>
+		LayoutElementButton.IsPressed.OnValueChange += field =>
 		{
 			if (!field.Value) return;
 			AddFeature(ui, UIVerticalLayout, ComponentView, PanelRoot, "Layout Element");
 		};
 
-		var SpriteeProviderButton = ui.Button("Sprite Prvider");
+		var SpriteProviderButton = ui.Button("Sprite Provider");
 
-		SpriteeProviderButton.IsPressed.OnValueChange += field =>
+		SpriteProviderButton.IsPressed.OnValueChange += field =>
 		{
 			if (!field.Value) return;
 			AddFeature(ui, UIVerticalLayout, ComponentView, PanelRoot, "Sprite Provider");
@@ -372,7 +372,7 @@ public class WorkerInspector_Patches
 			LoadUIXBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot);
 		};
 
-		SetUIColor(ui, LenowoTweeks_Core.secondaryUIColor.Value);
+		SetUIColor(ui, LenowoTweeks_Core.primaryUIColor.Value);
 
 		var VerticalLayoutButton = ui.Button("Vertical Layout");
 
@@ -419,7 +419,7 @@ public class WorkerInspector_Patches
 			LoadUIXBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot);
 		};
 
-		SetUIColor(ui, LenowoTweeks_Core.secondaryUIColor.Value);
+		SetUIColor(ui, LenowoTweeks_Core.primaryUIColor.Value);
 
 		var VerticalLayoutButton = ui.Button("Text Field");
 
