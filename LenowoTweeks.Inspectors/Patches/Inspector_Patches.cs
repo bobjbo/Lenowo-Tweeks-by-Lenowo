@@ -328,13 +328,7 @@ public class WorkerInspector_Patches
 			AddFeature(ui, UIVerticalLayout, ComponentView, PanelRoot, "Sprite Provider");
 		};
 
-		var ButtonToggleButton = ui.Button("Button Toggle");
-
-		ButtonToggleButton.IsPressed.OnValueChange += field =>
-		{
-			if (!field.Value) return;
-			AddFeature(ui, UIVerticalLayout, ComponentView, PanelRoot, "Button Toggle");
-		};
+		BuildButtonBuilders(ui, UIVerticalLayout, ComponentView, PanelRoot, "Context Component");
 
 		var OptionDriver = ui.Button("Option Description Driver");
 
@@ -343,13 +337,24 @@ public class WorkerInspector_Patches
 			if (!field.Value) return;
 			LoadBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot, "Option Description Driver");
 		};
+	}
+
+	public static void BuildButtonBuilders(UIBuilder ui, Slot UIVerticalLayout, SyncRef<Slot> ComponentView, Slot PanelRoot, string origin)
+	{
+		var ButtonToggleButton = ui.Button("Button Toggle");
+
+		ButtonToggleButton.IsPressed.OnValueChange += field =>
+		{
+			if (!field.Value) return;
+			AddFeature(ui, UIVerticalLayout, ComponentView, PanelRoot, "Button Toggle");
+		};
 
 		var ButtonSet = ui.Button("Button Set");
 
 		ButtonSet.IsPressed.OnValueChange += field =>
 		{
 			if (!field.Value) return;
-			LoadBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot, "Button Set");
+			LoadBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot, "Button Set", origin);
 		};
 	}
 
@@ -477,6 +482,8 @@ public class WorkerInspector_Patches
 			if (!field.Value) return;
 			AddFeature(ui, UIVerticalLayout, ComponentView, PanelRoot, "Gradient Image");
 		};
+
+		BuildButtonBuilders(ui, UIVerticalLayout, ComponentView, PanelRoot, "UIX Component");
 	}
 
 	public static void LoadLayoutBuilder(UIBuilder ui, Slot UIVerticalLayout, SyncRef<Slot> ComponentView, Slot PanelRoot)
@@ -592,7 +599,7 @@ public class WorkerInspector_Patches
 
 
 
-	public static void LoadBuilder(UIBuilder ui, Slot UIVerticalLayout, SyncRef<Slot> ComponentView, Slot PanelRoot, string builderType)
+	public static void LoadBuilder(UIBuilder ui, Slot UIVerticalLayout, SyncRef<Slot> ComponentView, Slot PanelRoot, string builderType, string origin = null)
 	{
 		UIVerticalLayout.DestroyChildren();
 		ui.NestInto(UIVerticalLayout);
@@ -605,6 +612,18 @@ public class WorkerInspector_Patches
 		{
 			if (!field.Value) return;
 			ui.NestInto(UIVerticalLayout);
+			if (origin != null)
+			{
+				switch (origin)
+				{
+					case "Context Compnent":
+						LoadContextComponentBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot);
+						break;
+					case "UIX Compnent":
+						LoadComponentAdder(ui, UIVerticalLayout, ComponentView, PanelRoot);
+						break;
+				}
+			}
 			if (builderType == "Vertical Layout" || builderType == "Horizontal Layout" || builderType == "Overlapping Layout")
 			{
 				LoadLayoutBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot);
