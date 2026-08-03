@@ -777,15 +777,18 @@ public class PrimitiveFields_Patch
 
 		Slot Panel = __instance.Slot.Parent;
 		Slot Texts = Panel.FindChild("Text");
-		Button button = Texts.GetComponentOrAttach<Button>();
-		var colorDriver = button.ColorDrivers.Add();
-		colorDriver.NormalColor.Value = RadiantUI_Constants.TEXT_COLOR;
-		colorDriver.HighlightColor.Value = RadiantUI_Constants.LABEL_COLOR;
-		colorDriver.PressColor.Value = RadiantUI_Constants.HEADING_COLOR;
 		ButtonToggle bt = Texts.AttachComponent<ButtonToggle>();
 		BooleanValueDriver<string> bvd = Texts.AttachComponent<BooleanValueDriver<string>>();
 		Text TextText = Texts.GetComponent<Text>();
-		colorDriver.ColorDrive.Target = TextText.Color;
+		Button button = Texts.GetComponentOrAttach<Button>(out bool buttonAttached);
+		if (buttonAttached)
+		{
+			var colorDriver = button.ColorDrivers.Add();
+			colorDriver.NormalColor.Value = RadiantUI_Constants.TEXT_COLOR;
+			colorDriver.HighlightColor.Value = RadiantUI_Constants.LABEL_COLOR;
+			colorDriver.PressColor.Value = RadiantUI_Constants.HEADING_COLOR;
+			colorDriver.ColorDrive.Target = TextText.Color;
+		}
 		Slot VL = Panel.FindChild("Vertical Layout");
 		ValueCopy<bool> vc = VL.AttachComponent<ValueCopy<bool>>();
 		ValueCopy<bool> vc2 = Panel.FindChild("Button").AttachComponent<ValueCopy<bool>>();
