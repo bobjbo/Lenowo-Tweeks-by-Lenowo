@@ -9,6 +9,8 @@ using HarmonyLib;
 
 using LenowoTweeks.Core;
 
+using ProtoFlux.Core;
+
 namespace LenowoTweeks.Inspectors.Patches;
 
 [HarmonyPatch]
@@ -106,84 +108,14 @@ public class WorkerInspector_Patches
 
 		if (ComponentView.Target.GetComponentInParents<Canvas>() == null)
 		{
-			if (ComponentView.Target.GetComponent<RootContextMenuItem>() == null)
-			{
-				var contextButton = ui.Button("Add Root Context Menu Item");
+			SetUIColor(ui, LenowoTweeks_Core.secondaryUIColor.Value);
+			var ContextMenuBuilderFolder = ui.Button("Context Menu Builder");
 
-				contextButton.IsPressed.OnValueChange += field =>
-				{
-					if (!field.Value) return;
-					Slot newButton = ComponentView.Target.AddSlot("Root Context Menu Item");
-					newButton.CreateSpawnUndoPoint();
-
-					var rootContext = newButton.AttachComponent<RootContextMenuItem>();
-
-					var menuItem = newButton.AttachComponent<ContextMenuItemSource>();
-					menuItem.LabelText = newButton.Name;
-
-					rootContext.Item.Target = menuItem;
-					PanelRoot.Destroy();
-					ComponentView.Target = newButton;
-				};
-			}
-
-			var noncontextButton = ui.Button("Add Context Menu Item");
-
-			noncontextButton.IsPressed.OnValueChange += field =>
+			ContextMenuBuilderFolder.IsPressed.OnValueChange += field =>
 			{
 				if (!field.Value) return;
-				Slot newButton = ComponentView.Target.AddSlot("Context Menu Item");
-				newButton.CreateSpawnUndoPoint();
-
-				var menuItem = newButton.AttachComponent<ContextMenuItemSource>();
-				menuItem.LabelText = newButton.Name;
-
-				PanelRoot.Destroy();
-				ComponentView.Target = newButton;
+				LoadContextMenuBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot);
 			};
-
-			var subMenuButton = ui.Button("Add Context Sub Menu");
-
-			subMenuButton.IsPressed.OnValueChange += field =>
-			{
-				if (!field.Value) return;
-				Slot newButton = ComponentView.Target.AddSlot("Context Sub Menu");
-				newButton.CreateSpawnUndoPoint();
-
-				var menuItem = newButton.AttachComponent<ContextMenuItemSource>();
-				menuItem.LabelText = newButton.Name;
-
-				newButton.AttachComponent<ContextMenuSubmenu>().ItemsRoot.Target = newButton;
-
-				if (ComponentView.Target.GetComponent<ContextMenuItemSource>() == null)
-				{
-					newButton.AttachComponent<RootContextMenuItem>().Item.Target = menuItem;
-				}
-
-				PanelRoot.Destroy();
-				ComponentView.Target = newButton;
-			};
-
-			if (ComponentView.Target.GetComponent<ContextMenuItemSource>() != null)
-			{
-				var backButton = ui.Button("Add Context Back Button");
-
-				backButton.IsPressed.OnValueChange += field =>
-				{
-					if (!field.Value) return;
-					Slot newButton = ComponentView.Target.AddSlot("Back");
-					newButton.CreateSpawnUndoPoint();
-
-					var menuItem = newButton.AttachComponent<ContextMenuItemSource>();
-					menuItem.LabelText = newButton.Name;
-					menuItem.Color.Value = new colorX(1, 0, 0, 1);
-
-					newButton.AttachComponent<ContextMenuSubmenu>().ItemsRoot.Target = ComponentView.Target.Parent;
-
-					PanelRoot.Destroy();
-					ComponentView.Target = newButton;
-				};
-			}
 		}
 
 
@@ -229,6 +161,150 @@ public class WorkerInspector_Patches
 
 		}
 		ui.NestOut();
+	}
+
+	public static void LoadContextMenuBuilder(UIBuilder ui, Slot UIVerticalLayout, SyncRef<Slot> ComponentView, Slot PanelRoot)
+	{
+		ui.NestInto(UIVerticalLayout);
+		UIVerticalLayout.DestroyChildren();
+
+		ui.Style.TextColor = colorX.Black;
+		var backToMain = ui.Button("Back");
+		backToMain.Slot.GetComponent<Image>().Tint.Value = new colorX(1, 0, 0, 1);
+
+		backToMain.IsPressed.OnValueChange += field =>
+		{
+			if (!field.Value) return;
+			ui.NestInto(UIVerticalLayout);
+			LoadMainPage(ui, UIVerticalLayout, ComponentView, PanelRoot);
+		};
+
+		SetUIColor(ui, LenowoTweeks_Core.secondaryUIColor.Value);
+		var ComponentSubmenu = ui.Button("Components");
+
+
+		ComponentSubmenu.IsPressed.OnValueChange += field =>
+		{
+			if (!field.Value) return;
+			LoadContextComponentBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot);
+		};
+
+		SetUIColor(ui, LenowoTweeks_Core.primaryUIColor.Value);
+		if (ComponentView.Target.GetComponent<RootContextMenuItem>() == null)
+		{
+			var contextButton = ui.Button("Add Root Context Menu Item");
+
+			contextButton.IsPressed.OnValueChange += field =>
+			{
+				if (!field.Value) return;
+				Slot newButton = ComponentView.Target.AddSlot("Root Context Menu Item");
+				newButton.CreateSpawnUndoPoint();
+
+				var rootContext = newButton.AttachComponent<RootContextMenuItem>();
+
+				var menuItem = newButton.AttachComponent<ContextMenuItemSource>();
+				menuItem.LabelText = newButton.Name;
+
+				rootContext.Item.Target = menuItem;
+				PanelRoot.Destroy();
+				ComponentView.Target = newButton;
+			};
+		}
+
+		var noncontextButton = ui.Button("Add Context Menu Item");
+
+		noncontextButton.IsPressed.OnValueChange += field =>
+		{
+			if (!field.Value) return;
+			Slot newButton = ComponentView.Target.AddSlot("Context Menu Item");
+			newButton.CreateSpawnUndoPoint();
+
+			var menuItem = newButton.AttachComponent<ContextMenuItemSource>();
+			menuItem.LabelText = newButton.Name;
+
+			PanelRoot.Destroy();
+			ComponentView.Target = newButton;
+		};
+
+		var subMenuButton = ui.Button("Add Context Sub Menu");
+
+		subMenuButton.IsPressed.OnValueChange += field =>
+		{
+			if (!field.Value) return;
+			Slot newButton = ComponentView.Target.AddSlot("Context Sub Menu");
+			newButton.CreateSpawnUndoPoint();
+
+			var menuItem = newButton.AttachComponent<ContextMenuItemSource>();
+			menuItem.LabelText = newButton.Name;
+
+			newButton.AttachComponent<ContextMenuSubmenu>().ItemsRoot.Target = newButton;
+
+			if (ComponentView.Target.GetComponent<ContextMenuItemSource>() == null)
+			{
+				newButton.AttachComponent<RootContextMenuItem>().Item.Target = menuItem;
+			}
+
+			PanelRoot.Destroy();
+			ComponentView.Target = newButton;
+		};
+
+		if (ComponentView.Target.GetComponent<ContextMenuItemSource>() != null)
+		{
+			var backButton = ui.Button("Add Context Back Button");
+
+			backButton.IsPressed.OnValueChange += field =>
+			{
+				if (!field.Value) return;
+				Slot newButton = ComponentView.Target.AddSlot("Back");
+				newButton.CreateSpawnUndoPoint();
+
+				var menuItem = newButton.AttachComponent<ContextMenuItemSource>();
+				menuItem.LabelText = newButton.Name;
+				menuItem.Color.Value = new colorX(1, 0, 0, 1);
+
+				newButton.AttachComponent<ContextMenuSubmenu>().ItemsRoot.Target = ComponentView.Target.Parent;
+
+				PanelRoot.Destroy();
+				ComponentView.Target = newButton;
+			};
+
+			
+		}
+	}
+
+	public static void LoadContextComponentBuilder(UIBuilder ui, Slot UIVerticalLayout, SyncRef<Slot> ComponentView, Slot PanelRoot)
+	{
+		ui.NestInto(UIVerticalLayout);
+		UIVerticalLayout.DestroyChildren();
+
+		ui.Style.TextColor = colorX.Black;
+		var backToMain = ui.Button("Back");
+		backToMain.Slot.GetComponent<Image>().Tint.Value = new colorX(1, 0, 0, 1);
+
+		backToMain.IsPressed.OnValueChange += field =>
+		{
+			if (!field.Value) return;
+			ui.NestInto(UIVerticalLayout);
+			LoadContextMenuBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot);
+		};
+		
+		SetUIColor(ui, LenowoTweeks_Core.primaryUIColor.Value);
+
+		var SpriteProviderButton = ui.Button("Sprite Provider");
+
+		SpriteProviderButton.IsPressed.OnValueChange += field =>
+		{
+			if (!field.Value) return;
+			AddFeature(ui, UIVerticalLayout, ComponentView, PanelRoot, "Sprite Provider");
+		};
+
+		var OptionDriver = ui.Button("Option Description Driver");
+
+		OptionDriver.IsPressed.OnValueChange += field =>
+		{
+			if (!field.Value) return;
+			LoadBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot, "Option Description Driver");
+		};
 	}
 
 	public static void LoadUIXBuilder(UIBuilder ui, Slot UIVerticalLayout, SyncRef<Slot> ComponentView, Slot PanelRoot)
@@ -495,6 +571,10 @@ public class WorkerInspector_Patches
 			{
 				LoadFieldBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot);
 			}
+			else if (builderType == "Option Description Driver")
+			{
+				LoadContextComponentBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot);
+			}
 		};
 
 		CreateHeader(ui, builderType);
@@ -578,7 +658,23 @@ public class WorkerInspector_Patches
 			CreateBuildButton(ui, UIVerticalLayout, ComponentView, PanelRoot, builderType);
 
 		}
-
+		else if (builderType == "Option Description Driver")
+		{
+			ui.HorizontalLayout(5);
+			var boolButton = ui.Button();
+			ui.Text("bool").Slot.Parent = boolButton.Slot;
+			var intButton = ui.Button();
+			ui.Text("int").Slot.Parent = intButton.Slot;
+			var floatButton = ui.Button();
+			ui.Text("float").Slot.Parent = floatButton.Slot;
+			ui.NestInto(UIVerticalLayout);
+			var typeField = CreateTypeFieldWithText(ui, "Type", typeof(bool));
+			boolButton.IsPressed.OnValueChange += (v) => typeField.Value = typeof(bool);
+			intButton.IsPressed.OnValueChange += (v) => typeField.Value = typeof(int);
+			floatButton.IsPressed.OnValueChange += (v) => typeField.Value = typeof(float);
+			ui.NestInto(UIVerticalLayout);
+			CreateBuildButton(ui, UIVerticalLayout, ComponentView, PanelRoot, builderType);
+		}
 
 
 	}
@@ -612,6 +708,21 @@ public class WorkerInspector_Patches
 		hl.Slot.GetComponent<Image>().NineSliceSizing.Value = NineSliceSizing.FixedSize;
 		hl.Slot.Name = name;
 
+	}
+
+	public static SyncType CreateTypeFieldWithText(UIBuilder ui, string name, Type defaultVal)
+	{
+		var hl = ui.HorizontalLayout(5, 5);
+		ui.Text(name);
+		var field = hl.Slot.AttachComponent<TypeField>();
+		field.Type.Value = defaultVal;
+		SyncMemberEditorBuilder.BuildField(field.Type, null, hl.Slot, null);
+		
+		hl.Slot.AttachComponent<Image>().Sprite.Target = ui.Style.ButtonSprite;
+		hl.Slot.GetComponent<Image>().NineSliceSizing.Value = NineSliceSizing.FixedSize;
+		hl.Slot.Name = name;
+
+		return field.Type;
 	}
 
 	public static void CreateEnumFieldWithText<T>(UIBuilder ui, string name, T defaultVal)
@@ -819,6 +930,29 @@ public class WorkerInspector_Patches
 				var Image = NewSlot.AttachComponent<Image>();
 				var Mask = NewSlot.AttachComponent<Mask>();
 				Mask.ShowMaskGraphic.Value = UIVerticalLayout.FindChild("Show Mash Graphic").GetComponent<ValueField<bool>>().Value;
+			}
+			else if (builderType == "Option Description Driver")
+			{
+				NewSlot.Destroy();
+				Type? customType = UIVerticalLayout.FindChild("Type").GetComponent<TypeField>().Type?.Value;
+				if (customType == null)
+				{
+					ComponentView.Target.AttachComponent<ValueOptionDescriptionDriver<bool>>();
+				}
+				else if (customType.IsEnginePrimitive())
+				{
+					ComponentView.Target.AttachComponent(typeof(ValueOptionDescriptionDriver<>).MakeGenericType(customType));
+				}
+				// for some reason this doesnt work
+				// not like anyone will be using this anyways, right
+				else if (customType is IWorldElement)
+				{
+					ComponentView.Target.AttachComponent(typeof(ReferenceOptionDescriptionDriver<>).MakeGenericType(customType));
+				}
+				else
+				{
+					ComponentView.Target.AttachComponent<ValueOptionDescriptionDriver<bool>>();
+				}
 			}
 			PanelRoot.Destroy();
 
