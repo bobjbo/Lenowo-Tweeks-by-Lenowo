@@ -23,7 +23,7 @@ namespace LenowoTweeks.Inspectors;
 public class LenowoTweeks_Inspectors : LenowoTweak
 {
 	private static Assembly ModAssembly => typeof(LenowoTweeks_Inspectors).Assembly;
-	internal const string VERSION_CONSTANT = "2.0.0";
+	internal const string VERSION_CONSTANT = "2.0.1";
 	const string ModName = "Lenowo Tweeks (Inspectors)";
 
 	public override string ModuleName => "Inspectors";
