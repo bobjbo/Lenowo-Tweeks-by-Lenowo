@@ -267,9 +267,39 @@ public class WorkerInspector_Patches
 				PanelRoot.Destroy();
 				ComponentView.Target = newButton;
 			};
-
-			
 		}
+
+		var toggleButton = ui.Button("Context Toggle Item");
+
+		toggleButton.IsPressed.OnValueChange += field =>
+		{
+			if (!field.Value) return;
+			Slot newButton = ComponentView.Target.AddSlot("Context Toggle Item");
+			newButton.CreateSpawnUndoPoint();
+
+			var menuItem = newButton.AttachComponent<ContextMenuItemSource>();
+
+			var bt = newButton.AttachComponent<ButtonToggle>();
+			bt.TargetValue.Target = newButton.ActiveSelf_Field;
+
+			var descDriver = newButton.AttachComponent<ValueOptionDescriptionDriver<bool>>();
+			descDriver.Value.Target = newButton.ActiveSelf_Field;
+			descDriver.DefaultOption.Label.Value = "{0}: Off";
+			descDriver.DefaultOption.Color.Value = RadiantUI_Constants.Hero.RED;
+			var newEl = descDriver.Options.Add();
+			newEl.ReferenceValue.Value = true;
+			newEl.Label.Value = "{0}: On";
+			newEl.Color.Value = RadiantUI_Constants.Hero.GREEN;
+
+			var format = newButton.AttachComponent<ValueTextFormatDriver<string>>();
+			format.Source.Target = newButton.Name_Field;
+			descDriver.Label.Target = format.Format;
+			descDriver.Color.Target = menuItem.Color;
+			format.Text.Target = menuItem.LabelTextField;
+
+			PanelRoot.Destroy();
+			ComponentView.Target = newButton;
+		};
 	}
 
 	public static void LoadContextComponentBuilder(UIBuilder ui, Slot UIVerticalLayout, SyncRef<Slot> ComponentView, Slot PanelRoot)
@@ -298,12 +328,28 @@ public class WorkerInspector_Patches
 			AddFeature(ui, UIVerticalLayout, ComponentView, PanelRoot, "Sprite Provider");
 		};
 
+		var ButtonToggleButton = ui.Button("Button Toggle");
+
+		ButtonToggleButton.IsPressed.OnValueChange += field =>
+		{
+			if (!field.Value) return;
+			AddFeature(ui, UIVerticalLayout, ComponentView, PanelRoot, "Button Toggle");
+		};
+
 		var OptionDriver = ui.Button("Option Description Driver");
 
 		OptionDriver.IsPressed.OnValueChange += field =>
 		{
 			if (!field.Value) return;
 			LoadBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot, "Option Description Driver");
+		};
+
+		var ButtonSet = ui.Button("Button Set");
+
+		ButtonSet.IsPressed.OnValueChange += field =>
+		{
+			if (!field.Value) return;
+			LoadBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot, "Button Set");
 		};
 	}
 
@@ -571,7 +617,7 @@ public class WorkerInspector_Patches
 			{
 				LoadFieldBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot);
 			}
-			else if (builderType == "Option Description Driver")
+			else if (builderType == "Option Description Driver" || builderType == "Button Set")
 			{
 				LoadContextComponentBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot);
 			}
@@ -658,20 +704,25 @@ public class WorkerInspector_Patches
 			CreateBuildButton(ui, UIVerticalLayout, ComponentView, PanelRoot, builderType);
 
 		}
-		else if (builderType == "Option Description Driver")
+		else if (builderType == "Option Description Driver" || builderType == "Button Set")
 		{
-			ui.HorizontalLayout(5);
-			var boolButton = ui.Button();
-			ui.Text("bool").Slot.Parent = boolButton.Slot;
-			var intButton = ui.Button();
-			ui.Text("int").Slot.Parent = intButton.Slot;
-			var floatButton = ui.Button();
-			ui.Text("float").Slot.Parent = floatButton.Slot;
+			var horizontal = ui.HorizontalLayout(5);
 			ui.NestInto(UIVerticalLayout);
 			var typeField = CreateTypeFieldWithText(ui, "Type", typeof(bool));
+			ui.NestInto(horizontal.Slot);
+			var boolButton = ui.Button("bool");
 			boolButton.IsPressed.OnValueChange += (v) => typeField.Value = typeof(bool);
+			var intButton = ui.Button("int");
 			intButton.IsPressed.OnValueChange += (v) => typeField.Value = typeof(int);
+			var floatButton = ui.Button("float");
 			floatButton.IsPressed.OnValueChange += (v) => typeField.Value = typeof(float);
+			if (builderType == "Button Set")
+			{
+				var userButton = ui.Button("User");
+				userButton.IsPressed.OnValueChange += (v) => typeField.Value = typeof(User);
+				var materialButton = ui.Button("Material");
+				materialButton.IsPressed.OnValueChange += (v) => typeField.Value = typeof(IAssetProvider<Material>);
+			}
 			ui.NestInto(UIVerticalLayout);
 			CreateBuildButton(ui, UIVerticalLayout, ComponentView, PanelRoot, builderType);
 		}
@@ -784,14 +835,16 @@ public class WorkerInspector_Patches
 		{
 			Slot.AttachComponent<GradientImage>();
 		}
+		else if (builderType == "Button Toggle")
+		{
+			Slot.AttachComponent<ButtonToggle>();
+		}
 		PanelRoot.Destroy();
 	}
 
 	public static void CreateBuildButton(UIBuilder ui, Slot UIVerticalLayout, SyncRef<Slot> ComponentView, Slot PanelRoot, string builderType)
 	{
-		var bg = ui.Button();
-
-		ui.Text("Build!!").Slot.Parent = bg.Slot;
+		var bg = ui.Button("Build!!");
 
 		bg.IsPressed.OnValueChange += f =>
 		{
@@ -934,24 +987,43 @@ public class WorkerInspector_Patches
 			else if (builderType == "Option Description Driver")
 			{
 				NewSlot.Destroy();
-				Type? customType = UIVerticalLayout.FindChild("Type").GetComponent<TypeField>().Type?.Value;
-				if (customType == null)
+				Type? type = UIVerticalLayout.FindChild("Type").GetComponent<TypeField>().Type?.Value;
+				if (type == null)
 				{
 					ComponentView.Target.AttachComponent<ValueOptionDescriptionDriver<bool>>();
 				}
-				else if (customType.IsEnginePrimitive())
+				else if (type.IsEnginePrimitive())
 				{
-					ComponentView.Target.AttachComponent(typeof(ValueOptionDescriptionDriver<>).MakeGenericType(customType));
+					ComponentView.Target.AttachComponent(typeof(ValueOptionDescriptionDriver<>).MakeGenericType(type));
 				}
-				// for some reason this doesnt work
-				// not like anyone will be using this anyways, right
-				else if (customType is IWorldElement)
+				else if (typeof(IWorldElement).IsAssignableFrom(type))
 				{
-					ComponentView.Target.AttachComponent(typeof(ReferenceOptionDescriptionDriver<>).MakeGenericType(customType));
+					ComponentView.Target.AttachComponent(typeof(ReferenceOptionDescriptionDriver<>).MakeGenericType(type));
 				}
 				else
 				{
 					ComponentView.Target.AttachComponent<ValueOptionDescriptionDriver<bool>>();
+				}
+			}
+			else if (builderType == "Button Set")
+			{
+				NewSlot.Destroy();
+				Type? type = UIVerticalLayout.FindChild("Type").GetComponent<TypeField>().Type?.Value;
+				if (type == null)
+				{
+					ComponentView.Target.AttachComponent<ButtonValueSet<bool>>();
+				}
+				else if (type.IsEnginePrimitive())
+				{
+					ComponentView.Target.AttachComponent(typeof(ButtonValueSet<>).MakeGenericType(type));
+				}
+				else if (typeof(IWorldElement).IsAssignableFrom(type))
+				{
+					ComponentView.Target.AttachComponent(typeof(ButtonReferenceSet<>).MakeGenericType(type));
+				}
+				else
+				{
+					ComponentView.Target.AttachComponent<ButtonValueSet<bool>>();
 				}
 			}
 			PanelRoot.Destroy();
