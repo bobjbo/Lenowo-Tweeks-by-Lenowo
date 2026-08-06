@@ -750,7 +750,7 @@ public class PrimitiveFields_Patch
 	public static bool ListNoLoady(ListEditor __instance)
 	{
 		Slot Panel = __instance.Slot.Parent;
-		if (!(Panel.FindChild("Vertical Layout")?.ActiveSelf ?? false))
+		if (!(Panel.FindChild("Vertical Layout")?.ActiveSelf ?? true))
 		{
 			return false;
 		}
@@ -777,6 +777,7 @@ public class PrimitiveFields_Patch
 
 		Slot Panel = __instance.Slot.Parent;
 		Slot Texts = Panel.FindChild("Text");
+		if (Texts == null) return;
 		ButtonToggle bt = Texts.AttachComponent<ButtonToggle>();
 		BooleanValueDriver<string> bvd = Texts.AttachComponent<BooleanValueDriver<string>>();
 		Text TextText = Texts.GetComponent<Text>();
@@ -817,7 +818,7 @@ public class PrimitiveFields_Patch
 	public static bool BagNoLoady(BagEditor __instance)
 	{
 		Slot Panel = __instance.Slot.Parent;
-		if (!(Panel.FindChild("Vertical Layout")?.ActiveSelf ?? false))
+		if (!(Panel.FindChild("Vertical Layout")?.ActiveSelf ?? true))
 		{
 			return false;
 		}
