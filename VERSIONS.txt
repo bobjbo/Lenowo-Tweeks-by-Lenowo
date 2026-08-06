@@ -1,4 +1,4 @@
 Core=2.0.1
-General=2.0.0
+General=2.0.1
 Inspectors=2.0.1
-ProtoFlux=2.0.0
+ProtoFlux=2.0.1
