@@ -58,7 +58,7 @@ public static class Helpers
 
 	public static Slot GetModSharedSlot(User runner)
 	{
-		return runner.World.RootSlot.FindChild("__TEMP").FindChildOrAdd("LenowoTweeks Shared", persistent: false);
+		return runner.World.RootSlot.FindChildOrAdd("__TEMP", persistent: false).FindChildOrAdd("LenowoTweeks Shared", persistent: false);
 	}
 	public static bool HasModUserSlot(User runner)
 	{
