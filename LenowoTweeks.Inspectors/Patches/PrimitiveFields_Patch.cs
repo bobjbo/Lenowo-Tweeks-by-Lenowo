@@ -633,7 +633,9 @@ public class PrimitiveFields_Patch
 
 			Slot root = Texts.Parent.AddSlot("BlendshapeSearch");
 			ValueField<string> field = root.AttachComponent<ValueField<string>>();
-			SyncMemberEditorBuilder.BuildField(field.Value, field.GetSyncMemberFieldInfo("Value"), root, null!);
+			LayoutElement layout = root.GetComponentOrAttach<LayoutElement>();
+			SyncMemberEditorBuilder.BuildField(field.Value, field.GetSyncMemberFieldInfo("Value"), root, layout);
+			layout.MinHeight.Value = 24f;
 			TextEditor tEditor = root.GetComponentInChildren<TextEditor>();
 			tEditor?.FinishHandling.Value = TextEditor.FinishAction.NullOnWhitespace;
 			(tEditor?.Text.Target as Text)?.NullContent.Value = "<alpha=#88><i>Search blendshapes</closeall>";
@@ -642,7 +644,7 @@ public class PrimitiveFields_Patch
 			field.Value.OnValueChange += content =>
 			{
 				SkinnedMeshRenderer? meshRenderer;
-				if (editor.GetSyncMember("_targetList") is SyncRef<ISyncList> iList && iList.Target is { } list) //editor("_targetList")?.Target != null)
+				if (editor.GetSyncMember("_targetList") is SyncRef<ISyncList> iList && iList.Target is { } list)
 				{
 					meshRenderer = (editor.GetSyncMember("_targetSkin") as SyncRef<SkinnedMeshRenderer>)?.Target;
 					List<Predicate<string>> scoreIndicators = new List<Predicate<string>>

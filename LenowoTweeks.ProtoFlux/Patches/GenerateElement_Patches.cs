@@ -26,7 +26,7 @@ public class GenerateElement_Patches
 
 		var textureSource = Helpers.GetConfigReferenceSource<IAssetProvider<ITexture2D>>(root.LocalUser, textureName, connectorAssets);
 		IAssetProvider<ITexture2D> spriteTexture = textureSource.Target;
-		if (spriteTexture != null && spriteTexture.FindNearestParent<Slot>() == connectorAssets)
+		if (spriteTexture != null && spriteTexture.TryGetSlot() == connectorAssets)
 		{
 			var staticTex = (StaticTexture2D)spriteTexture;
 			if (staticTex != null && staticTex.URL.Value != atlasUri)
