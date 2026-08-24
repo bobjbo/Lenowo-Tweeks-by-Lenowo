@@ -3,13 +3,10 @@
 	"tasks": [
 		{
 			"label": "build Debug",
-			"command": "dotnet",
+			"command": "build",
 			"type": "process",
 			"group": "build",
 			"args": [
-				"build",
-				"LenowoTweeks.slnx",
-				"-c",
 				"Debug"
 			],
 			"problemMatcher": "$msCompile"
@@ -20,6 +17,7 @@
 			"group": "build",
 			"type": "process",
 			"args": [
+				"Release"
 			],
 			"problemMatcher": "$msCompile"
 		}

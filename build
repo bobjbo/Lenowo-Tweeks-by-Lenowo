@@ -7,10 +7,13 @@
 # Get this current directory, to prevent possible problems
 DIR=$(dirname "$0")
 
+# Clean up first, can prevent meaningless errors, at the cost of a slight bit more time to build.
+$DIR/clean
+
 echo "Building Modules..."
-dotnet build $DIR/LenowoTweeks.AllModules/LenowoTweeks.AllModules.csproj -c Release
+dotnet build $DIR/LenowoTweeks.AllModules/LenowoTweeks.AllModules.csproj -c $1
 
 echo "Building Config Updater..."
-dotnet build $DIR/LenowoTweeks.ConfigUpdater/LenowoTweeks.ConfigUpdater.csproj -c Release
+dotnet build $DIR/LenowoTweeks.ConfigUpdater/LenowoTweeks.ConfigUpdater.csproj -c $1
 
 echo "Finished Building!"
