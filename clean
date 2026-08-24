@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+# Clear out all build data
+
+# Avoid problems with not being in the same directory when running this script
+DIR=$(dirname "$0")
+
+# This could probably be a loop..
+rm -rf $DIR/LenowoTweeks.AllModules/bin/
+rm -rf $DIR/LenowoTweeks.AllModules/obj/
+
+rm -rf $DIR/LenowoTweeks.Core/bin/
+rm -rf $DIR/LenowoTweeks.Core/obj/
+
+rm -rf $DIR/LenowoTweeks.General/bin/
+rm -rf $DIR/LenowoTweeks.General/obj/
+
+rm -rf $DIR/LenowoTweeks.Inspectors/bin/
+rm -rf $DIR/LenowoTweeks.Inspectors/obj/
+
+rm -rf $DIR/LenowoTweeks.ProtoFlux/bin/
+rm -rf $DIR/LenowoTweeks.ProtoFlux/obj/
+
+rm -rf $DIR/LenowoTweeks.ConfigUpdater/bin/
+rm -rf $DIR/LenowoTweeks.ConfigUpdater/obj/

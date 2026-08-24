@@ -47,6 +47,8 @@ public class LenowoTweeks_Inspectors : LenowoTweak
 	public static ModConfigKey<Patches.FieldNameMode> fieldNameMode = new("Field Name Mode", "This controls how the fields are named in the inspector.", Patches.FieldNameMode.Normal);
 	public static ModConfigKey<bool> slotInspectorResetAll = new("Slot Inspector Reset All", "This toggles if a 'Reset All' button is created on inspectors", false);
 
+	public static ModConfigKey<bool> copyComponentsToButtons = new("Copy Components To Buttons", "If enabled, try and find the slot at 'Config/UIComponents.[Type]', and copies the components to the buttons with the same type.\nThe types can be Component, Field, and MemberAction", false);
+
 	public static ModConfigKey<bool> collapseComponents = new("Collapse Components", "This toggles if the components in the inspector should load collapsed.", false);
 	public static ModConfigKey<colorX> collapsedComponentColor = new("Collapsed Component Color", "This text color of a collapsed component.", RadiantUI_Constants.MidLight.YELLOW);
 	public static ModConfigKey<colorX> expandedComponentColor = new("Expanded Component Color", "This text color of a expanded component.", RadiantUI_Constants.LABEL_COLOR);
@@ -67,6 +69,9 @@ public class LenowoTweeks_Inspectors : LenowoTweak
 	public static ModConfigKey<bool> childrenBuilderOnlyUIX = new("Add Children Builder - Only UIX", "Allows the Add Children Builder to be active, but only if the slot is under a canvas. requires Add Children Buidler to be enabled.", false);
 	public static ModConfigKey<float> buttonMinHeightDefault = new("Button Min Height Default", "The default value for the min height property on the UIX Builder", 0f);
 
+	public static ModConfigKey<bool> variableSpaceForWorkers = new("Variable Space For WorkerInspectors", "If enabled, the variable 'IsWorkerInspector' will be created and set to true for standalone WorkerInspectors", false);
+
+
 	public static ModConfigKey<colorX> defaultUIXPanelColor = new("Default UIX Panel Color", "This controls the color that is used when creating a blank UIX panel", colorX.DarkGray);
 
 	public static ModConfiguration? Config;
@@ -76,7 +81,7 @@ public class LenowoTweeks_Inspectors : LenowoTweak
 		{
 			"Inspectors", new()
 			{
-				{ "Base", [ modifiedInspectorUIX, fieldNameMode, nohelp, expandedStringInputs, slotInspectorResetAll, defaultUIXPanelColor ] },
+				{ "Base", [ modifiedInspectorUIX, fieldNameMode, copyComponentsToButtons, nohelp, expandedStringInputs, slotInspectorResetAll, defaultUIXPanelColor, variableSpaceForWorkers ] },
 				{ "Components", [ collapseComponents, collapsedComponentColor, expandedComponentColor, modifiedComponentHeaders, dynvarComponentHeaderName ]},
 				{ "Lists", [ listCollapsing, maxListElementsForAutoCollapse, bagCollapsing, maxBagElementsForAutoCollapse ]},
 				{ "Blendshapes", [ displayIndexWithBlendshape, allowSearchingBlendshapes ] },

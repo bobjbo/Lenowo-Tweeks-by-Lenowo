@@ -12,7 +12,7 @@
 		<ProjectReference Include="../LenowoTweeks.ProtoFlux/LenowoTweeks.ProtoFlux.csproj" />
 	</ItemGroup>
 
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)'=='Release'">
+	<Target Name="MakeZip" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
 		<Delete Files="$(OutputPath)LenowoTweeks.AllModules.dll" />
 		<ItemGroup>
 			<InputFiles Include="$(OutputPath)/LenowoTweeks.*.dll" />

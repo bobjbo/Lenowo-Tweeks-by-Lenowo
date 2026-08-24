@@ -293,6 +293,9 @@ public class ConfigUIBuilder()
 	{
 		bool isValid = false;
 
+		// prevent a null string from existing
+		if (value is string v2 && v2 == null) value = (T)(object)"";
+
 		try
 		{
 			isValid = configKey.TypedConfigKey.Validate(value);
@@ -310,7 +313,10 @@ public class ConfigUIBuilder()
 	private void HandleConfigFieldChange<T>(SyncField<T> syncField, ModConfiguration modConfiguration, ModConfigKey<T> configKey)
 	{
 		bool isSet = modConfiguration.TryGetValue(configKey.TypedConfigKey, out T configValue);
-		if (isSet && (Equals(configValue, syncField.Value) || !Equals(syncField.Value, syncField.Value)))
+		var curVal = syncField.Value;
+		// prevent a null string from existing
+		if (curVal is string v2 && v2 == null) curVal = (T)(object)"";
+		if (isSet && (Equals(configValue, curVal) || !Equals(curVal, curVal)))
 		{
 			configKey.Value = configValue;
 			return; // Skip if new value is unmodified or is logically inconsistent (self != self)
@@ -318,10 +324,10 @@ public class ConfigUIBuilder()
 
 		try
 		{
-			if (!configKey.TypedConfigKey.Validate(syncField.Value)) return;
+			if (!configKey.TypedConfigKey.Validate(curVal)) return;
 		} catch { return; }
 
-		configKey.Value = syncField.Value;
+		configKey.Value = curVal;
 
 		modConfiguration.Save(true);
 	}

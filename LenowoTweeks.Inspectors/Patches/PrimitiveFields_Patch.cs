@@ -9,6 +9,8 @@ using FrooxEngine.UIX;
 
 using HarmonyLib;
 
+using LenowoTweeks.Core;
+
 namespace LenowoTweeks.Inspectors.Patches;
 
 public enum FieldNameMode
@@ -60,7 +62,28 @@ public class PrimitiveFields_Patch
 				Panel.FindChildInHierarchy("Left").Destroy();
 				Panel.FindChild("Text").GetComponent<RectTransform>().AnchorMin.Value = new float2(0.01f, 0);
 			}
+			if (LenowoTweeks_Inspectors.copyComponentsToButtons.Value)
+			{
+				Slot memberActionRef = Helpers.GetConfigReference<Slot>(__instance.LocalUser, "UIComponents.MemberAction");
+				if (memberActionRef != null)
+				{
+					Panel.CopyComponents(memberActionRef);
+				}
+			}
 		} catch { }
+
+		if (LenowoTweeks_Inspectors.copyComponentsToButtons.Value)
+		{
+			Slot fieldRef = Helpers.GetConfigReference<Slot>(__instance.LocalUser, "UIComponents.Field");
+			if (fieldRef != null)
+			{
+				var allButtons = __instance.Slot.GetComponentsInChildren<Button>().Select(c => c.Slot);
+				foreach (var button in allButtons)
+				{
+					button.CopyComponents(fieldRef);
+				}
+			}
+		}
 
 		if (!LenowoTweeks_Inspectors.expandedStringInputs.Value) return;
 
@@ -116,7 +139,7 @@ public class PrimitiveFields_Patch
 	[HarmonyPatch(typeof(BooleanMemberEditor), "BuildUI")]
 	public static void BooleanPostfix(BooleanMemberEditor __instance, SyncRef<Button> ____button, RelayRef<IField> ____target)
 	{
-		if (!LenowoTweeks_Inspectors.modifiedInspectorUIX.Value) return;
+		if (!LenowoTweeks_Inspectors.modifiedInspectorUIX.Value && !LenowoTweeks_Inspectors.copyComponentsToButtons.Value) return;
 		if (__instance.World.IsUserspace())
 		{
 			var parentDynSpace = __instance.Slot.GetComponentInParents<DynamicVariableSpace>();
@@ -134,6 +157,17 @@ public class PrimitiveFields_Patch
 
 		Slot FieldButton = ____button.Slot;
 		Slot Panel = FieldButton.Parent.Parent; // The parent panel of the button aka the fucking field
+
+		if (LenowoTweeks_Inspectors.copyComponentsToButtons.Value)
+		{
+			Slot memberActionRef = Helpers.GetConfigReference<Slot>(__instance.LocalUser, "UIComponents.MemberAction");
+			if (memberActionRef != null)
+			{
+				Panel.CopyComponents(memberActionRef);
+			}
+		}
+
+		if (!LenowoTweeks_Inspectors.modifiedInspectorUIX.Value) return;
 
 		string Text = LenowoTweeks_Inspectors.fieldNameMode.Value switch
 		{
@@ -180,6 +214,17 @@ public class PrimitiveFields_Patch
 
 		Slot Panel = __instance.Slot.Parent.Parent;
 
+		if (LenowoTweeks_Inspectors.copyComponentsToButtons.Value)
+		{
+			Slot memberActionRef = Helpers.GetConfigReference<Slot>(__instance.LocalUser, "UIComponents.MemberAction");
+			if (memberActionRef != null)
+			{
+				Panel.CopyComponents(memberActionRef);
+			}
+		}
+
+		if (!LenowoTweeks_Inspectors.modifiedInspectorUIX.Value) return;
+
 		string Text = LenowoTweeks_Inspectors.fieldNameMode.Value switch
 		{
 			FieldNameMode.Normal => "",
@@ -206,7 +251,7 @@ public class PrimitiveFields_Patch
 	[HarmonyPatch(typeof(EnumMemberEditor), "BuildUI")]
 	public static void EatemPostfix(EnumMemberEditor __instance, RelayRef<IField> ____target)
 	{
-		if (!LenowoTweeks_Inspectors.modifiedInspectorUIX.Value) return;
+		if (!LenowoTweeks_Inspectors.modifiedInspectorUIX.Value && !LenowoTweeks_Inspectors.copyComponentsToButtons.Value) return;
 		if (__instance.World.IsUserspace())
 		{
 			var parentDynSpace = __instance.Slot.GetComponentInParents<DynamicVariableSpace>();
@@ -222,6 +267,17 @@ public class PrimitiveFields_Patch
 		}
 
 		Slot Panel = __instance.Slot.Parent.Parent;
+
+		if (LenowoTweeks_Inspectors.copyComponentsToButtons.Value)
+		{
+			Slot memberActionRef = Helpers.GetConfigReference<Slot>(__instance.LocalUser, "UIComponents.MemberAction");
+			if (memberActionRef != null)
+			{
+				Panel.CopyComponents(memberActionRef);
+			}
+		}
+
+		if (!LenowoTweeks_Inspectors.modifiedInspectorUIX.Value) return;
 		if (Panel.GetComponent<MemberEditor>() != null) return;
 
 		string Text = LenowoTweeks_Inspectors.fieldNameMode.Value switch
@@ -250,7 +306,7 @@ public class PrimitiveFields_Patch
 	[HarmonyPatch(typeof(SliderMemberEditor), "BuildUI")]
 	public static void SlidePostfix(SliderMemberEditor __instance, RelayRef<IField> ____target)
 	{
-		if (!LenowoTweeks_Inspectors.modifiedInspectorUIX.Value) return;
+		if (!LenowoTweeks_Inspectors.modifiedInspectorUIX.Value && !LenowoTweeks_Inspectors.copyComponentsToButtons.Value) return;
 		if (__instance.World.IsUserspace())
 		{
 			var parentDynSpace = __instance.Slot.GetComponentInParents<DynamicVariableSpace>();
@@ -262,6 +318,17 @@ public class PrimitiveFields_Patch
 		}
 
 		Slot Panel = __instance.Slot.Parent.Parent;
+
+		if (LenowoTweeks_Inspectors.copyComponentsToButtons.Value)
+		{
+			Slot memberActionRef = Helpers.GetConfigReference<Slot>(__instance.LocalUser, "UIComponents.MemberAction");
+			if (memberActionRef != null)
+			{
+				Panel.CopyComponents(memberActionRef);
+			}
+		}
+
+		if (!LenowoTweeks_Inspectors.modifiedInspectorUIX.Value) return;
 
 		string Text = LenowoTweeks_Inspectors.fieldNameMode.Value switch
 		{
@@ -289,7 +356,7 @@ public class PrimitiveFields_Patch
 	[HarmonyPatch(typeof(RefEditor), "Setup", argumentTypes: [typeof(ISyncRef), typeof(UIBuilder)])]
 	public static void RefPostfix(RefEditor __instance, RelayRef<ISyncRef> ____targetRef)
 	{
-		if (!LenowoTweeks_Inspectors.modifiedInspectorUIX.Value) return;
+		if (!LenowoTweeks_Inspectors.modifiedInspectorUIX.Value && !LenowoTweeks_Inspectors.copyComponentsToButtons.Value) return;
 		if (__instance.World.IsUserspace())
 		{
 			var parentDynSpace = __instance.Slot.GetComponentInParents<DynamicVariableSpace>();
@@ -305,6 +372,17 @@ public class PrimitiveFields_Patch
 		}
 
 		Slot Panel = __instance.Slot.Parent;
+
+		if (LenowoTweeks_Inspectors.copyComponentsToButtons.Value)
+		{
+			Slot memberActionRef = Helpers.GetConfigReference<Slot>(__instance.LocalUser, "UIComponents.MemberAction");
+			if (memberActionRef != null)
+			{
+				Panel.CopyComponents(memberActionRef);
+			}
+		}
+
+		if (!LenowoTweeks_Inspectors.modifiedInspectorUIX.Value) return;
 
 		string Text = LenowoTweeks_Inspectors.fieldNameMode.Value switch
 		{
@@ -332,7 +410,7 @@ public class PrimitiveFields_Patch
 	[HarmonyPatch(typeof(ColorMemberEditorBase), "BuildUI")]
 	public static void ColorPostfix(ColorMemberEditorBase __instance, RelayRef<IField> ____target)
 	{
-		if (!LenowoTweeks_Inspectors.modifiedInspectorUIX.Value) return;
+		if (!LenowoTweeks_Inspectors.modifiedInspectorUIX.Value && !LenowoTweeks_Inspectors.copyComponentsToButtons.Value) return;
 		if (__instance.World.IsUserspace())
 		{
 			var parentDynSpace = __instance.Slot.GetComponentInParents<DynamicVariableSpace>();
@@ -348,6 +426,17 @@ public class PrimitiveFields_Patch
 		}
 
 		Slot Panel = __instance.Slot.Parent.Parent;
+
+		if (LenowoTweeks_Inspectors.copyComponentsToButtons.Value)
+		{
+			Slot memberActionRef = Helpers.GetConfigReference<Slot>(__instance.LocalUser, "UIComponents.MemberAction");
+			if (memberActionRef != null)
+			{
+				Panel.CopyComponents(memberActionRef);
+			}
+		}
+
+		if (!LenowoTweeks_Inspectors.modifiedInspectorUIX.Value) return;
 
 		string Text = LenowoTweeks_Inspectors.fieldNameMode.Value switch
 		{
@@ -376,7 +465,7 @@ public class PrimitiveFields_Patch
 	[HarmonyPatch(typeof(TextureRefEditor), "Setup")]
 	public static void TextureRefPostfix(TextureRefEditor __instance, RelayRef<AssetRef<ITexture2D>> ____targetRef)
 	{
-		if (!LenowoTweeks_Inspectors.modifiedInspectorUIX.Value) return;
+		if (!LenowoTweeks_Inspectors.modifiedInspectorUIX.Value && !LenowoTweeks_Inspectors.copyComponentsToButtons.Value) return;
 		if (__instance.World.IsUserspace())
 		{
 			var parentDynSpace = __instance.Slot.GetComponentInParents<DynamicVariableSpace>();
@@ -388,6 +477,17 @@ public class PrimitiveFields_Patch
 		}
 
 		Slot Panel = __instance.Slot.Parent;
+
+		if (LenowoTweeks_Inspectors.copyComponentsToButtons.Value)
+		{
+			Slot memberActionRef = Helpers.GetConfigReference<Slot>(__instance.LocalUser, "UIComponents.MemberAction");
+			if (memberActionRef != null)
+			{
+				Panel.CopyComponents(memberActionRef);
+			}
+		}
+
+		if (!LenowoTweeks_Inspectors.modifiedInspectorUIX.Value) return;
 
 		string Text = LenowoTweeks_Inspectors.fieldNameMode.Value switch
 		{
@@ -415,7 +515,7 @@ public class PrimitiveFields_Patch
 	[HarmonyPatch(typeof(NullableMemberEditor), "BuildUI")]
 	public static void NullablePostfix(NullableMemberEditor __instance, RelayRef<IField> ____target)
 	{
-		if (!LenowoTweeks_Inspectors.modifiedInspectorUIX.Value) return;
+		if (!LenowoTweeks_Inspectors.modifiedInspectorUIX.Value && !LenowoTweeks_Inspectors.copyComponentsToButtons.Value) return;
 		if (__instance.World.IsUserspace())
 		{
 			var parentDynSpace = __instance.Slot.GetComponentInParents<DynamicVariableSpace>();
@@ -432,6 +532,17 @@ public class PrimitiveFields_Patch
 		}
 
 		Slot Panel = editorSlot.Parent.Parent;
+
+		if (LenowoTweeks_Inspectors.copyComponentsToButtons.Value)
+		{
+			Slot memberActionRef = Helpers.GetConfigReference<Slot>(__instance.LocalUser, "UIComponents.MemberAction");
+			if (memberActionRef != null)
+			{
+				Panel.CopyComponents(memberActionRef);
+			}
+		}
+
+		if (!LenowoTweeks_Inspectors.modifiedInspectorUIX.Value) return;
 
 		string Text = LenowoTweeks_Inspectors.fieldNameMode.Value switch
 		{
@@ -494,7 +605,7 @@ public class PrimitiveFields_Patch
 	[HarmonyPatch(typeof(SyncPlaybackEditor), "Setup")]
 	public static void PlaybackPostfix(SyncPlaybackEditor __instance, RelayRef<SyncPlayback> ____playback)
 	{
-		if (!LenowoTweeks_Inspectors.modifiedInspectorUIX.Value) return;
+		if (!LenowoTweeks_Inspectors.modifiedInspectorUIX.Value && !LenowoTweeks_Inspectors.copyComponentsToButtons.Value) return;
 		if (__instance.World.IsUserspace())
 		{
 			var parentDynSpace = __instance.Slot.GetComponentInParents<DynamicVariableSpace>();
@@ -510,6 +621,17 @@ public class PrimitiveFields_Patch
 		}
 
 		Slot Panel = __instance.Slot.Parent;
+
+		if (LenowoTweeks_Inspectors.copyComponentsToButtons.Value)
+		{
+			Slot memberActionRef = Helpers.GetConfigReference<Slot>(__instance.LocalUser, "UIComponents.MemberAction");
+			if (memberActionRef != null)
+			{
+				Panel.CopyComponents(memberActionRef);
+			}
+		}
+
+		if (!LenowoTweeks_Inspectors.modifiedInspectorUIX.Value) return;
 
 		string Text = LenowoTweeks_Inspectors.fieldNameMode.Value switch
 		{
@@ -538,7 +660,7 @@ public class PrimitiveFields_Patch
 	[HarmonyPatch(typeof(DelegateEditor), "Setup")]
 	public static void DelegatePostfix(DelegateEditor __instance, RelayRef<ISyncDelegate> ____targetDelegate)
 	{
-		if (!LenowoTweeks_Inspectors.modifiedInspectorUIX.Value) return;
+		if (!LenowoTweeks_Inspectors.modifiedInspectorUIX.Value && !LenowoTweeks_Inspectors.copyComponentsToButtons.Value) return;
 		if (__instance.World.IsUserspace())
 		{
 			var parentDynSpace = __instance.Slot.GetComponentInParents<DynamicVariableSpace>();
@@ -554,7 +676,17 @@ public class PrimitiveFields_Patch
 		}
 
 		Slot Panel = __instance.Slot.Parent;
-		Panel.Name = "deli sausage";
+
+		if (LenowoTweeks_Inspectors.copyComponentsToButtons.Value)
+		{
+			Slot memberActionRef = Helpers.GetConfigReference<Slot>(__instance.LocalUser, "UIComponents.MemberAction");
+			if (memberActionRef != null)
+			{
+				Panel.CopyComponents(memberActionRef);
+			}
+		}
+
+		if (!LenowoTweeks_Inspectors.modifiedInspectorUIX.Value) return;
 
 		string Text = LenowoTweeks_Inspectors.fieldNameMode.Value switch
 		{
@@ -627,7 +759,7 @@ public class PrimitiveFields_Patch
 		if (LenowoTweeks_Inspectors.allowSearchingBlendshapes.Value && __instance is BlendshapeWeightListEditor editor)
 		{
 			Slot parent1 = Texts.Parent[1];
-			Slot parent2 =  Texts.Parent[2];
+			Slot parent2 = Texts.Parent[2];
 			parent1.OrderOffset = 1;
 			parent2.OrderOffset = 2;
 
@@ -703,10 +835,10 @@ public class PrimitiveFields_Patch
 				string BlendshapeName(int index) => meshRenderer?.BlendShapeName(index) ?? index.ToString();
 
 				bool FindCondition(string text2) => text2.Contains(content, StringComparison.OrdinalIgnoreCase);
-				
+
 				static void ScoreAndSort(List<string> candidates, List<Predicate<string>> scoreIndicators)
 				{
-					candidates.Sort(delegate(string a, string b)
+					candidates.Sort(delegate (string a, string b)
 					{
 						int scoreA = Score(a);
 						int scoreB = Score(b);
@@ -725,8 +857,7 @@ public class PrimitiveFields_Patch
 									{
 										score += 10 * (scoreIndicators.Count - index);
 									}
-								}
-								catch
+								} catch
 								{
 									// ignored
 								}

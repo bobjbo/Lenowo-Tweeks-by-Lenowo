@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+# Build the mod
+# - This is mostly due to the build being incorrect if not done correctly
+# - Which is quite frequent, so may as well make a proper bash script for this.
+
+# Get this current directory, to prevent possible problems
+DIR=$(dirname "$0")
+
+echo "Building Modules..."
+dotnet build $DIR/LenowoTweeks.AllModules/LenowoTweeks.AllModules.csproj -c Release
+
+echo "Building Config Updater..."
+dotnet build $DIR/LenowoTweeks.ConfigUpdater/LenowoTweeks.ConfigUpdater.csproj -c Release
+
+echo "Finished Building!"

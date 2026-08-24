@@ -124,6 +124,14 @@ public class WorkerInspector_Patch
 							UniLog.Error($"LenowoTweeks // You broke it - Failed on ExpandComponent:\n{e}");
 						}
 					};
+					if (LenowoTweeks_Inspectors.copyComponentsToButtons.Value)
+					{
+						Slot componentHeaderRef = Helpers.GetConfigReference<Slot>(__instance.LocalUser, "UIComponents.Component");
+						if (componentHeaderRef != null)
+						{
+							b.Slot.CopyComponents(componentHeaderRef);
+						}
+					}
 					ui.NestOut();
 					Helpers.SetConfigVariable(__instance.LocalUser, "CollapsedColor", LenowoTweeks_Inspectors.collapsedComponentColor.Value);
 					Helpers.SetConfigVariable(__instance.LocalUser, "ExpandedColor", LenowoTweeks_Inspectors.expandedComponentColor.Value);
@@ -175,6 +183,15 @@ public class WorkerInspector_Patch
 		}
 
 		return false;
+	}
+
+	[HarmonyPostfix]
+	[HarmonyPatch(typeof(WorkerInspector), nameof(WorkerInspector.Setup))]
+	public static void WorkerInspectorFinder(WorkerInspector __instance)
+	{
+		if (!LenowoTweeks_Inspectors.variableSpaceForWorkers.Value) return;
+		__instance.Slot.AttachComponent<DynamicVariableSpace>();
+		DynamicVariableHelper.CreateVariable<bool>(__instance.Slot, "IsWorkerInspector", true, false);
 	}
 
 	public static void AddHeaderText(UIBuilder ui, InspectorHeaderAttribute header)

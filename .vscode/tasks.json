@@ -2,28 +2,26 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-            "label": "build Debug",
-            "command": "dotnet",
-            "type": "process",
+			"label": "build Debug",
+			"command": "dotnet",
+			"type": "process",
 			"group": "build",
-            "args": [
-                "build",
-                "${workspaceFolder}/LenowoTweeks.slnx"
-            ],
-            "problemMatcher": "$msCompile"
-        },
+			"args": [
+				"build",
+				"LenowoTweeks.slnx",
+				"-c",
+				"Debug"
+			],
+			"problemMatcher": "$msCompile"
+		},
 		{
-            "label": "build Release",
-            "command": "dotnet",
+			"label": "build Release",
+			"command": "build",
 			"group": "build",
-            "type": "process",
-            "args": [
-                "build",
-                "${workspaceFolder}/LenowoTweeks.slnx",
-                "-c",
-                "Release"
-            ],
-            "problemMatcher": "$msCompile"
-        }
+			"type": "process",
+			"args": [
+			],
+			"problemMatcher": "$msCompile"
+		}
 	]
 }

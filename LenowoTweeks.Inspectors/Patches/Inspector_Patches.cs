@@ -317,7 +317,7 @@ public class WorkerInspector_Patches
 			ui.NestInto(UIVerticalLayout);
 			LoadContextMenuBuilder(ui, UIVerticalLayout, ComponentView, PanelRoot);
 		};
-		
+
 		SetUIColor(ui, LenowoTweeks_Core.primaryUIColor.Value);
 
 		var SpriteProviderButton = ui.Button("Sprite Provider");
@@ -787,7 +787,7 @@ public class WorkerInspector_Patches
 		var field = hl.Slot.AttachComponent<TypeField>();
 		field.Type.Value = defaultVal;
 		SyncMemberEditorBuilder.BuildField(field.Type, null, hl.Slot, null);
-		
+
 		hl.Slot.AttachComponent<Image>().Sprite.Target = ui.Style.ButtonSprite;
 		hl.Slot.GetComponent<Image>().NineSliceSizing.Value = NineSliceSizing.FixedSize;
 		hl.Slot.Name = name;
