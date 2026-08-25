@@ -1,9 +1,9 @@
 <Solution>
 	<!-- These get compiled by AllModules, so no point compiling them beforehand i guess -->
-	<!-- <Project Path="LenowoTweeks.Core\LenowoTweeks.Core.csproj" />
+	<Project Path="LenowoTweeks.Core\LenowoTweeks.Core.csproj" />
 	<Project Path="LenowoTweeks.General\LenowoTweeks.General.csproj" />
 	<Project Path="LenowoTweeks.Inspectors\LenowoTweeks.Inspectors.csproj" />
-	<Project Path="LenowoTweeks.ProtoFlux\LenowoTweeks.ProtoFlux.csproj" /> -->
+	<Project Path="LenowoTweeks.ProtoFlux\LenowoTweeks.ProtoFlux.csproj" />
 
 	<Project Path="LenowoTweeks.AllModules\LenowoTweeks.AllModules.csproj" />
 
