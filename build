@@ -10,8 +10,30 @@ DIR=$(dirname "$0")
 # Clean up first, can prevent meaningless errors, at the cost of a slight bit more time to build.
 $DIR/clean
 
+
 echo "Building Modules..."
 dotnet build $DIR/LenowoTweeks.AllModules/LenowoTweeks.AllModules.csproj -c $1
+
+if [[ "$1" == "Release" ]] then
+	OUTPUT=$DIR/output
+	mkdir $OUTPUT
+
+	cp -r $DIR/LenowoTweeks.AllModules/bin/Release/net10.0/Files/* $OUTPUT/
+	cp $DIR/LenowoTweeks.AllModules/bin/Release/net10.0/LenowoTweeks.All.zip $OUTPUT/LenowoTweeks.All.zip
+
+	echo "Creating SingleFile dll..."
+
+	# ilrepack \
+	# 	/lib:"$HOME/.nuget/packages/lib.harmony/2.4.2/net10.0/0Harmony.dll" \
+	# 	/lib:"$HOME/.nuget/packages/ResoniteModLoader/5.0.1/net10.0/ResoniteModLoader.dll" \
+	# 	/out:"$OUTPUT/LenowoTweeks.dll" \
+	# 	"$OUTPUT/LenowoTweeks.Core.dll" \
+	# 	"$OUTPUT/LenowoTweeks.General.dll" \
+	# 	"$OUTPUT/LenowoTweeks.Inspectors.dll" \
+	# 	"$OUTPUT/LenowoTweeks.ProtoFlux.dll"
+
+fi
+
 
 echo "Building Config Updater..."
 dotnet build $DIR/LenowoTweeks.ConfigUpdater/LenowoTweeks.ConfigUpdater.csproj -c $1

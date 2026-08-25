@@ -5,6 +5,8 @@
 # Avoid problems with not being in the same directory when running this script
 DIR=$(dirname "$0")
 
+rm -rf $DIR/output/
+
 # This could probably be a loop..
 rm -rf $DIR/LenowoTweeks.AllModules/bin/
 rm -rf $DIR/LenowoTweeks.AllModules/obj/
