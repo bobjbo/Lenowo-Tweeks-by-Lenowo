@@ -39,6 +39,23 @@ public class PrimitiveFields_Patch
 
 		try
 		{
+			if (LenowoTweeks_Inspectors.copyComponentsToButtons.Value)
+			{
+				Slot memberActionRef = Helpers.GetConfigReference<Slot>(__instance.LocalUser, "UIComponents.MemberAction");
+				if (memberActionRef != null)
+				{
+					Panel.CopyComponents(memberActionRef);
+				}
+				Slot fieldRef = Helpers.GetConfigReference<Slot>(__instance.LocalUser, "UIComponents.Field");
+				if (fieldRef != null)
+				{
+					var allButtons = __instance.Slot.GetComponentsInChildren<Button>().Select(c => c.Slot);
+					foreach (var button in allButtons)
+					{
+						button.CopyComponents(fieldRef);
+					}
+				}
+			}
 			if (LenowoTweeks_Inspectors.modifiedInspectorUIX.Value)
 			{
 				var valueType = ____target.Target.ValueType;
@@ -62,28 +79,9 @@ public class PrimitiveFields_Patch
 				Panel.FindChildInHierarchy("Left").Destroy();
 				Panel.FindChild("Text").GetComponent<RectTransform>().AnchorMin.Value = new float2(0.01f, 0);
 			}
-			if (LenowoTweeks_Inspectors.copyComponentsToButtons.Value)
-			{
-				Slot memberActionRef = Helpers.GetConfigReference<Slot>(__instance.LocalUser, "UIComponents.MemberAction");
-				if (memberActionRef != null)
-				{
-					Panel.CopyComponents(memberActionRef);
-				}
-			}
 		} catch { }
 
-		if (LenowoTweeks_Inspectors.copyComponentsToButtons.Value)
-		{
-			Slot fieldRef = Helpers.GetConfigReference<Slot>(__instance.LocalUser, "UIComponents.Field");
-			if (fieldRef != null)
-			{
-				var allButtons = __instance.Slot.GetComponentsInChildren<Button>().Select(c => c.Slot);
-				foreach (var button in allButtons)
-				{
-					button.CopyComponents(fieldRef);
-				}
-			}
-		}
+		
 
 		if (!LenowoTweeks_Inspectors.expandedStringInputs.Value) return;
 
