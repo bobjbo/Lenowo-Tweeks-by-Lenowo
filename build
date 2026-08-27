@@ -26,4 +26,6 @@ fi
 echo "Building Config Updater..."
 dotnet build $DIR/LenowoTweeks.ConfigUpdater/LenowoTweeks.ConfigUpdater.csproj -c $1
 
+cp $DIR/LenowoTweeks.ConfigUpdater/bin/$1/net10.0/LenowoTweeks.ConfigUpdater.dll $OUTPUT/
+
 echo "Finished Building!"
