@@ -23,7 +23,7 @@ namespace LenowoTweeks.ProtoFlux;
 public class LenowoTweeks_ProtoFlux : LenowoTweak
 {
 	private static Assembly ModAssembly => typeof(LenowoTweeks_ProtoFlux).Assembly;
-	internal const string VERSION_CONSTANT = "2.0.1";
+	internal const string VERSION_CONSTANT = "2.0.2";
 	const string ModName = "Lenowo Tweeks (ProtoFlux)";
 
 	public override string ModuleName => "ProtoFlux";

@@ -81,7 +81,7 @@ public class LenowoTweeks_Inspectors : LenowoTweak
 		{
 			"Inspectors", new()
 			{
-				{ "Base", [ modifiedInspectorUIX, fieldNameMode, copyComponentsToButtons, nohelp, expandedStringInputs, slotInspectorResetAll, defaultUIXPanelColor, variableSpaceForWorkers ] },
+				{ "Base", [ modifiedInspectorUIX, fieldNameMode, /*copyComponentsToButtons,*/ nohelp, expandedStringInputs, slotInspectorResetAll, defaultUIXPanelColor, variableSpaceForWorkers ] },
 				{ "Components", [ collapseComponents, collapsedComponentColor, expandedComponentColor, modifiedComponentHeaders, dynvarComponentHeaderName ]},
 				{ "Lists", [ listCollapsing, maxListElementsForAutoCollapse, bagCollapsing, maxBagElementsForAutoCollapse ]},
 				{ "Blendshapes", [ displayIndexWithBlendshape, allowSearchingBlendshapes ] },

@@ -195,7 +195,7 @@ public class PrimitiveFields_Patch
 	[HarmonyPatch(typeof(QuaternionMemberEditor), "BuildUI")]
 	public static void QuatragidyPostfix(QuaternionMemberEditor __instance, RelayRef<IField> ____target)
 	{
-		if (!LenowoTweeks_Inspectors.modifiedInspectorUIX.Value) return;
+		if (!LenowoTweeks_Inspectors.modifiedInspectorUIX.Value && !LenowoTweeks_Inspectors.copyComponentsToButtons.Value) return;
 		if (__instance.World.IsUserspace())
 		{
 			var parentDynSpace = __instance.Slot.GetComponentInParents<DynamicVariableSpace>();
