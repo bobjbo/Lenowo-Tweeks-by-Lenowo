@@ -122,14 +122,14 @@ public static class GetItemLinkPatch
 		}
 	}
 
-	static InventoryBrowser? invBrowserInstance;
+	static List<InventoryBrowser> invBrowserInstances = [];
 
 	[HarmonyPostfix]
 	[HarmonyPatch("OnAwake")]
 	public static void InitializeSyncMembersPostfix(InventoryBrowser __instance)
 	{
 		if (__instance.World != Userspace.UserspaceWorld) return;
-		invBrowserInstance = __instance;
+		invBrowserInstances.Add(__instance);
 		SetupConfigChanges();
 	}
 
@@ -141,21 +141,24 @@ public static class GetItemLinkPatch
 
 	public static void GetItemLinkOnChanges(object? newValue)
 	{
-		if (invBrowserInstance == null) return;
-		if (LenowoTweeks_General.getItemLink.Value)
+		foreach (var instance in invBrowserInstances)
 		{
-			Traverse.Create(invBrowserInstance).Field<Sync<InventoryBrowser.SpecialItemType>>("_lastSpecialItemType").Value.Value = UniqueSIT;
-		}
-		else
-		{
-			var buttonsRoot = Traverse.Create(invBrowserInstance).Field<SyncRef<Slot>>("_buttonsRoot").Value;
-			if (buttonsRoot == null) return;
-			if (buttonsRoot.Target == null) return;
-			if (buttonsRoot.Target.ChildrenCount == 0) return;
-			Slot buttonRoot = buttonsRoot.Target[0];
-			if (buttonRoot == null) return;
-			Slot buttons = buttonRoot.FindChild(ButtonsRootName);
-			buttons?.Destroy();
+			if (instance == null) continue;
+			if (LenowoTweeks_General.getItemLink.Value)
+			{
+				Traverse.Create(instance).Field<Sync<InventoryBrowser.SpecialItemType>>("_lastSpecialItemType").Value.Value = UniqueSIT;
+			}
+			else
+			{
+				var buttonsRoot = Traverse.Create(instance).Field<SyncRef<Slot>>("_buttonsRoot").Value;
+				if (buttonsRoot == null) return;
+				if (buttonsRoot.Target == null) return;
+				if (buttonsRoot.Target.ChildrenCount == 0) return;
+				Slot buttonRoot = buttonsRoot.Target[0];
+				if (buttonRoot == null) return;
+				Slot buttons = buttonRoot.FindChild(ButtonsRootName);
+				buttons?.Destroy();
+			}
 		}
 	}
 
