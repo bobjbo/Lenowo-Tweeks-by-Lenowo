@@ -106,7 +106,7 @@ public class LenowoTweeks_ProtoFlux : LenowoTweak
 		},
 #endif
 	};
-	
+
 	public override ModConfiguration? GetConfig => instance.GetConfiguration();
 	public override Dictionary<string, Dictionary<string, List<ModConfigKey>>> GetKeys => SortedConfigKeys;
 	public override int ConfigOrder => -7;

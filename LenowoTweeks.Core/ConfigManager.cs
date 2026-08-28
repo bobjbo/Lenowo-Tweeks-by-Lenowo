@@ -83,7 +83,7 @@ public class ConfigUIBuilder()
 
 	public ConfigUIBuilder(IEnumerable<LenowoTweak> modules) : this()
 	{
-		CurModules = [..modules];
+		CurModules = [.. modules];
 		CurModules.Sort((a, b) => a.ConfigOrder - b.ConfigOrder);
 		mappings = CurModules
 			.Where(m => m.GetConfig != null)

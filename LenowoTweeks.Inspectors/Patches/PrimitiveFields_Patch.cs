@@ -81,7 +81,7 @@ public class PrimitiveFields_Patch
 			}
 		} catch { }
 
-		
+
 
 		if (!LenowoTweeks_Inspectors.expandedStringInputs.Value) return;
 

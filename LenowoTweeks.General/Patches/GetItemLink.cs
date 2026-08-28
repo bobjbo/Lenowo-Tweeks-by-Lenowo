@@ -1,10 +1,12 @@
-using Elements.Core;
-using FrooxEngine;
-using FrooxEngine.UIX;
-using HarmonyLib;
-using FrooxEngine.Store;
-
 using System.Reflection;
+
+using Elements.Core;
+
+using FrooxEngine;
+using FrooxEngine.Store;
+using FrooxEngine.UIX;
+
+using HarmonyLib;
 
 namespace LenowoTweeks.General;
 
@@ -37,13 +39,13 @@ public static class GetItemLinkPatch
 		if (!LenowoTweeks_General.getItemLink.Value) return;
 		if (__instance.World != Userspace.UserspaceWorld) return;
 		if (__state == InventoryBrowser.ClassifyItem(currentItem as InventoryItemUI) || __state != UniqueSIT) return;
-		
+
 		Slot buttonRoot = ____buttonsRoot.Target[0];
 		UIBuilder ui = new(buttonRoot);
 		RadiantUI_Constants.SetupDefaultStyle(ui);
 		var hori = ui.HorizontalLayout(4);
 		hori.Slot.Name = ButtonsRootName;
-		
+
 		// Weird workaround to force UIX reflow, otherwise buttons are invisible
 		hori.PaddingLeft.Value = 1;
 		__instance.RunInUpdates(0, () =>
@@ -98,7 +100,7 @@ public static class GetItemLinkPatch
 		bool enableButtons = __instance.SelectedInventoryItem != null;
 		Slot buttons = buttonRoot.FindChild(ButtonsRootName);
 		if (buttons == null) return;
-		
+
 		foreach (var child in buttons.Children)
 		{
 			if (child.Tag == GetAssetTag)
