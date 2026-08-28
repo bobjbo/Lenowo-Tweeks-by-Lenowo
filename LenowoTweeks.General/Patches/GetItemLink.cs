@@ -1,5 +1,6 @@
 using System.Reflection;
 
+using Elements.Assets;
 using Elements.Core;
 
 using FrooxEngine;
@@ -121,13 +122,41 @@ public static class GetItemLinkPatch
 		}
 	}
 
+	static InventoryBrowser? invBrowserInstance;
+
 	[HarmonyPostfix]
 	[HarmonyPatch("OnAwake")]
-	public static void InitializeSyncMembersPostfix(InventoryBrowser __instance, Sync<InventoryBrowser.SpecialItemType> ____lastSpecialItemType)
+	public static void InitializeSyncMembersPostfix(InventoryBrowser __instance)
 	{
-		if (!LenowoTweeks_General.getItemLink.Value) return;
 		if (__instance.World != Userspace.UserspaceWorld) return;
-		____lastSpecialItemType.Value = UniqueSIT;
+		invBrowserInstance = __instance;
+		SetupConfigChanges();
+	}
+
+	public static void SetupConfigChanges()
+	{
+		LenowoTweeks_General.getItemLink.ConfigKey.OnChanged += GetItemLinkOnChanges;
+		GetItemLinkOnChanges(LenowoTweeks_General.getItemLink.Value);
+	}
+
+	public static void GetItemLinkOnChanges(object? newValue)
+	{
+		if (invBrowserInstance == null) return;
+		if (LenowoTweeks_General.getItemLink.Value)
+		{
+			Traverse.Create(invBrowserInstance).Field<Sync<InventoryBrowser.SpecialItemType>>("_lastSpecialItemType").Value.Value = UniqueSIT;
+		}
+		else
+		{
+			var buttonsRoot = Traverse.Create(invBrowserInstance).Field<SyncRef<Slot>>("_buttonsRoot").Value;
+			if (buttonsRoot == null) return;
+			if (buttonsRoot.Target == null) return;
+			if (buttonsRoot.Target.ChildrenCount == 0) return;
+			Slot buttonRoot = buttonsRoot.Target[0];
+			if (buttonRoot == null) return;
+			Slot buttons = buttonRoot.FindChild(ButtonsRootName);
+			buttons?.Destroy();
+		}
 	}
 
 	public static void AddButton(ButtonEventHandler onPress, string tag, colorX tint, Uri sprite, UIBuilder ui)
@@ -140,7 +169,7 @@ public static class GetItemLinkPatch
 		buttonSlot[0].GetComponent<Image>().Tint.Value = colorX.Black;
 
 		// https://github.com/Psychpsyo/Tooltippery Support, implemented based on the readme
-		buttonSlot.AttachComponent<FrooxEngine.Comment>().Text.Value = "TooltipperyLabel:" + tag;
+		buttonSlot.AttachComponent<Comment>().Text.Value = "TooltipperyLabel:" + tag;
 	}
 
 	public static void ItemLink(IButton button, InventoryItemUI Item, bool type)
