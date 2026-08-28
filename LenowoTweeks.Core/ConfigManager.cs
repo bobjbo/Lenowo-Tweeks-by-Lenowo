@@ -1,5 +1,6 @@
 #pragma warning disable CS8603 // Possible null reference return.
 
+using System.Collections.Immutable;
 using System.Reflection;
 
 using Elements.Core;
@@ -13,6 +14,8 @@ using ResoniteModLoader;
 // i would say its worth it though
 
 namespace LenowoTweeks.Core;
+
+using KeyType = Dictionary<string, Dictionary<string, List<ModConfigKey>>>;
 
 #region Config Types
 public class ModConfigKey
@@ -72,22 +75,67 @@ public class ModConfigKey<T> : ModConfigKey
 #region Config UI Builder
 public class ConfigUIBuilder()
 {
-	public ModConfiguration? ThisConfig;
+	public List<LenowoTweak> CurModules = [];
+	public Dictionary<LenowoTweak, KeyValuePair<ModConfiguration, KeyType>> mappings = [];
+	public Dictionary<ModConfiguration, List<ModConfigKey>> keyMappings = [];
 
 	public int currentConfigIndex = 0;
 
-	public ConfigUIBuilder(ModConfiguration? config) : this()
+	public ConfigUIBuilder(IEnumerable<LenowoTweak> modules) : this()
 	{
-		ThisConfig = config;
+		CurModules = [..modules];
+		CurModules.Sort((a, b) => a.ConfigOrder - b.ConfigOrder);
+		mappings = CurModules
+			.Where(m => m.GetConfig != null)
+			.ToDictionary(
+				keySelector: (m) => m,
+				elementSelector: (m) => new KeyValuePair<ModConfiguration, KeyType>(m.GetConfig, m.GetKeys)
+			);
+		keyMappings = [];
+		foreach (var mapping in mappings)
+		{
+			var triplelist = mapping.Value.Value.Select(v1 => v1.Value.Select(v2 => v2.Value));
+			List<List<ModConfigKey>> doublelist = [];
+			foreach (var v in triplelist) doublelist.AddRange(v);
+			List<ModConfigKey> singlelist = [];
+			foreach (var v in doublelist) singlelist.AddRange(v);
+			keyMappings.Add(mapping.Value.Key, singlelist);
+		}
 	}
 
-	public void BuildConfigUI(UIBuilder ui, Dictionary<string, Dictionary<string, List<ModConfigKey>>> configKeys)
+	public void BuildConfigUI(UIBuilder ui)
 	{
-		if (ThisConfig == null) return;
+		if (mappings.Count == 0) return;
+
+		KeyType mergedConfigs = [];
+		foreach (var kv in mappings)
+		{
+			var keys = kv.Value.Value;
+			foreach (var kv2 in keys)
+			{
+				if (!mergedConfigs.TryGetValue(kv2.Key, out var kv3))
+				{
+					kv3 = [];
+					mergedConfigs.Add(kv2.Key, kv3);
+				}
+				foreach (var values in kv2.Value)
+				{
+					if (!kv3.TryGetValue(values.Key, out var kv4))
+					{
+						kv4 = [];
+						kv3.Add(values.Key, kv4);
+					}
+					kv4.AddRange(values.Value.Where((v) => !kv4.Contains(v)));
+				}
+			}
+		}
+		var sortedList = mergedConfigs.ToList();
+		sortedList.Sort((a, b) => (a.Key == "Debug Settings" ? 0 : 1) - (b.Key == "Debug Settings" ? 0 : 1));
+		var sortedDict = sortedList.ToDictionary();
 
 		currentConfigIndex = 0;
 
-		foreach (var kv in configKeys)
+		foreach (var kv in mergedConfigs)
 		{
 			BuildSection(ui, kv.Key, kv.Value);
 		}
@@ -149,7 +197,8 @@ public class ConfigUIBuilder()
 
 	public void BuildGenericField<T>(UIBuilder ui, ModConfigKey<T> key)
 	{
-		if (ThisConfig == null) return; // even though we already do this, the linter doesnt know that. this just tells it that ThisConfig is never null here.
+		ModConfiguration? keyConfig = keyMappings.FirstOrDefault(k => k.Value.Contains(key), new()).Key;
+		if (keyConfig == null) return;
 
 		bool isType = typeof(T) == typeof(Type);
 		if (!(isType || DynamicValueVariable<T>.IsValidGenericType))
@@ -198,7 +247,7 @@ public class ConfigUIBuilder()
 		var initialValue = key.Value;
 
 		syncField.Value = initialValue;
-		syncField.OnValueChange += (syncF) => HandleConfigFieldChange(syncF, ThisConfig, key);
+		syncField.OnValueChange += (syncF) => HandleConfigFieldChange(syncF, keyConfig, key);
 
 		// Validate the value changes
 		// LocalFilter changes the value passed to InternalSetValue

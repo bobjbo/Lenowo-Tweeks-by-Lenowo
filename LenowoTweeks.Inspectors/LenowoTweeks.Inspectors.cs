@@ -90,16 +90,17 @@ public class LenowoTweeks_Inspectors : LenowoTweak
 		}
 	};
 
+	public override ModConfiguration? GetConfig => instance.GetConfiguration();
+	public override Dictionary<string, Dictionary<string, List<ModConfigKey>>> GetKeys => SortedConfigKeys;
+	public override int ConfigOrder => -8;
+
 	public static void GenerateUI(UIBuilder ui)
 	{
-		new ConfigUIBuilder(instance?.GetConfiguration()).BuildConfigUI(ui, SortedConfigKeys);
+		//new ConfigUIBuilder(instance?.GetConfiguration()).BuildConfigUI(ui, SortedConfigKeys);
 	}
 	public static void ModSettings_BuildModUi(UIBuilder ui)
 	{
-		// this is stupid.
-		// - The last mod in the list is likely the most recent version from HotReload. if not hotreloaded, will be the main instance.
-		var mostRecentMod = ModLoader.Mods().Last(m => m.Name == ModName);
-		mostRecentMod.InvokeMethod("GenerateUI", ui);
+		LenowoTweeks_Core.ModSettings_BuildModUi(ui);
 	}
 
 	public override void DefineConfiguration(ModConfigurationDefinitionBuilder builder)

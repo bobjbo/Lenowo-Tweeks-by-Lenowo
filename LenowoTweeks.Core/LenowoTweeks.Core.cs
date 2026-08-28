@@ -54,9 +54,14 @@ public class LenowoTweeks_Core : LenowoTweak
 		}
 	};
 
+	public override ModConfiguration? GetConfig => instance.GetConfiguration();
+	public override Dictionary<string, Dictionary<string, List<ModConfigKey>>> GetKeys => SortedConfigKeys;
+	public override int ConfigOrder => -10;
+
 	public static void GenerateUI(UIBuilder ui)
 	{
-		new ConfigUIBuilder(instance?.GetConfiguration()).BuildConfigUI(ui, SortedConfigKeys);
+		var asClass = RegisteredModules.Cast<LenowoTweak>();
+		new ConfigUIBuilder(asClass).BuildConfigUI(ui);
 	}
 	public static void ModSettings_BuildModUi(UIBuilder ui)
 	{
