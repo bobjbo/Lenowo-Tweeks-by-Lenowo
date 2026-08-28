@@ -130,12 +130,12 @@ public class ConfigUIBuilder()
 			}
 		}
 		var sortedList = mergedConfigs.ToList();
-		sortedList.Sort((a, b) => (a.Key == "Debug Settings" ? 0 : 1) - (b.Key == "Debug Settings" ? 0 : 1));
+		sortedList.Sort((a, b) => (a.Key == "Debug Settings" ? 1 : 0) - (b.Key == "Debug Settings" ? 1 : 0));
 		var sortedDict = sortedList.ToDictionary();
 
 		currentConfigIndex = 0;
 
-		foreach (var kv in mergedConfigs)
+		foreach (var kv in sortedDict)
 		{
 			BuildSection(ui, kv.Key, kv.Value);
 		}

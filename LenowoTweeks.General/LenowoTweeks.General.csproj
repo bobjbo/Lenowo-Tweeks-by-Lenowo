@@ -38,6 +38,7 @@
 
 	<ItemGroup>
 		<ResoniteReference Include="FrooxEngine" />
+		<ResoniteReference Include="FrooxEngine.Store" />
 		<ResoniteReference Include="Elements.Core" />
 		<ResoniteReference Include="Elements.Assets" />
 		<ResoniteReference Include="Renderite.Shared" />

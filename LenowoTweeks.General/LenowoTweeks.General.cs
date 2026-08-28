@@ -19,7 +19,7 @@ namespace LenowoTweeks.General;
 public class LenowoTweeks_General : LenowoTweak
 {
 	private static Assembly ModAssembly => typeof(LenowoTweeks_General).Assembly;
-	internal const string VERSION_CONSTANT = "2.0.1";
+	internal const string VERSION_CONSTANT = "2.0.2";
 	const string ModName = "Lenowo Tweeks (General)";
 
 	public override string ModuleName => "General";
@@ -37,6 +37,8 @@ public class LenowoTweeks_General : LenowoTweak
 	public static ModConfigKey<ValueFieldDropMode> valueFieldDroppingMode = new("Valuefield Dropping Mode", "This controls how ValueFields are allowed to drop into TextFields.\t <size=90%>AlwaysAllow = Works as normal, AllowIfNotSelf = Prevent ValueFields under the same ObjectRoot as the TextField, NeverAllow = Never drop ValueFields</size>", ValueFieldDropMode.AlwaysAllow);
 	public static ModConfigKey<string> worldSearchGlobalTags = new("Global World Search Filter", "Global Tags to apply to all world searches.", "", "World Search Global Tags");
 
+	public static ModConfigKey<bool> getItemLink = new("Get Item Link", "If enabled, adds some buttons to the dash for getting a resdb or resrec. Same as the GetItemLink mod, but part of here for rml support", false);
+
 	public static ModConfiguration? Config;
 
 	public static readonly Dictionary<string, Dictionary<string, List<ModConfigKey>>> SortedConfigKeys = new()
@@ -44,7 +46,7 @@ public class LenowoTweeks_General : LenowoTweak
 		{
 			"General", new()
 			{
-				{ "Base", [ valueFieldDroppingMode, worldSearchGlobalTags ] }
+				{ "Base", [ valueFieldDroppingMode, worldSearchGlobalTags, getItemLink ] }
 			}
 		}
 	};
