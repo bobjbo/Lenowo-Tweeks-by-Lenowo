@@ -30,7 +30,6 @@ public static class GetItemLinkPatch
 	[HarmonyPatch("OnItemSelected")]
 	public static void OnItemSelectedPrefix(ref InventoryBrowser.SpecialItemType __state, Sync<InventoryBrowser.SpecialItemType> ____lastSpecialItemType)
 	{
-		if (!LenowoTweeks_General.getItemLink.Value) return;
 		__state = ____lastSpecialItemType.Value;
 	}
 	[HarmonyPostfix]
@@ -39,7 +38,8 @@ public static class GetItemLinkPatch
 	{
 		if (!LenowoTweeks_General.getItemLink.Value) return;
 		if (__instance.World != Userspace.UserspaceWorld) return;
-		if (__state == InventoryBrowser.ClassifyItem(currentItem as InventoryItemUI) || __state != UniqueSIT) return;
+		var classified = InventoryBrowser.ClassifyItem(currentItem as InventoryItemUI);
+		if (!(__state != classified || classified == InventoryBrowser.SpecialItemType.World || __state == UniqueSIT)) return;
 
 		Slot buttonRoot = ____buttonsRoot.Target[0];
 		UIBuilder ui = new(buttonRoot);
