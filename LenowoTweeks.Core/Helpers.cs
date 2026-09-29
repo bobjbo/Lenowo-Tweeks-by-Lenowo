@@ -119,7 +119,7 @@ public static class Helpers
 		if (runner.IsLocalUser)
 		{
 			Slot versionsSlot = userConfig.FindChildOrAdd("Versions");
-			foreach (var module in LenowoTweeks_Core.RegisteredModules)
+			foreach (var module in LenowoTweeks_Core.LoadedTweaks)
 			{
 				versionsSlot.FindChildOrAdd(module.ModuleName).Tag = module.ModuleVersion;
 			}
