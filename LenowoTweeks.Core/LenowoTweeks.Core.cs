@@ -60,8 +60,10 @@ public class LenowoTweeks_Core : LenowoTweak
 
 	public static void GenerateUI(UIBuilder ui)
 	{
+		var allMods = ModLoader.Mods();
 		var asClass = RegisteredModules.Cast<LenowoTweak>();
-		new ConfigUIBuilder(asClass).BuildConfigUI(ui);
+		var mostRecentModules = asClass.Select(t => (LenowoTweak)allMods.LastOrDefault(m => m.Name == t.Name, t));
+		new ConfigUIBuilder(mostRecentModules).BuildConfigUI(ui);
 	}
 	public static void ModSettings_BuildModUi(UIBuilder ui)
 	{
