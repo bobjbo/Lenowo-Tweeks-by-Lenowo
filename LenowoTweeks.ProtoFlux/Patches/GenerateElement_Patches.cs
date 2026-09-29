@@ -121,7 +121,6 @@ public class GenerateElement_Patches
 				if (tex1 != null)
 				{
 					SpriteProvider newSpriteProvider = spriteAssetSlot.AttachComponent<SpriteProvider>();
-					newSpriteProvider.Rect.Value = rect;
 					newSpriteProvider.Borders.Value = borders;
 
 					var newItem = multiDriverNormal.Drives.Add();
@@ -132,12 +131,12 @@ public class GenerateElement_Patches
 					e1.Target = newSpriteProvider;
 				}
 			}
+			e1.Target.Rect.Value = rect;
 			if (e2.Target == null)
 			{
 				if (tex2 != null)
 				{
 					SpriteProvider newSpriteProvider2 = spriteAssetSlot.AttachComponent<SpriteProvider>();
-					newSpriteProvider2.Rect.Value = rect;
 					newSpriteProvider2.Borders.Value = borders;
 
 					var newItem = multiDriverAlt.Drives.Add();
@@ -148,6 +147,7 @@ public class GenerateElement_Patches
 					e2.Target = newSpriteProvider2;
 				}
 			}
+			e2.Target.Rect.Value = rect;
 		}
 
 
