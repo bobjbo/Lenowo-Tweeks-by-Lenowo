@@ -17,6 +17,9 @@ namespace LenowoTweeks.Inspectors.Patches;
 [HarmonyPatch]
 public class WorkerInspector_Patch
 {
+	// would very much rather this be a transpiler patch, as then its a little better with updates
+	// this would force a lot of this to change though, to account for it.
+	// not 100% sure how to go about this, so for now i will not
 	[HarmonyPrefix]
 	[HarmonyPatch(typeof(WorkerInspector), "BuildUIForComponent")]
 	public static bool BuildUIForComponent(WorkerInspector __instance, SyncRef<Worker> ____targetWorker, Worker worker, bool allowRemove = true, bool allowDuplicate = true, bool allowContainer = false, Predicate<ISyncMember> memberFilter = null)
@@ -25,7 +28,6 @@ public class WorkerInspector_Patch
 		// also only filter if the inspector is not owned by host
 		if (__instance.LocalUser.IsHost && !Helpers.ModShouldRun(__instance.Slot.Parent.GetObjectRoot())) return true;
 
-		// possibly prevent error crashing shit
 		try
 		{
 			if (__instance == null || __instance.IsRemoved || __instance.Slot == null || __instance.Slot.IsRemoved || worker == null || worker.IsRemoved) return false;
@@ -34,6 +36,40 @@ public class WorkerInspector_Patch
 			RadiantUI_Constants.SetupEditorStyle(ui);
 			ui.Style.RequireLockInToPress = true;
 			Slot componentVL = ui.VerticalLayout(6f).Slot;
+			if (LenowoTweeks_Inspectors.sortComponentsByUpdateOrder.Value)
+			{
+				if (worker is Component c)
+				{
+					componentVL.OrderOffset = c.UpdateOrder * 10;
+					if (LenowoTweeks_Inspectors.commentsAsHeaders.Value && c is Comment comment)
+					{
+						componentVL.OrderOffset -= 5;
+					}
+				}
+				else if (worker is Slot)
+				{
+					componentVL.OrderOffset = long.MinValue;
+				}
+			}
+			if (LenowoTweeks_Inspectors.commentsAsHeaders.Value)
+			{
+				if (worker is Comment comment)
+				{
+					var headerSlot = ui.VerticalLayout().Slot;
+					var headerText = ui.Text(comment.Text.Value);
+					ui.NestOut();
+					var headerLayout = headerSlot.GetComponent<LayoutElement>();
+					headerLayout.MinHeight.Value = 48;
+					headerSlot.AttachComponent<ContentSizeFitter>().VerticalFit.Value = SizeFit.PreferredSize;
+					headerSlot.OrderOffset = long.MaxValue;
+					headerText.HorizontalAutoSize.Value = true;
+					headerSlot.Name = "Header";
+					comment.Text.OnValueChange += (v) =>
+					{
+						headerText.Content.Value = comment.Text;	
+					};
+				}
+			}
 			if (worker is not Slot)
 			{
 				ui.Style.MinHeight = 32f;
@@ -191,7 +227,7 @@ public class WorkerInspector_Patch
 	{
 		if (!LenowoTweeks_Inspectors.variableSpaceForWorkers.Value) return;
 		__instance.Slot.AttachComponent<DynamicVariableSpace>();
-		DynamicVariableHelper.CreateVariable<bool>(__instance.Slot, "IsWorkerInspector", true, false);
+		DynamicVariableHelper.CreateVariable<bool>(__instance.Slot.GetObjectRoot(), "IsWorkerInspector", true, false);
 	}
 
 	public static void AddHeaderText(UIBuilder ui, InspectorHeaderAttribute header)
