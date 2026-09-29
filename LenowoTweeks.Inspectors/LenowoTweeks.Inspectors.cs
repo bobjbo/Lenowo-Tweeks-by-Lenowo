@@ -97,10 +97,6 @@ public class LenowoTweeks_Inspectors : LenowoTweak
 	public override Dictionary<string, Dictionary<string, List<ModConfigKey>>> GetKeys => SortedConfigKeys;
 	public override int ConfigOrder => -8;
 
-	public static void GenerateUI(UIBuilder ui)
-	{
-		//new ConfigUIBuilder(instance?.GetConfiguration()).BuildConfigUI(ui, SortedConfigKeys);
-	}
 	public static void ModSettings_BuildModUi(UIBuilder ui)
 	{
 		LenowoTweeks_Core.ModSettings_BuildModUi(ui);
