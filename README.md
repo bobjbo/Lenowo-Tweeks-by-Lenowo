@@ -1,6 +1,6 @@
 # Lenowo Tweeks
 
-# PARTS OF THIS MOD REQUIRE "MYINSPECTORS" AND/OR "CUSTOMITEMSLIB"
+# PARTS OF THIS MOD REQUIRE [MYINSPECTORS](https://github.com/art0007i/MyInspectors)
 
 A [ResoniteModLoader](https://github.com/resonite-modding-group/ResoniteModLoader) mod for [Resonite](https://resonite.com/) that does things we want. :3
 
