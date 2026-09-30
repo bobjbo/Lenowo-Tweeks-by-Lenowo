@@ -11,6 +11,8 @@ using Elements.Core;
 using FrooxEngine.UIX;
 
 using LenowoTweeks.Core;
+using LenowoTweeks.Inspectors.Patches;
+
 
 
 
@@ -57,8 +59,8 @@ public class LenowoTweeks_Inspectors : LenowoTweak
 	public static ModConfigKey<string> dynvarComponentHeaderName = new("Dynvar Component Header Name", "Replaces ['Variable','Field','Reference'] with the provided text on dynamic variables in the component header (Formatted as 'Variable;Field;Reference')", "");
 
 	public static ModConfigKey<bool> sortComponentsByUpdateOrder = new("Sort Components By Update Order", "If components should be sorted by their update order first, rather than by refid", false);
-	public static ModConfigKey<bool> commentsAsHeaders = new("Comments As Headers", "If comments appear as 'component headers'", false);
-
+	public static ModConfigKey<CommentHeaderMode> commentHeaderMode = new("Comment Header Mode", "How comments should appear in inspectors", CommentHeaderMode.Default);
+	
 	public static ModConfigKey<bool> listCollapsing = new("List Collapsing", "If lists should be able to collapse", true);
 	public static ModConfigKey<bool> bagCollapsing = new("Bag Collapsing", "If bags should be able to collapse", true);
 
@@ -85,7 +87,7 @@ public class LenowoTweeks_Inspectors : LenowoTweak
 			"Inspectors", new()
 			{
 				{ "Base", [ modifiedInspectorUIX, fieldNameMode, /*copyComponentsToButtons,*/ nohelp, expandedStringInputs, slotInspectorResetAll, defaultUIXPanelColor, variableSpaceForWorkers ] },
-				{ "Components", [ collapseComponents, collapsedComponentColor, expandedComponentColor, modifiedComponentHeaders, dynvarComponentHeaderName, sortComponentsByUpdateOrder, commentsAsHeaders ]},
+				{ "Components", [ collapseComponents, collapsedComponentColor, expandedComponentColor, modifiedComponentHeaders, dynvarComponentHeaderName, sortComponentsByUpdateOrder, commentHeaderMode ]},
 				{ "Lists", [ listCollapsing, maxListElementsForAutoCollapse, bagCollapsing, maxBagElementsForAutoCollapse ]},
 				{ "Blendshapes", [ displayIndexWithBlendshape, allowSearchingBlendshapes ] },
 				{ "Actions", [ enableAddChildrenBuilder, childrenBuilderOnlyUIX ] }

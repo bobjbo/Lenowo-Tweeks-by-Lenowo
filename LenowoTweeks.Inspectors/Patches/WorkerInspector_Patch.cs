@@ -13,6 +13,24 @@ using LenowoTweeks.Core;
 
 namespace LenowoTweeks.Inspectors.Patches;
 
+[Flags]
+public enum CommentHeaderMode
+{
+	Default = ShowComponent, // default functionality
+	DefaultAbove = Default | ComponentAboveOthers, // component above others
+	DefaultHeader = DefaultAbove | TextAbove, // text above component
+	DefaultHeaderBelow = DefaultAbove | TextBelow, // text below component
+	PureHeader = ComponentAboveOthers | TextBelow, // component above others, text below, dont render component
+	
+	// the actual flags
+	ShowComponent = 1,
+	RepositionComponent = 2,
+	HasText = 4,
+	ComponentAboveOthers = RepositionComponent | 8,
+	ComponentBelowOthers = RepositionComponent | 16,
+	TextAbove = HasText | 32,
+	TextBelow = HasText | 64,
+}
 
 [HarmonyPatch]
 public class WorkerInspector_Patch
@@ -36,14 +54,20 @@ public class WorkerInspector_Patch
 			RadiantUI_Constants.SetupEditorStyle(ui);
 			ui.Style.RequireLockInToPress = true;
 			Slot componentVL = ui.VerticalLayout(6f).Slot;
+			var commentMode = LenowoTweeks_Inspectors.commentHeaderMode.Value; 
+			var isComment = worker is Comment;
+			var comment = isComment ? (Comment)worker : null;
 			if (LenowoTweeks_Inspectors.sortComponentsByUpdateOrder.Value)
 			{
 				if (worker is Component c)
 				{
 					componentVL.OrderOffset = c.UpdateOrder * 10;
-					if (LenowoTweeks_Inspectors.commentsAsHeaders.Value && c is Comment comment)
+					if (commentMode.HasFlag(CommentHeaderMode.RepositionComponent) && isComment)
 					{
-						componentVL.OrderOffset -= 5;
+						if (commentMode.HasFlag(CommentHeaderMode.ComponentBelowOthers))
+							componentVL.OrderOffset += 5;
+						else
+							componentVL.OrderOffset -= 5;
 					}
 				}
 				else if (worker is Slot)
@@ -51,26 +75,23 @@ public class WorkerInspector_Patch
 					componentVL.OrderOffset = long.MinValue;
 				}
 			}
-			if (LenowoTweeks_Inspectors.commentsAsHeaders.Value)
+			if (commentMode.HasFlag(CommentHeaderMode.HasText) && isComment)
 			{
-				if (worker is Comment comment)
+				var headerSlot = ui.VerticalLayout().Slot;
+				var headerText = ui.Text(comment.Text.Value);
+				ui.NestOut();
+				var headerLayout = headerSlot.GetComponent<LayoutElement>();
+				headerLayout.MinHeight.Value = 48;
+				headerSlot.AttachComponent<ContentSizeFitter>().VerticalFit.Value = SizeFit.PreferredSize;
+				headerSlot.OrderOffset = commentMode.HasFlag(CommentHeaderMode.TextBelow) ? long.MaxValue : long.MinValue;
+				headerText.HorizontalAutoSize.Value = true;
+				headerSlot.Name = "Header";
+				comment.Text.OnValueChange += (v) =>
 				{
-					var headerSlot = ui.VerticalLayout().Slot;
-					var headerText = ui.Text(comment.Text.Value);
-					ui.NestOut();
-					var headerLayout = headerSlot.GetComponent<LayoutElement>();
-					headerLayout.MinHeight.Value = 48;
-					headerSlot.AttachComponent<ContentSizeFitter>().VerticalFit.Value = SizeFit.PreferredSize;
-					headerSlot.OrderOffset = long.MaxValue;
-					headerText.HorizontalAutoSize.Value = true;
-					headerSlot.Name = "Header";
-					comment.Text.OnValueChange += (v) =>
-					{
-						headerText.Content.Value = comment.Text;	
-					};
-				}
+					headerText.Content.Value = comment.Text;	
+				};
 			}
-			if (worker is not Slot)
+			if (worker is not Slot && (!isComment || commentMode.HasFlag(CommentHeaderMode.ShowComponent) || worker.LocalUser.EditMode))
 			{
 				ui.Style.MinHeight = 32f;
 				ui.HorizontalLayout(4f);
