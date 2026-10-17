@@ -3,20 +3,24 @@
 	"tasks": [
 		{
 			"label": "build Debug",
-			"command": "build",
+			"command": "dotnet",
 			"type": "process",
 			"group": "build",
 			"args": [
+				"build",
+				"-c",
 				"Debug"
 			],
 			"problemMatcher": "$msCompile"
 		},
 		{
 			"label": "build Release",
-			"command": "build",
+			"command": "dotnet",
 			"group": "build",
 			"type": "process",
 			"args": [
+				"build",
+				"-c",
 				"Release"
 			],
 			"problemMatcher": "$msCompile"
