@@ -16,20 +16,17 @@ namespace LenowoTweeks.Inspectors.Patches;
 [Flags]
 public enum CommentHeaderMode
 {
-	Default = ShowComponent, // default functionality
-	DefaultAbove = Default | ComponentAboveOthers, // component above others
-	DefaultHeader = DefaultAbove | TextAbove, // text above component
-	DefaultHeaderBelow = DefaultAbove | TextBelow, // text below component
-	PureHeader = ComponentAboveOthers | TextBelow, // component above others, text below, dont render component
-	
-	// the actual flags
 	ShowComponent = 1,
-	RepositionComponent = 2,
-	HasText = 4,
-	ComponentAboveOthers = RepositionComponent | 8,
-	ComponentBelowOthers = RepositionComponent | 16,
-	TextAbove = HasText | 32,
-	TextBelow = HasText | 64,
+	ComponentAbove = 2,
+	TextAbove = 4,
+	ComponentBelow = 8,
+	TextBelow = 16,
+
+
+	Default = ShowComponent,
+	ComponentHeader = ShowComponent | ComponentAbove | TextAbove,
+	PureHeader = ComponentAbove | TextBelow,
+	
 }
 
 [HarmonyPatch]
@@ -62,9 +59,9 @@ public class WorkerInspector_Patch
 				if (worker is Component c)
 				{
 					componentVL.OrderOffset = c.UpdateOrder * 10;
-					if (commentMode.HasFlag(CommentHeaderMode.RepositionComponent) && isComment)
+					if (isComment && (commentMode.HasFlag(CommentHeaderMode.ComponentAbove) || commentMode.HasFlag(CommentHeaderMode.ComponentBelow)))
 					{
-						if (commentMode.HasFlag(CommentHeaderMode.ComponentBelowOthers))
+						if (commentMode.HasFlag(CommentHeaderMode.ComponentBelow))
 							componentVL.OrderOffset += 5;
 						else
 							componentVL.OrderOffset -= 5;
@@ -75,7 +72,7 @@ public class WorkerInspector_Patch
 					componentVL.OrderOffset = long.MinValue;
 				}
 			}
-			if (commentMode.HasFlag(CommentHeaderMode.HasText) && isComment)
+			if (isComment && (commentMode.HasFlag(CommentHeaderMode.TextAbove) | commentMode.HasFlag(CommentHeaderMode.TextBelow)))
 			{
 				var headerSlot = ui.VerticalLayout().Slot;
 				var headerText = ui.Text(comment.Text.Value);
