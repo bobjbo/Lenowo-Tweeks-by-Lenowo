@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Text.RegularExpressions;
 
+using Elements.Assets;
 using Elements.Core;
 
 using FrooxEngine;
@@ -327,13 +328,28 @@ public class WorkerInspector_Patch
 		{
 			Type spatialType = workerType.GenericTypeArguments[0];
 			string parentName = baseParentType.GetNiceName();
-			string ShapeType = Regex.Replace(parentName, "((?<=[a-z])[A-Z]|[A-Z](?=[a-z]))", " $1").Trim().Split(" ")[0];
+			string ShapeType = SplitByUppercase(parentName)[0];
 
 			headerName = $"<b>{spatialType.GetNiceName()} {ShapeType} Spatial Variable: {spatialVar.VariableName}</b>";
+		}
+
+		else if (worker is CloudVariableBase cloudVar)
+		{
+			// :(
+			string typeName = workerType.GetNiceName();
+			var split = SplitByUppercase(typeName[..typeName.IndexOf("<")]);
+			string varType = split.Last();
+			string activeName = split[0] == "Active" ? "Active " : "";
+			headerName = $"<b>{workerType.GenericTypeArguments[0].GetNiceName()} {activeName}Cloud {varType}: {cloudVar.Path.Value}</b>";
 		}
 		
 
 		return headerName;
+	}
+
+	static string[] SplitByUppercase(string input)
+	{
+		return Regex.Replace(input, "((?<=[a-z])[A-Z]|[A-Z](?=[a-z]))", " $1").Trim().Split(" ");
 	}
 
 
