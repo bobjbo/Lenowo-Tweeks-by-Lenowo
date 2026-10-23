@@ -1,6 +1,8 @@
 using System.Reflection;
 using System.Reflection.Emit;
 
+using Elements.Core;
+
 using FrooxEngine;
 using FrooxEngine.Undo;
 
@@ -95,7 +97,72 @@ public class MemberActionsPatches
 					}
 				});
 			};
-
 		}
+		if (target is ISyncRef fieldRef) {
+			if (fieldRef is IAssetRef assetRef)
+			{
+				menu.AddItem("Create Boolean Asset Driver", (Uri?)null, RadiantUI_Constants.Hero.GREEN).Button.LocalPressed += (_, _) =>
+				{
+					typeof(MemberActionsPatches).GetMethod(nameof(MakeBooleanAssetDriver)).MakeGenericMethod(assetRef.TargetType.GenericTypeArguments[0]).Invoke(null, [assetRef]);
+					menu.Close();
+				};
+			}
+			menu.AddItem("Create Boolean Reference Driver", (Uri?)null, RadiantUI_Constants.Hero.GREEN).Button.LocalPressed += (_, _) =>
+			{
+				typeof(MemberActionsPatches).GetMethod(nameof(MakeBooleanReferenceDriver)).MakeGenericMethod(fieldRef.TargetType).Invoke(null, [fieldRef]);
+				menu.Close();
+			};
+		}
+		else if (target is IField field)
+		{
+			if (typeof(ValueGradientDriver<>).MakeGenericType(field.ValueType).IsValidGenericType(true))
+			{
+				menu.AddItem("Create Gradient Driver", (Uri?)null, RadiantUI_Constants.Hero.GREEN).Button.LocalPressed += (_, _) =>
+				{
+					typeof(MemberActionsPatches).GetMethod(nameof(MakeGradientDriver)).MakeGenericMethod(field.ValueType).Invoke(null, [field]);
+					menu.Close();
+				};
+			}
+			if (typeof(BooleanValueDriver<>).MakeGenericType(field.ValueType).IsValidGenericType(true))
+			{
+				menu.AddItem("Create Boolean Value Driver", (Uri?)null, RadiantUI_Constants.Hero.GREEN).Button.LocalPressed += (_, _) =>
+				{
+					typeof(MemberActionsPatches).GetMethod(nameof(MakeBooleanValueDriver)).MakeGenericMethod(field.ValueType).Invoke(null, [field]);
+					menu.Close();
+				};
+			}
+		}
+	}
+
+	public static void MakeGradientDriver<T>(IField<T> field)
+	{
+		var vgd = field.FindNearestParent<Slot>().AttachComponent<ValueGradientDriver<T>>();
+		vgd.Points.Add().Value.Value = field.Value;
+		var p2 = vgd.Points.Add();
+		p2.Value.Value = field.Value;
+		p2.Position.Value = 1f;
+		vgd.Target.Target = field;
+	}
+
+	public static void MakeBooleanValueDriver<T>(IField<T> field)
+	{
+		var bvd = field.FindNearestParent<Slot>().AttachComponent<BooleanValueDriver<T>>();
+		bvd.FalseValue.Value = field.Value;
+		bvd.TrueValue.Value = field.Value;
+		bvd.TargetField.Target = field;
+	}
+	public static void MakeBooleanReferenceDriver<T>(SyncRef<T> field) where T : class, IWorldElement
+	{
+		var bvd = field.FindNearestParent<Slot>().AttachComponent<BooleanReferenceDriver<T>>();
+		bvd.FalseTarget.Target = field.Target;
+		bvd.TrueTarget.Target = field.Target;
+		bvd.TargetReference.Target = field;
+	}
+	public static void MakeBooleanAssetDriver<T>(AssetRef<T> field) where T : class, IAsset
+	{
+		var bvd = field.FindNearestParent<Slot>().AttachComponent<BooleanAssetDriver<T>>();
+		bvd.FalseTarget.Target = field.Target;
+		bvd.TrueTarget.Target = field.Target;
+		bvd.Target.Target = field;
 	}
 }
