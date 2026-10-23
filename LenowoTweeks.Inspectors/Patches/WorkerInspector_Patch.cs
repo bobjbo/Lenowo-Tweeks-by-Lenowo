@@ -11,6 +11,8 @@ using HarmonyLib;
 
 using LenowoTweeks.Core;
 
+using ProtoFlux.Core;
+
 namespace LenowoTweeks.Inspectors.Patches;
 
 [Flags]
@@ -261,6 +263,11 @@ public class WorkerInspector_Patch
 		Type workerType = worker.GetType();
 		string headerName = "<b>" + workerType.GetNiceName() + "</b>";
 		if (!LenowoTweeks_Inspectors.modifiedComponentHeaders.Value) return headerName;
+
+		// not even 100% sure why but it works so
+		Type baseType = workerType.BaseType;
+		Type baseParentType = baseType.IsGenericType ? baseType.GetGenericTypeDefinition() : baseType;
+
 		if (worker is IDynamicVariable dynVar)
 		{
 			string dynvarCustomHeader = LenowoTweeks_Inspectors.dynvarComponentHeaderName.Value ?? "";
@@ -289,10 +296,43 @@ public class WorkerInspector_Patch
 			}
 			headerName = headerName.Replace("Variable", varHeader);
 		}
-		if (worker is DynamicVariableSpace space)
+		else if (worker is DynamicVariableSpace space)
 		{
 			headerName = $"<b>{space.GetType().GetNiceName()}: {(string.IsNullOrWhiteSpace(space.SpaceName) ? "<i>unset</i>" : space.SpaceName)}</b>";
 		}
+
+		else if (baseParentType == typeof(ParentData<>))
+		{
+			dynamic parentData = worker;
+			string tag = parentData.Tag.Value;
+			Type dataType = workerType.GenericTypeArguments[0];
+			string typeType = typeof(IWorldElement).IsAssignableFrom(dataType) ? "Reference" : "Value";
+			UniLog.Warning($"{tag} / {dataType} / {typeType}");
+			// parent value/reference
+			headerName = $"<b>{dataType.GetNiceName()} Parent {typeType}: {tag}</b>";
+		}
+		else if (baseParentType == typeof(ParentDataLink<>))
+		{
+			// parent value link/reference link
+			dynamic parentData = worker;
+			string tag = parentData.MatchTag.Value;
+			Type dataType = workerType.GenericTypeArguments[0];
+			string typeType = typeof(IWorldElement).IsAssignableFrom(dataType) ? "Reference" : "Value";
+			UniLog.Warning($"{tag} / {dataType} / {typeType}");
+			// parent value/reference
+			headerName = $"<b>{dataType.GetNiceName()} Parent {typeType} Link: {tag}</b>";
+		}
+
+		else if (worker is ISpatialVariable spatialVar)
+		{
+			Type spatialType = workerType.GenericTypeArguments[0];
+			string parentName = baseParentType.GetNiceName();
+			string ShapeType = Regex.Replace(parentName, "((?<=[a-z])[A-Z]|[A-Z](?=[a-z]))", " $1").Trim().Split(" ")[0];
+
+			headerName = $"<b>{spatialType.GetNiceName()} {ShapeType} Spatial Variable: {spatialVar.VariableName}</b>";
+		}
+		
+
 		return headerName;
 	}
 
