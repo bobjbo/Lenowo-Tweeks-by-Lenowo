@@ -265,110 +265,119 @@ public class WorkerInspector_Patch
 		string headerName = "<b>" + workerType.GetNiceName() + "</b>";
 		if (!LenowoTweeks_Inspectors.modifiedComponentHeaders.Value) return headerName;
 
-		// not even 100% sure why but it works so
-		Type baseType = workerType.BaseType;
-		Type baseParentType = baseType.IsGenericType ? baseType.GetGenericTypeDefinition() : baseType;
-
-		var categoryAttribute = workerType.GetCustomAttribute<CategoryAttribute>();
-		string workerCategory = categoryAttribute?.Paths.FirstOrDefault();
-
-		if (worker is IDynamicVariable dynVar)
+		// just in case (so it doesnt break all of component generation)
+		try
 		{
-			string dynvarCustomHeader = LenowoTweeks_Inspectors.dynvarComponentHeaderName.Value ?? "";
-			string[] split = dynvarCustomHeader.Split(';');
-			string varHeader = split.Length >= 1 ? split[0] : "";
-			if (string.IsNullOrEmpty(varHeader)) varHeader = "Variable";
-			string fieldHeader = split.Length >= 2 ? split[1] : "";
-			if (string.IsNullOrEmpty(fieldHeader)) fieldHeader = "Field";
-			string referenceHeader = split.Length >= 3 ? split[2] : "";
-			if (string.IsNullOrEmpty(referenceHeader)) referenceHeader = "Reference";
+			// not even 100% sure why but it works so
+			Type baseType = workerType.BaseType;
+			Type baseParentType = baseType.IsGenericType ? baseType.GetGenericTypeDefinition() : baseType;
 
-			headerName = $"<b>{((workerType == typeof(DynamicTypeVariable) || workerType == typeof(DynamicTypeField)) ? "Type" : workerType.GenericTypeArguments.First().GetNiceName())} Variable: {(string.IsNullOrWhiteSpace(dynVar.VariableName) ? "<i>unset</i>" : dynVar.VariableName)}</b>";
-			string niceName = workerType.GetNiceName();
-			if (niceName.Contains("Variable") && !niceName.Contains("Variable<") && !niceName.Contains("Type"))
+			var categoryAttribute = workerType.GetCustomAttribute<CategoryAttribute>();
+			string workerCategory = categoryAttribute?.Paths.FirstOrDefault();
+
+			if (worker is IDynamicVariable dynVar)
 			{
-				string variableComponentName = niceName.Substring(niceName.IndexOf("Variable"), MathX.Clamp(niceName.IndexOf('<') - niceName.IndexOf("Variable"), 0, 1000));
-				headerName = headerName.Replace("Variable", Regex.Replace(variableComponentName, "(?<!^)([A-Z])", " $1"));
+				string dynvarCustomHeader = LenowoTweeks_Inspectors.dynvarComponentHeaderName.Value ?? "";
+				string[] split = dynvarCustomHeader.Split(';');
+				string varHeader = split.Length >= 1 ? split[0] : "";
+				if (string.IsNullOrEmpty(varHeader)) varHeader = "Variable";
+				string fieldHeader = split.Length >= 2 ? split[1] : "";
+				if (string.IsNullOrEmpty(fieldHeader)) fieldHeader = "Field";
+				string referenceHeader = split.Length >= 3 ? split[2] : "";
+				if (string.IsNullOrEmpty(referenceHeader)) referenceHeader = "Reference";
+
+				headerName = $"<b>{((workerType == typeof(DynamicTypeVariable) || workerType == typeof(DynamicTypeField)) ? "Type" : workerType.GenericTypeArguments.First().GetNiceName())} Variable: {(string.IsNullOrWhiteSpace(dynVar.VariableName) ? "<i>unset</i>" : dynVar.VariableName)}</b>";
+				string niceName = workerType.GetNiceName();
+				if (niceName.Contains("Variable") && !niceName.Contains("Variable<") && !niceName.Contains("Type"))
+				{
+					string variableComponentName = niceName.Substring(niceName.IndexOf("Variable"), MathX.Clamp(niceName.IndexOf('<') - niceName.IndexOf("Variable"), 0, 1000));
+					headerName = headerName.Replace("Variable", Regex.Replace(variableComponentName, "(?<!^)([A-Z])", " $1"));
+				}
+				else if (workerType == typeof(DynamicTypeVariable) || workerType == typeof(DynamicTypeField))
+				{
+					headerName = headerName.Replace("Variable", workerType == typeof(DynamicTypeField) ? fieldHeader : "Variable");
+				}
+				else if (workerType.GetGenericTypeDefinition() == typeof(DynamicField<>) || workerType.GetGenericTypeDefinition() == typeof(DynamicReference<>))
+				{
+					headerName = headerName.Replace("Variable", (workerType.GetGenericTypeDefinition() == typeof(DynamicField<>)) ? fieldHeader : referenceHeader);
+				}
+				headerName = headerName.Replace("Variable", varHeader);
 			}
-			else if (workerType == typeof(DynamicTypeVariable) || workerType == typeof(DynamicTypeField))
+			else if (worker is DynamicVariableSpace space)
 			{
-				headerName = headerName.Replace("Variable", workerType == typeof(DynamicTypeField) ? fieldHeader : "Variable");
+				headerName = $"<b>{space.GetType().GetNiceName()}: {(string.IsNullOrWhiteSpace(space.SpaceName) ? "<i>unset</i>" : space.SpaceName)}</b>";
 			}
-			else if (workerType.GetGenericTypeDefinition() == typeof(DynamicField<>) || workerType.GetGenericTypeDefinition() == typeof(DynamicReference<>))
+
+			else if (baseParentType == typeof(ParentData<>))
 			{
-				headerName = headerName.Replace("Variable", (workerType.GetGenericTypeDefinition() == typeof(DynamicField<>)) ? fieldHeader : referenceHeader);
+				dynamic parentData = worker;
+				string tag = parentData.Tag.Value;
+				Type dataType = workerType.GenericTypeArguments[0];
+				string typeType = typeof(IWorldElement).IsAssignableFrom(dataType) ? "Reference" : "Value";
+				// parent value/reference
+				headerName = $"<b>{dataType.GetNiceName()} Parent {typeType}: {tag}</b>";
 			}
-			headerName = headerName.Replace("Variable", varHeader);
-		}
-		else if (worker is DynamicVariableSpace space)
-		{
-			headerName = $"<b>{space.GetType().GetNiceName()}: {(string.IsNullOrWhiteSpace(space.SpaceName) ? "<i>unset</i>" : space.SpaceName)}</b>";
-		}
+			else if (baseParentType == typeof(ParentDataLink<>))
+			{
+				// parent value link/reference link
+				dynamic parentData = worker;
+				string tag = parentData.MatchTag.Value;
+				Type dataType = workerType.GenericTypeArguments[0];
+				string typeType = typeof(IWorldElement).IsAssignableFrom(dataType) ? "Reference" : "Value";
+				// parent value/reference
+				headerName = $"<b>{dataType.GetNiceName()} Parent {typeType} Link: {tag}</b>";
+			}
 
-		else if (baseParentType == typeof(ParentData<>))
-		{
-			dynamic parentData = worker;
-			string tag = parentData.Tag.Value;
-			Type dataType = workerType.GenericTypeArguments[0];
-			string typeType = typeof(IWorldElement).IsAssignableFrom(dataType) ? "Reference" : "Value";
-			// parent value/reference
-			headerName = $"<b>{dataType.GetNiceName()} Parent {typeType}: {tag}</b>";
-		}
-		else if (baseParentType == typeof(ParentDataLink<>))
-		{
-			// parent value link/reference link
-			dynamic parentData = worker;
-			string tag = parentData.MatchTag.Value;
-			Type dataType = workerType.GenericTypeArguments[0];
-			string typeType = typeof(IWorldElement).IsAssignableFrom(dataType) ? "Reference" : "Value";
-			// parent value/reference
-			headerName = $"<b>{dataType.GetNiceName()} Parent {typeType} Link: {tag}</b>";
-		}
+			else if (worker is ISpatialVariable spatialVar)
+			{
+				Type spatialType = workerType.GenericTypeArguments[0];
+				string typeName = workerType.GetNiceName();
+				var split = SplitByUppercase(typeName);
+				string ShapeType = split[0];
+				string ValueType = split[1];
 
-		else if (worker is ISpatialVariable spatialVar)
-		{
-			Type spatialType = workerType.GenericTypeArguments[0];
-			string typeName = workerType.GetNiceName();
-			var split = SplitByUppercase(typeName);
-			string ShapeType = split[0];
-			string ValueType = split[1];
+				headerName = $"<b>{spatialType.GetNiceName()} {ShapeType} {ValueType} Variable: {spatialVar.VariableName}</b>";
+			}
+			// this is possibly the worst way to do this (but it works!)
+			else if (workerCategory == "Data/Spatial/Samplers" && workerType != typeof(SpatialVariableBlendDriver))
+			{
+				// this is also just stupid in general
+				dynamic spatial2 = worker;
+				string varName = spatial2.VariableName.Value;
+				// variable type
+				Type? varType = workerType.IsGenericType ? workerType.GenericTypeArguments[0] : null;
+				if (varType == null && workerType == typeof(TypeSpatialVariableDriver)) varType = typeof(Type);
+				// BooleanSpatialVariableDriver has no generics and as such i must read it a stupid way
+				if (varType == null && spatial2.DefaultValue != null) varType = spatial2.DefaultValue.Value.GetType();
+				// extract its end type (driver, collector, partial derivative driver)
+				string typeName = workerType.GetNiceName();
+				int nameEnd = typeName.IndexOf("<");
+				int nameStart = typeName.IndexOf("SpatialVariable") + 15;
+				var split = SplitByUppercase(nameEnd < 0 ? typeName[nameStart..] : typeName[nameStart..nameEnd]);
+				string compType = string.Join(" ", split);
+				// extract its start type (numeric, minmax, cloning)
+				var split2 = SplitByUppercase(typeName[..(nameStart - 15)]);
+				string specialType = string.Join(" ", split2[..(split2.Count() - 1)]);
+				if (specialType != "") specialType += " ";
+				headerName = $"<b>{varType.GetNiceName()} {specialType}Spatial {compType}: {varName}</b>";
+			}
 
-			headerName = $"<b>{spatialType.GetNiceName()} {ShapeType} {ValueType} Variable: {spatialVar.VariableName}</b>";
+			else if (worker is CloudVariableBase cloudVar)
+			{
+				// :(
+				string typeName = workerType.GetNiceName();
+				var split = SplitByUppercase(typeName[..typeName.IndexOf("<")]);
+				string varType = split.Last();
+				string activeName = split[0] == "Active" ? "Active " : "";
+				headerName = $"<b>{workerType.GenericTypeArguments[0].GetNiceName()} {activeName}Cloud {varType}: {cloudVar.Path.Value}</b>";
+			}
 		}
-		// this is possibly the worst way to do this (but it works!)
-		else if (workerCategory == "Data/Spatial/Samplers" && workerType != typeof(SpatialVariableBlendDriver))
+		catch (Exception e)
 		{
-			// this is also just stupid in general
-			dynamic spatial2 = worker;
-			string varName = spatial2.VariableName.Value;
-			// variable type
-			Type? varType = workerType.IsGenericType ? workerType.GenericTypeArguments[0] : null;
-			if (varType == null && workerType == typeof(TypeSpatialVariableDriver)) varType = typeof(Type);
-			// BooleanSpatialVariableDriver has no generics and as such i must read it a stupid way
-			if (varType == null && spatial2.DefaultValue != null) varType = spatial2.DefaultValue.Value.GetType();
-			// extract its end type (driver, collector, partial derivative driver)
-			string typeName = workerType.GetNiceName();
-			int nameEnd = typeName.IndexOf("<");
-			int nameStart = typeName.IndexOf("SpatialVariable") + 15;
-			var split = SplitByUppercase(nameEnd < 0 ? typeName[nameStart..] : typeName[nameStart..nameEnd]);
-			string compType = string.Join(" ", split);
-			// extract its start type (numeric, minmax, cloning)
-			var split2 = SplitByUppercase(typeName[..(nameStart - 15)]);
-			string specialType = string.Join(" ", split2[..(split2.Count() - 1)]);
-			if (specialType != "") specialType += " ";
-			headerName = $"<b>{varType.GetNiceName()} {specialType}Spatial {compType}: {varName}</b>";
+			UniLog.Error($"LenowoTweeks // Exception in GetComponentHeaderName. Resetting to default.\n{e}");
+			// maybe add a way to know if something failed?
+			headerName = $"<b>{workerType.GetNiceName()}</b>";
 		}
-
-		else if (worker is CloudVariableBase cloudVar)
-		{
-			// :(
-			string typeName = workerType.GetNiceName();
-			var split = SplitByUppercase(typeName[..typeName.IndexOf("<")]);
-			string varType = split.Last();
-			string activeName = split[0] == "Active" ? "Active " : "";
-			headerName = $"<b>{workerType.GenericTypeArguments[0].GetNiceName()} {activeName}Cloud {varType}: {cloudVar.Path.Value}</b>";
-		}
-		
 
 		return headerName;
 	}
