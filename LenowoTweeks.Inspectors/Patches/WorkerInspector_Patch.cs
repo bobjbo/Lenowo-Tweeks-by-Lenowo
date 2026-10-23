@@ -262,8 +262,8 @@ public class WorkerInspector_Patch
 	private static string GetComponentHeaderName(Worker worker)
 	{
 		Type workerType = worker.GetType();
-		string headerName = "<b>" + workerType.GetNiceName() + "</b>";
-		if (!LenowoTweeks_Inspectors.modifiedComponentHeaders.Value) return headerName;
+		string headerName = workerType.GetNiceName();
+		if (!LenowoTweeks_Inspectors.modifiedComponentHeaders.Value) return $"<b>{headerName}</b>";
 
 		// just in case (so it doesnt break all of component generation)
 		try
@@ -286,7 +286,7 @@ public class WorkerInspector_Patch
 				string referenceHeader = split.Length >= 3 ? split[2] : "";
 				if (string.IsNullOrEmpty(referenceHeader)) referenceHeader = "Reference";
 
-				headerName = $"<b>{((workerType == typeof(DynamicTypeVariable) || workerType == typeof(DynamicTypeField)) ? "Type" : workerType.GenericTypeArguments.First().GetNiceName())} Variable: {(string.IsNullOrWhiteSpace(dynVar.VariableName) ? "<i>unset</i>" : dynVar.VariableName)}</b>";
+				headerName = $"{((workerType == typeof(DynamicTypeVariable) || workerType == typeof(DynamicTypeField)) ? "Type" : workerType.GenericTypeArguments.First().GetNiceName())} Variable: {(string.IsNullOrWhiteSpace(dynVar.VariableName) ? "<i>unset</i>" : dynVar.VariableName)}";
 				string niceName = workerType.GetNiceName();
 				if (niceName.Contains("Variable") && !niceName.Contains("Variable<") && !niceName.Contains("Type"))
 				{
@@ -305,7 +305,7 @@ public class WorkerInspector_Patch
 			}
 			else if (worker is DynamicVariableSpace space)
 			{
-				headerName = $"<b>{space.GetType().GetNiceName()}: {(string.IsNullOrWhiteSpace(space.SpaceName) ? "<i>unset</i>" : space.SpaceName)}</b>";
+				headerName = $"{space.GetType().GetNiceName()}: {(string.IsNullOrWhiteSpace(space.SpaceName) ? "<i>unset</i>" : space.SpaceName)}";
 			}
 
 			else if (baseParentType == typeof(ParentData<>))
@@ -315,7 +315,7 @@ public class WorkerInspector_Patch
 				Type dataType = workerType.GenericTypeArguments[0];
 				string typeType = typeof(IWorldElement).IsAssignableFrom(dataType) ? "Reference" : "Value";
 				// parent value/reference
-				headerName = $"<b>{dataType.GetNiceName()} Parent {typeType}: {tag}</b>";
+				headerName = $"{dataType.GetNiceName()} Parent {typeType}: {tag}";
 			}
 			else if (baseParentType == typeof(ParentDataLink<>))
 			{
@@ -325,7 +325,7 @@ public class WorkerInspector_Patch
 				Type dataType = workerType.GenericTypeArguments[0];
 				string typeType = typeof(IWorldElement).IsAssignableFrom(dataType) ? "Reference" : "Value";
 				// parent value/reference
-				headerName = $"<b>{dataType.GetNiceName()} Parent {typeType} Link: {tag}</b>";
+				headerName = $"{dataType.GetNiceName()} Parent {typeType} Link: {tag}";
 			}
 
 			else if (worker is ISpatialVariable spatialVar)
@@ -336,7 +336,7 @@ public class WorkerInspector_Patch
 				string ShapeType = split[0];
 				string ValueType = split[1];
 
-				headerName = $"<b>{spatialType.GetNiceName()} {ShapeType} {ValueType} Variable: {spatialVar.VariableName}</b>";
+				headerName = $"{spatialType.GetNiceName()} {ShapeType} {ValueType} Variable: {spatialVar.VariableName}";
 			}
 			// this is possibly the worst way to do this (but it works!)
 			else if (workerCategory == "Data/Spatial/Samplers" && workerType != typeof(SpatialVariableBlendDriver))
@@ -359,7 +359,7 @@ public class WorkerInspector_Patch
 				var split2 = SplitByUppercase(typeName[..(nameStart - 15)]);
 				string specialType = string.Join(" ", split2[..(split2.Count() - 1)]);
 				if (specialType != "") specialType += " ";
-				headerName = $"<b>{varType.GetNiceName()} {specialType}Spatial {compType}: {varName}</b>";
+				headerName = $"{varType.GetNiceName()} {specialType}Spatial {compType}: {varName}";
 			}
 
 			else if (worker is CloudVariableBase cloudVar)
@@ -369,17 +369,17 @@ public class WorkerInspector_Patch
 				var split = SplitByUppercase(typeName[..typeName.IndexOf("<")]);
 				string varType = split.Last();
 				string activeName = split[0] == "Active" ? "Active " : "";
-				headerName = $"<b>{workerType.GenericTypeArguments[0].GetNiceName()} {activeName}Cloud {varType}: {cloudVar.Path.Value}</b>";
+				headerName = $"{workerType.GenericTypeArguments[0].GetNiceName()} {activeName}Cloud {varType}: {cloudVar.Path.Value}";
 			}
 		}
 		catch (Exception e)
 		{
 			UniLog.Error($"LenowoTweeks // Exception in GetComponentHeaderName. Resetting to default.\n{e}");
 			// maybe add a way to know if something failed?
-			headerName = $"<b>{workerType.GetNiceName()}</b>";
+			headerName = $"{workerType.GetNiceName()}";
 		}
 
-		return headerName;
+		return $"<b>{headerName}</b>";
 	}
 
 	static string[] SplitByUppercase(string input)
