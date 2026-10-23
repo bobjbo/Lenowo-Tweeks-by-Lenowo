@@ -68,6 +68,7 @@ public class MemberActionsPatches
 
 	private static void GenerateMemberActions(ContextMenu menu, ISyncMember target)
 	{
+		if (!LenowoTweeks_Inspectors.extraMemberActions.Value) return;
 		var world = menu.World;
 		if (target is SyncRef<User> userField)
 		{

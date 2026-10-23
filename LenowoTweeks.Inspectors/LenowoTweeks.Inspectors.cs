@@ -49,6 +49,8 @@ public class LenowoTweeks_Inspectors : LenowoTweak
 	public static ModConfigKey<Patches.FieldNameMode> fieldNameMode = new("Field Name Mode", "This controls how the fields are named in the inspector.", Patches.FieldNameMode.Normal);
 	public static ModConfigKey<bool> slotInspectorResetAll = new("Slot Inspector Reset All", "This toggles if a 'Reset All' button is created on inspectors", false);
 
+	public static ModConfigKey<bool> extraMemberActions = new("Extra Member Actions", "If clicking on the left bit of fields has more actions", false);
+
 	public static ModConfigKey<bool> copyComponentsToButtons = new("Copy Components To Buttons", "If enabled, try and find the slot at 'Config/UIComponents.[Type]', and copies the components to the buttons with the same type.\nThe types can be Component, Field, and MemberAction", false);
 
 	public static ModConfigKey<bool> collapseComponents = new("Collapse Components", "This toggles if the components in the inspector should load collapsed.", false);
@@ -86,7 +88,7 @@ public class LenowoTweeks_Inspectors : LenowoTweak
 		{
 			"Inspectors", new()
 			{
-				{ "Base", [ modifiedInspectorUIX, fieldNameMode, /*copyComponentsToButtons,*/ nohelp, expandedStringInputs, slotInspectorResetAll, defaultUIXPanelColor, variableSpaceForWorkers ] },
+				{ "Base", [ modifiedInspectorUIX, fieldNameMode, /*copyComponentsToButtons,*/ nohelp, expandedStringInputs, slotInspectorResetAll, extraMemberActions, defaultUIXPanelColor, variableSpaceForWorkers ] },
 				{ "Components", [ collapseComponents, collapsedComponentColor, expandedComponentColor, modifiedComponentHeaders, dynvarComponentHeaderName, sortComponentsByUpdateOrder, commentHeaderMode ]},
 				{ "Lists", [ listCollapsing, maxListElementsForAutoCollapse, bagCollapsing, maxBagElementsForAutoCollapse ]},
 				{ "Blendshapes", [ displayIndexWithBlendshape, allowSearchingBlendshapes ] },
