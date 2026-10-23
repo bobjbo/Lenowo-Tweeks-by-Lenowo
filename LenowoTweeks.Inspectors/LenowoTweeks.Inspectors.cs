@@ -62,7 +62,7 @@ public class LenowoTweeks_Inspectors : LenowoTweak
 
 	public static ModConfigKey<bool> sortComponentsByUpdateOrder = new("Sort Components By Update Order", "If components should be sorted by their update order first, rather than by refid", false);
 	public static ModConfigKey<CommentHeaderMode> commentHeaderMode = new("Comment Header Mode", "How comments should appear in inspectors", CommentHeaderMode.Default);
-	
+
 	public static ModConfigKey<bool> listCollapsing = new("List Collapsing", "If lists should be able to collapse", true);
 	public static ModConfigKey<bool> bagCollapsing = new("Bag Collapsing", "If bags should be able to collapse", true);
 

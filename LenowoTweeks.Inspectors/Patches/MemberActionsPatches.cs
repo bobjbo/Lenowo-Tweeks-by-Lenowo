@@ -99,7 +99,8 @@ public class MemberActionsPatches
 				});
 			};
 		}
-		if (target is ISyncRef fieldRef) {
+		if (target is ISyncRef fieldRef)
+		{
 			if (fieldRef is IAssetRef assetRef)
 			{
 				menu.AddItem("Create Boolean Asset Driver", (Uri?)null, RadiantUI_Constants.Hero.GREEN).Button.LocalPressed += (_, _) =>

@@ -29,7 +29,7 @@ public enum CommentHeaderMode
 	Default = ShowComponent,
 	ComponentHeader = ShowComponent | ComponentAbove | TextAbove,
 	PureHeader = ComponentAbove | TextBelow,
-	
+
 }
 
 [HarmonyPatch]
@@ -54,7 +54,7 @@ public class WorkerInspector_Patch
 			RadiantUI_Constants.SetupEditorStyle(ui);
 			ui.Style.RequireLockInToPress = true;
 			Slot componentVL = ui.VerticalLayout(6f).Slot;
-			var commentMode = LenowoTweeks_Inspectors.commentHeaderMode.Value; 
+			var commentMode = LenowoTweeks_Inspectors.commentHeaderMode.Value;
 			var isComment = worker is Comment;
 			var comment = isComment ? (Comment)worker : null;
 			if (LenowoTweeks_Inspectors.sortComponentsByUpdateOrder.Value)
@@ -88,7 +88,7 @@ public class WorkerInspector_Patch
 				headerSlot.Name = "Header";
 				comment.Text.OnValueChange += (v) =>
 				{
-					headerText.Content.Value = comment.Text;	
+					headerText.Content.Value = comment.Text;
 				};
 			}
 			if (worker is not Slot && (!isComment || commentMode.HasFlag(CommentHeaderMode.ShowComponent) || worker.LocalUser.EditMode))
@@ -371,8 +371,7 @@ public class WorkerInspector_Patch
 				string activeName = split[0] == "Active" ? "Active " : "";
 				headerName = $"{workerType.GenericTypeArguments[0].GetNiceName()} {activeName}Cloud {varType}: {cloudVar.Path.Value}";
 			}
-		}
-		catch (Exception e)
+		} catch (Exception e)
 		{
 			UniLog.Error($"LenowoTweeks // Exception in GetComponentHeaderName. Resetting to default.\n{e}");
 			// maybe add a way to know if something failed?
