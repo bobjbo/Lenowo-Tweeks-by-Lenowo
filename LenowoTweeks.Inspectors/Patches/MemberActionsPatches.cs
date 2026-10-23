@@ -69,70 +69,76 @@ public class MemberActionsPatches
 	private static void GenerateMemberActions(ContextMenu menu, ISyncMember target)
 	{
 		if (!LenowoTweeks_Inspectors.extraMemberActions.Value) return;
-		var world = menu.World;
-		if (target is SyncRef<User> userField)
+		try
 		{
-			menu.AddItem("Local User", (Uri?)null, RadiantUI_Constants.Hero.PURPLE).Button.LocalPressed += (_, _) =>
+			var world = menu.World;
+			if (target is SyncRef<User> userField)
 			{
-				userField.UndoableSet(world.LocalUser);
-				menu.Close();
-			};
-			menu.AddItem("Host User", (Uri?)null, RadiantUI_Constants.Hero.PURPLE).Button.LocalPressed += (_, _) =>
-			{
-				userField.UndoableSet(world.HostUser);
-				menu.Close();
-			};
-			menu.AddItem("Set User:", (Uri?)null, RadiantUI_Constants.Hero.PURPLE).Button.LocalPressed += (_, evData) =>
-			{
-				world.RootSlot.StartTask(async () =>
+				menu.AddItem("Local User", (Uri?)null, RadiantUI_Constants.Hero.PURPLE).Button.LocalPressed += (_, _) =>
 				{
-					menu = await world.LocalUser.OpenContextMenu(userField, evData.source.Slot);
-					foreach (var user in world.AllUsers)
+					userField.UndoableSet(world.LocalUser);
+					menu.Close();
+				};
+				menu.AddItem("Host User", (Uri?)null, RadiantUI_Constants.Hero.PURPLE).Button.LocalPressed += (_, _) =>
+				{
+					userField.UndoableSet(world.HostUser);
+					menu.Close();
+				};
+				menu.AddItem("Set User:", (Uri?)null, RadiantUI_Constants.Hero.PURPLE).Button.LocalPressed += (_, evData) =>
+				{
+					world.RootSlot.StartTask(async () =>
 					{
-						var thisUser = user;
-						menu.AddItem(thisUser.UserName, (Uri?)null, RadiantUI_Constants.Hero.PURPLE).Button.LocalPressed += (_, _) =>
+						menu = await world.LocalUser.OpenContextMenu(userField, evData.source.Slot);
+						foreach (var user in world.AllUsers)
 						{
-							userField.UndoableSet(thisUser);
-							menu.Close();
-						};
-					}
-				});
-			};
-		}
-		if (target is ISyncRef fieldRef)
+							var thisUser = user;
+							menu.AddItem(thisUser.UserName, (Uri?)null, RadiantUI_Constants.Hero.PURPLE).Button.LocalPressed += (_, _) =>
+							{
+								userField.UndoableSet(thisUser);
+								menu.Close();
+							};
+						}
+					});
+				};
+			}
+			if (target is ISyncRef fieldRef)
+			{
+				if (fieldRef is IAssetRef assetRef)
+				{
+					menu.AddItem("Create Boolean Asset Driver", (Uri?)null, RadiantUI_Constants.Hero.GREEN).Button.LocalPressed += (_, _) =>
+					{
+						typeof(MemberActionsPatches).GetMethod(nameof(MakeBooleanAssetDriver)).MakeGenericMethod(assetRef.TargetType.GenericTypeArguments[0]).Invoke(null, [assetRef]);
+						menu.Close();
+					};
+				}
+				menu.AddItem("Create Boolean Reference Driver", (Uri?)null, RadiantUI_Constants.Hero.GREEN).Button.LocalPressed += (_, _) =>
+				{
+					typeof(MemberActionsPatches).GetMethod(nameof(MakeBooleanReferenceDriver)).MakeGenericMethod(fieldRef.TargetType).Invoke(null, [fieldRef]);
+					menu.Close();
+				};
+			}
+			else if (target is IField field)
+			{
+				if (typeof(ValueGradientDriver<>).MakeGenericType(field.ValueType).IsValidGenericType(true))
+				{
+					menu.AddItem("Create Gradient Driver", (Uri?)null, RadiantUI_Constants.Hero.GREEN).Button.LocalPressed += (_, _) =>
+					{
+						typeof(MemberActionsPatches).GetMethod(nameof(MakeGradientDriver)).MakeGenericMethod(field.ValueType).Invoke(null, [field]);
+						menu.Close();
+					};
+				}
+				if (typeof(BooleanValueDriver<>).MakeGenericType(field.ValueType).IsValidGenericType(true))
+				{
+					menu.AddItem("Create Boolean Value Driver", (Uri?)null, RadiantUI_Constants.Hero.GREEN).Button.LocalPressed += (_, _) =>
+					{
+						typeof(MemberActionsPatches).GetMethod(nameof(MakeBooleanValueDriver)).MakeGenericMethod(field.ValueType).Invoke(null, [field]);
+						menu.Close();
+					};
+				}
+			}
+		} catch (Exception e)
 		{
-			if (fieldRef is IAssetRef assetRef)
-			{
-				menu.AddItem("Create Boolean Asset Driver", (Uri?)null, RadiantUI_Constants.Hero.GREEN).Button.LocalPressed += (_, _) =>
-				{
-					typeof(MemberActionsPatches).GetMethod(nameof(MakeBooleanAssetDriver)).MakeGenericMethod(assetRef.TargetType.GenericTypeArguments[0]).Invoke(null, [assetRef]);
-					menu.Close();
-				};
-			}
-			menu.AddItem("Create Boolean Reference Driver", (Uri?)null, RadiantUI_Constants.Hero.GREEN).Button.LocalPressed += (_, _) =>
-			{
-				typeof(MemberActionsPatches).GetMethod(nameof(MakeBooleanReferenceDriver)).MakeGenericMethod(fieldRef.TargetType).Invoke(null, [fieldRef]);
-				menu.Close();
-			};
-		}
-		else if (target is IField field)
-		{
-			if (typeof(ValueGradientDriver<>).MakeGenericType(field.ValueType).IsValidGenericType(true))
-			{
-				menu.AddItem("Create Gradient Driver", (Uri?)null, RadiantUI_Constants.Hero.GREEN).Button.LocalPressed += (_, _) =>
-				{
-					typeof(MemberActionsPatches).GetMethod(nameof(MakeGradientDriver)).MakeGenericMethod(field.ValueType).Invoke(null, [field]);
-					menu.Close();
-				};
-			}
-			if (typeof(BooleanValueDriver<>).MakeGenericType(field.ValueType).IsValidGenericType(true))
-			{
-				menu.AddItem("Create Boolean Value Driver", (Uri?)null, RadiantUI_Constants.Hero.GREEN).Button.LocalPressed += (_, _) =>
-				{
-					typeof(MemberActionsPatches).GetMethod(nameof(MakeBooleanValueDriver)).MakeGenericMethod(field.ValueType).Invoke(null, [field]);
-					menu.Close();
-				};
-			}
+			UniLog.Error($"LenowoTweeks // Exception in GenerateMemberActions\n{e}");
 		}
 	}
 
