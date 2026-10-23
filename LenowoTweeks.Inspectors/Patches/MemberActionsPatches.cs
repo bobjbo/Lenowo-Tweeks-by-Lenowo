@@ -119,7 +119,9 @@ public class MemberActionsPatches
 			}
 			else if (target is IField field)
 			{
-				if (typeof(ValueGradientDriver<>).MakeGenericType(field.ValueType).IsValidGenericType(true))
+				var coder = Traverse.Create(typeof(Coder<>).MakeGenericType(field.ValueType));
+				
+				if (coder.Property<bool>("SupportsLerp").Value) // gradient drivers
 				{
 					menu.AddItem("Create Gradient Driver", (Uri?)null, RadiantUI_Constants.Hero.GREEN).Button.LocalPressed += (_, _) =>
 					{
@@ -127,7 +129,7 @@ public class MemberActionsPatches
 						menu.Close();
 					};
 				}
-				if (typeof(BooleanValueDriver<>).MakeGenericType(field.ValueType).IsValidGenericType(true))
+				if (coder.Property<bool>("IsEnginePrimitive").Value) // boolean value drivers
 				{
 					menu.AddItem("Create Boolean Value Driver", (Uri?)null, RadiantUI_Constants.Hero.GREEN).Button.LocalPressed += (_, _) =>
 					{
