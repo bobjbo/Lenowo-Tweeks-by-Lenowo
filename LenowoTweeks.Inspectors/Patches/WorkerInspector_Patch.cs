@@ -143,6 +143,8 @@ public class WorkerInspector_Patch
 						try
 						{
 							if (__instance == null || __instance.IsRemoved || __instance.Slot == null || __instance.Slot.IsRemoved || worker == null || worker.IsRemoved) return;
+							// try a bit more to prevent random crashes from other users expanding the component
+							if (ui == null || content == null || content.IsRemoved) return;
 							if (content.ChildrenCount == 0 && v)
 							{
 								ui.NestInto(content);
@@ -193,7 +195,7 @@ public class WorkerInspector_Patch
 					Helpers.SetConfigVariable(__instance.LocalUser, "CollapsedColor", LenowoTweeks_Inspectors.collapsedComponentColor.Value);
 					Helpers.SetConfigVariable(__instance.LocalUser, "ExpandedColor", LenowoTweeks_Inspectors.expandedComponentColor.Value);
 					var bvd = button.Slot.AttachComponent<BooleanValueDriver<colorX>>();
-					button.ColorDrivers[1].ColorDrive.Target = null;
+					button.ColorDrivers.RemoveAt(1);
 					bvd.TargetField.Target = button.Label.Color;
 					bvd.TrueValue.Value = RadiantUI_Constants.LABEL_COLOR;
 					Helpers.DriveFromVariable(__instance.LocalUser, "ExpandedColor", bvd.TrueValue);
