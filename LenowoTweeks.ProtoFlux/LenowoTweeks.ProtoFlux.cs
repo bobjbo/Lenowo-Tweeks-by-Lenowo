@@ -46,6 +46,7 @@ public class LenowoTweeks_ProtoFlux : LenowoTweak
 
 	public static ModConfigKey<bool> initializeProtofluxGlobals = new("Initialize Protoflux Globals", "When enabled, this will try to initialize globals in protoflux, like string inputs for DynamicInputs or booleans in Update", false);
 
+	public static ModConfigKey<bool> useProperDelegateNames = new("Use Proper Delegate Names", "If MethodProxy nodes should have the method show the actual method name (like Slot.Destroy or FileMetadata.OnImportFile) rather than the type name", true);
 
 	public static ModConfigKey<bool> protofluxEditableNames = new("Protoflux Editable Node Names", "Allows Protoflux inputs/displays/calls to be renamed using a button", false, "Protoflux Editable Names");
 	public static ModConfigKey<bool> allProtofluxEditableNames = new("Allow editing all protoflux names", "Allows ALL Protoflux nodes to be renamed. Requires editable node names to be enabled.", false, "All Protoflux Editable Names");
@@ -88,7 +89,7 @@ public class LenowoTweeks_ProtoFlux : LenowoTweak
 		{
 			"ProtoFlux", new()
 			{
-				{ "Base", [ disableRelayBackground, expandedProtofluxStringInputs, nohelp, disablePhysicalInteraction, initializeProtofluxGlobals ] },
+				{ "Base", [ disableRelayBackground, expandedProtofluxStringInputs, nohelp, disablePhysicalInteraction, initializeProtofluxGlobals, useProperDelegateNames ] },
 				{ "Node Renaming", [ protofluxEditableNames, allProtofluxEditableNames ] },
 				{ "Context Menu", [ AllowGooberUnpack, GreedyGooberUnpack, InspectNodeShortcut ] },
 				{ "Custom Connections", [ useCustomProtofluxConnections, AllowFluxVisualsOverride, wireImageWrapMode, wireTextureFilterMode, wireConnectorFlipUV, wireTextureColor, connectorTextureColor ] },

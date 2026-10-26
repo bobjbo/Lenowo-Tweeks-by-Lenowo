@@ -1,3 +1,5 @@
+using Elements.Core;
+
 using FrooxEngine;
 using FrooxEngine.ProtoFlux;
 using FrooxEngine.UIX;
@@ -20,6 +22,7 @@ public class ProtoFlux_FixGlobals
 		if (!LenowoTweeks_ProtoFlux.initializeProtofluxGlobals.Value) return;
 		Type valueType = __instance.ValueType.Value;
 		Type baseType = valueType.IsGenericType ? valueType.GetGenericTypeDefinition() : valueType;
+
 		// DO NOT DO METHOD/FUNCTION PROXIES!!!
 		if (valueType.IsGenericType && baseType.Name.Contains("Func") || baseType.Name.Contains("Action")) return;
 		// LIKE SERIOUSLY DO NOT DO THEM
@@ -39,5 +42,22 @@ public class ProtoFlux_FixGlobals
 		}
 
 		__instance.InvokeMethod("OnChanges");
+	}
+
+	[HarmonyPostfix]
+	[HarmonyPatch(typeof(ProtoFluxRefProxy), "UpdateLabel")]
+	public static void FixGlobalDelegateLabel(ProtoFluxRefProxy __instance, FieldDrive<string> ____label)
+	{
+		if (!LenowoTweeks_ProtoFlux.useProperDelegateNames.Value) return;
+		if (__instance is not ProtoFluxGlobalRefProxy globalRef) return;
+		var globalProxy = Traverse.Create(globalRef).Field<RelayRef<IGlobalValueProxy>>("_currentProxy").Value.Target;
+		if (globalProxy == null) return;
+		var proxyType = globalProxy.GetType();
+		if (!proxyType.IsGenericType || proxyType.GetGenericTypeDefinition() != typeof(GlobalDelegate<>)) return;
+		// globalProxy is a GlobalDelegate<T>, so update the label with the actual delegate name
+		var actualDelegate = Traverse.Create(globalProxy).Field("Delegate").Property("Target").Property("Method").Property<string>("Name").Value;
+		if (actualDelegate == null) return;
+		var sourceElement = Traverse.Create(globalProxy).Field("Delegate").Field<IWorldElement>("_targetElement").Value;
+		____label.Target.Value = $"{sourceElement.GetType().GetNiceName()}: {actualDelegate}";
 	}
 }
