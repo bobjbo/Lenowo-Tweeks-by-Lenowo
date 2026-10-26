@@ -109,24 +109,49 @@ public static class Helpers
 		return protofluxManager.FindChildOrAdd(runner.UserName + "\'s Wire Manager", persistent: false);
 	}
 
+	public static Dictionary<User, Tuple<Slot, DynamicVariableSpace>> CachedConfigs = [];
+
 	public static DynamicVariableSpace GetConfigSpace(User runner)
 	{
+		var foundSpace = CachedConfigs.TryGetValue(runner, out var possibleConfig);
+		if (foundSpace && possibleConfig.Item2 != null && !possibleConfig.Item2.IsRemoved) return possibleConfig.Item2;
+		if (foundSpace && possibleConfig.Item1 != null && !possibleConfig.Item1.IsRemoved)
+		{
+			var dynSpace = possibleConfig.Item1.GetComponentOrAttach<DynamicVariableSpace>(out bool attached2);
+			if (attached2) dynSpace.SpaceName.Value = "Config";
+			CachedConfigs[runner] = new(possibleConfig.Item1, dynSpace);
+			return dynSpace;
+		}
+
 		Slot userConfig = GetModUserSlot(runner);
 		DynamicVariableSpace variableSpace = userConfig.GetComponentOrAttach<DynamicVariableSpace>(out bool attached);
 		// It should always be config, so this is fine
-		variableSpace.SpaceName.Value = "Config";
+		if (attached) variableSpace.SpaceName.Value = "Config";
 
-		if (runner.IsLocalUser)
-		{
-			Slot versionsSlot = userConfig.FindChildOrAdd("Versions");
-			foreach (var module in LenowoTweeks_Core.LoadedTweaks)
-			{
-				versionsSlot.FindChildOrAdd(module.ModuleName).Tag = module.ModuleVersion;
-			}
-		}
+		CachedConfigs[runner] = new(userConfig, variableSpace);
+
+		if (runner.IsLocalUser) UpdateModVersionsSlot(runner);
 
 		return variableSpace;
 	}
+
+	public static void UpdateModVersionsSlot(User runner)
+	{
+		Slot userConfig = GetModUserSlot(runner);
+		Slot versionsSlot = userConfig.FindChildOrAdd("Versions");
+		foreach (var module in LenowoTweeks_Core.LoadedTweaks)
+		{
+			versionsSlot.FindChildOrAdd(module.ModuleName).Tag = module.ModuleVersion;
+		}
+	}
+
+	// todo: maybe use ReferenceDictionary<string,IField>?
+	// could improve speed a little more, and allow things to be just a bit better
+	// SyncRef<> is just IField<RefID>, so it can be casted
+	// store default fields too, and allow some things with that?
+	// if Dict["SomeVar"] is null, use default value
+	// when writing a value through the mod, write to the default reference, not the current
+	// may work a lot better for overriding too, so this may happen somewhat soon
 
 	public static T GetConfigVariable<T>(User runner, string VariableName, T defaultValue = default)
 	{
@@ -236,38 +261,32 @@ public static class Helpers
 		output.DriveFrom(source);
 	}
 
-	public static Slot GetTimeSineDriverSlot(User runner)
+	// shared clock for all users, as only a single clock is needed
+	public static Slot GetClockSlot(User runner)
 	{
-		return GetModUserSlot(runner).FindChildOrAdd("TSD");
+		return GetModSharedSlot(runner).FindChildOrAdd("Clock");
 	}
-	public static IField<bool> GetTimeSineDriverSource(User runner)
+	public static IField<bool> GetClockSource(User runner)
 	{
-		Slot TSDS = GetTimeSineDriverSlot(runner);
-		var tsd = TSDS.GetComponentOrAttach<TimeSineDriver>();
-		var fvf = TSDS.GetComponentOrAttach<ValueField<float>>();
-		var cid = TSDS.GetComponentOrAttach<ConvertibleIntDriver<float>>();
-		var ivf = TSDS.GetComponentOrAttach<ValueField<int>>();
-		var veqd = TSDS.GetComponentOrAttach<ValueEqualityDriver<int>>();
-		tsd.Min.Value = 0;
-		tsd.Max.Value = 1;
-		tsd.Speed.Value = 4;
-		tsd.Target.Target = fvf.Value;
-		cid.Source.Target = fvf.Value;
-		cid.Target.Target = ivf.Value;
-		veqd.TargetValue.Target = ivf.Value;
-		veqd.Reference.Value = 1;
-		var tsdSource = GetConfigVariableSource<bool>(runner, "TSD.Source", TSDS);
-		veqd.Target.Target = tsdSource;
-
-		return tsdSource;
+		Slot DriverSlot = GetClockSlot(runner);
+		var driver = DriverSlot.GetComponentOrAttach<ValueEqualityDriver<int>>(out bool attached);
+		if (!attached)
+		{
+			return DriverSlot.Persistent_Field;
+		}
+		var timeDriver = DriverSlot.GetComponentOrAttach<TimeIntDriver>();
+		timeDriver.Repeat.Value = 2;
+		timeDriver.Scale.Value = 1;
+		timeDriver.Target.Target = driver.Reference;
+		driver.Target.Target = DriverSlot.Persistent_Field;
+		
+		return DriverSlot.Persistent_Field;
 	}
 
-	public static void DriveFromTSD(User runner, IField<bool> output)
+	public static void DriveFromClock(User runner, IField<bool> output)
 	{
-		Slot TSDS = GetTimeSineDriverSlot(runner);
-		var source = GetConfigVariableSource<bool>(runner, "TSD.Source", TSDS);
-		if (source == null) return;
-		output.DriveFrom(source);
+		var field = GetClockSource(runner);
+		output.DriveFrom(field);
 	}
 
 	// root should be an object that you are ok with being overridden

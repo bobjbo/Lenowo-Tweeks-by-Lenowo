@@ -87,7 +87,7 @@ public class GenerateElement_Patches
 		brd.FalseTarget.Target = e2.Target;
 
 		brd.TargetReference.Target = image.Sprite;
-		var tsdSource = Helpers.GetTimeSineDriverSource(runningUser);
+		var tsdSource = Helpers.GetClockSource(runningUser);
 
 		if (runningUser.IsLocalUser)
 		{
@@ -166,14 +166,14 @@ public class GenerateElement_Patches
 				eqd.TargetReference.Target = impProxy.Wire;
 			}
 			eqd.Target.Target = brd.State;
-			Helpers.DriveFromTSD(runningUser, eqd.EnabledField);
+			Helpers.DriveFromClock(runningUser, eqd.EnabledField);
 		}
 		else if (targetConnection is INodeOutput nodeOutput)
 		{
 			var rl = image.Slot.GetComponentOrAttach<ReferenceList<ProtoFluxNode>>();
 			if (rl.References.Count == 0) rl.References.Add(null);
 			var eqDriver = SetupEqualityDriver(image.Slot, brd.State, rl.References.GetElement(0));
-			Helpers.DriveFromTSD(runningUser, eqDriver.EnabledField);
+			Helpers.DriveFromClock(runningUser, eqDriver.EnabledField);
 			//brd.State.Value = true;
 		}
 		else if (targetConnection is INodeOperation nodeOperation)
@@ -181,7 +181,7 @@ public class GenerateElement_Patches
 			var rl = image.Slot.GetComponentOrAttach<ReferenceList<ProtoFluxNode>>();
 			if (rl.References.Count == 0) rl.References.Add(null);
 			var eqDriver = SetupEqualityDriver(image.Slot, brd.State, rl.References.GetElement(0));
-			Helpers.DriveFromTSD(runningUser, eqDriver.EnabledField);
+			Helpers.DriveFromClock(runningUser, eqDriver.EnabledField);
 			//brd.State.Value = true;
 		}
 	}
@@ -192,7 +192,7 @@ public class GenerateElement_Patches
 		eq.Target.Target = bv;
 		eq.TargetReference.Target = field;
 		eq.Invert.Value = true;
-		Helpers.DriveFromVariable(s.LocalUser, "TSD.Source", eq.EnabledField);
+		Helpers.DriveFromClock(s.LocalUser, eq.EnabledField);
 		return eq;
 	}
 
