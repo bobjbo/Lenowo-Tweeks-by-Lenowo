@@ -264,7 +264,9 @@ public static class Helpers
 	// shared clock for all users, as only a single clock is needed
 	public static Slot GetClockSlot(User runner)
 	{
-		return GetModSharedSlot(runner).FindChildOrAdd("Clock");
+		var clock = GetModSharedSlot(runner).FindChildOrAdd("Clock");
+		clock.OrderOffset = long.MinValue;
+		return clock;
 	}
 	public static IField<bool> GetClockSource(User runner)
 	{
