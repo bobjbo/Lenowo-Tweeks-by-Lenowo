@@ -183,6 +183,17 @@ public class WorkerInspector_Patch
 							UniLog.Error($"LenowoTweeks // You broke it - Failed on ExpandComponent:\n{e}");
 						}
 					};
+					if (__instance.TargetWorker is Slot container)
+					{
+						if (container.ComponentCount < LenowoTweeks_Inspectors.collapseMinComponents.Value && worker.SyncMemberCount < LenowoTweeks_Inspectors.collapseMinFields.Value)
+						{
+							content.ActiveSelf_Field.Value = true;
+						}
+					}
+					if (worker is User)
+					{
+						content.ActiveSelf_Field.Value = true;
+					}
 					if (LenowoTweeks_Inspectors.copyComponentsToButtons.Value)
 					{
 						Slot componentHeaderRef = Helpers.GetConfigReference<Slot>(__instance.LocalUser, "UIComponents.Component");

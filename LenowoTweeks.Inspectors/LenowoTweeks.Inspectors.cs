@@ -57,6 +57,9 @@ public class LenowoTweeks_Inspectors : LenowoTweak
 	public static ModConfigKey<colorX> collapsedComponentColor = new("Collapsed Component Color", "This text color of a collapsed component.", RadiantUI_Constants.MidLight.YELLOW);
 	public static ModConfigKey<colorX> expandedComponentColor = new("Expanded Component Color", "This text color of a expanded component.", RadiantUI_Constants.LABEL_COLOR);
 
+	public static ModConfigKey<int> collapseMinComponents = new("Auto Collapse: Minimum Components", "How many components are required to be on a slot before it collapses by default. 0 or less will always collapse components.", 0);
+	public static ModConfigKey<int> collapseMinFields = new("Auto Collapse: Minimum Fields", "How many fields on the component before it collapses by default, useful if you want to only show smaller components. 0 or less will always collapse components.", 12);
+
 	public static ModConfigKey<bool> modifiedComponentHeaders = new("Modified Component Headers", "This toggles if the component headers can be modified on certain types", true);
 	public static ModConfigKey<string> dynvarComponentHeaderName = new("Dynvar Component Header Name", "Replaces ['Variable','Field','Reference'] with the provided text on dynamic variables in the component header (Formatted as 'Variable;Field;Reference')", "");
 
@@ -89,7 +92,7 @@ public class LenowoTweeks_Inspectors : LenowoTweak
 			"Inspectors", new()
 			{
 				{ "Base", [ modifiedInspectorUIX, fieldNameMode, /*copyComponentsToButtons,*/ nohelp, expandedStringInputs, slotInspectorResetAll, extraMemberActions, defaultUIXPanelColor, variableSpaceForWorkers ] },
-				{ "Components", [ collapseComponents, collapsedComponentColor, expandedComponentColor, modifiedComponentHeaders, dynvarComponentHeaderName, sortComponentsByUpdateOrder, commentHeaderMode ]},
+				{ "Components", [ collapseComponents, collapsedComponentColor, expandedComponentColor, collapseMinComponents, collapseMinFields, modifiedComponentHeaders, dynvarComponentHeaderName, sortComponentsByUpdateOrder, commentHeaderMode ]},
 				{ "Lists", [ listCollapsing, maxListElementsForAutoCollapse, bagCollapsing, maxBagElementsForAutoCollapse ]},
 				{ "Blendshapes", [ displayIndexWithBlendshape, allowSearchingBlendshapes ] },
 				{ "Actions", [ enableAddChildrenBuilder, childrenBuilderOnlyUIX ] }
