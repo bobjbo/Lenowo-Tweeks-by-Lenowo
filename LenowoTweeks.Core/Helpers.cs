@@ -281,7 +281,7 @@ public static class Helpers
 		timeDriver.Scale.Value = 1;
 		timeDriver.Target.Target = driver.Reference;
 		driver.Target.Target = DriverSlot.Persistent_Field;
-		
+
 		return DriverSlot.Persistent_Field;
 	}
 

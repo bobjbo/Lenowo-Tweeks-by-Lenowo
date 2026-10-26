@@ -120,7 +120,7 @@ public class MemberActionsPatches
 			else if (target is IField field)
 			{
 				var coder = Traverse.Create(typeof(Coder<>).MakeGenericType(field.ValueType));
-				
+
 				if (coder.Property<bool>("SupportsLerp").Value) // gradient drivers
 				{
 					menu.AddItem("Create Gradient Driver", (Uri?)null, RadiantUI_Constants.Hero.GREEN).Button.LocalPressed += (_, _) =>
