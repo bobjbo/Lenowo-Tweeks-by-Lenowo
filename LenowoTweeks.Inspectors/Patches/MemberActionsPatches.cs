@@ -101,41 +101,44 @@ public class MemberActionsPatches
 					});
 				};
 			}
-			if (target is ISyncRef fieldRef)
+			if (target is IField field && !field.IsDriven)
 			{
-				if (fieldRef is IAssetRef assetRef)
+				if (target is ISyncRef fieldRef)
 				{
-					menu.AddItem("Create Boolean Asset Driver", (Uri?)null, RadiantUI_Constants.Hero.GREEN).Button.LocalPressed += (_, _) =>
+					if (fieldRef is IAssetRef assetRef)
 					{
-						typeof(MemberActionsPatches).GetMethod(nameof(MakeBooleanAssetDriver)).MakeGenericMethod(assetRef.TargetType.GenericTypeArguments[0]).Invoke(null, [assetRef]);
+						menu.AddItem("Create Boolean Asset Driver", (Uri?)null, RadiantUI_Constants.Hero.GREEN).Button.LocalPressed += (_, _) =>
+						{
+							typeof(MemberActionsPatches).GetMethod(nameof(MakeBooleanAssetDriver)).MakeGenericMethod(assetRef.TargetType.GenericTypeArguments[0]).Invoke(null, [assetRef]);
+							menu.Close();
+						};
+					}
+					menu.AddItem("Create Boolean Reference Driver", (Uri?)null, RadiantUI_Constants.Hero.GREEN).Button.LocalPressed += (_, _) =>
+					{
+						typeof(MemberActionsPatches).GetMethod(nameof(MakeBooleanReferenceDriver)).MakeGenericMethod(fieldRef.TargetType).Invoke(null, [fieldRef]);
 						menu.Close();
 					};
 				}
-				menu.AddItem("Create Boolean Reference Driver", (Uri?)null, RadiantUI_Constants.Hero.GREEN).Button.LocalPressed += (_, _) =>
+				else
 				{
-					typeof(MemberActionsPatches).GetMethod(nameof(MakeBooleanReferenceDriver)).MakeGenericMethod(fieldRef.TargetType).Invoke(null, [fieldRef]);
-					menu.Close();
-				};
-			}
-			else if (target is IField field)
-			{
-				var coder = Traverse.Create(typeof(Coder<>).MakeGenericType(field.ValueType));
+					var coder = Traverse.Create(typeof(Coder<>).MakeGenericType(field.ValueType));
 
-				if (coder.Property<bool>("SupportsLerp").Value) // gradient drivers
-				{
-					menu.AddItem("Create Gradient Driver", (Uri?)null, RadiantUI_Constants.Hero.GREEN).Button.LocalPressed += (_, _) =>
+					if (coder.Property<bool>("SupportsLerp").Value) // gradient drivers
 					{
-						typeof(MemberActionsPatches).GetMethod(nameof(MakeGradientDriver)).MakeGenericMethod(field.ValueType).Invoke(null, [field]);
-						menu.Close();
-					};
-				}
-				if (coder.Property<bool>("IsEnginePrimitive").Value) // boolean value drivers
-				{
-					menu.AddItem("Create Boolean Value Driver", (Uri?)null, RadiantUI_Constants.Hero.GREEN).Button.LocalPressed += (_, _) =>
+						menu.AddItem("Create Gradient Driver", (Uri?)null, RadiantUI_Constants.Hero.GREEN).Button.LocalPressed += (_, _) =>
+						{
+							typeof(MemberActionsPatches).GetMethod(nameof(MakeGradientDriver)).MakeGenericMethod(field.ValueType).Invoke(null, [field]);
+							menu.Close();
+						};
+					}
+					if (coder.Property<bool>("IsEnginePrimitive").Value) // boolean value drivers
 					{
-						typeof(MemberActionsPatches).GetMethod(nameof(MakeBooleanValueDriver)).MakeGenericMethod(field.ValueType).Invoke(null, [field]);
-						menu.Close();
-					};
+						menu.AddItem("Create Boolean Value Driver", (Uri?)null, RadiantUI_Constants.Hero.GREEN).Button.LocalPressed += (_, _) =>
+						{
+							typeof(MemberActionsPatches).GetMethod(nameof(MakeBooleanValueDriver)).MakeGenericMethod(field.ValueType).Invoke(null, [field]);
+							menu.Close();
+						};
+					}
 				}
 			}
 		} catch (Exception e)
