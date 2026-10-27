@@ -118,6 +118,11 @@ public class MemberActionsPatches
 						typeof(MemberActionsPatches).GetMethod(nameof(MakeBooleanReferenceDriver)).MakeGenericMethod(fieldRef.TargetType).Invoke(null, [fieldRef]);
 						menu.Close();
 					};
+					menu.AddItem("Create Override", (Uri?)null, RadiantUI_Constants.Hero.GREEN).Button.LocalPressed += (_, _) =>
+					{
+						typeof(MemberActionsPatches).GetMethod(nameof(MakeReferenceUserOverride)).MakeGenericMethod(fieldRef.TargetType).Invoke(null, [fieldRef]);
+						menu.Close();
+					};
 				}
 				else
 				{
@@ -138,6 +143,27 @@ public class MemberActionsPatches
 							typeof(MemberActionsPatches).GetMethod(nameof(MakeBooleanValueDriver)).MakeGenericMethod(field.ValueType).Invoke(null, [field]);
 							menu.Close();
 						};
+						menu.AddItem("Create Override", (Uri?)null, RadiantUI_Constants.Hero.GREEN).Button.LocalPressed += (_, _) =>
+						{
+							typeof(MemberActionsPatches).GetMethod(nameof(MakeValueUserOverride)).MakeGenericMethod(field.ValueType).Invoke(null, [field]);
+							menu.Close();
+						};
+						if (LenowoTweeks_Inspectors.moreMemberActions.Value)
+						{
+							menu.AddItem("Create Numeric Override Gather", (Uri?)null, RadiantUI_Constants.Hero.GREEN).Button.LocalPressed += (_, _) =>
+							{
+								typeof(MemberActionsPatches).GetMethod(nameof(MakeNumericUserOverride)).MakeGenericMethod(field.ValueType).Invoke(null, [field]);
+								menu.Close();
+							};
+							if (field.ValueType == typeof(bool))
+							{
+								menu.AddItem("Create Boolean Override Gather", (Uri?)null, RadiantUI_Constants.Hero.GREEN).Button.LocalPressed += (_, _) =>
+								{
+									typeof(MemberActionsPatches).GetMethod(nameof(MakeBooleanUserOverride)).Invoke(null, [field]);
+									menu.Close();
+								};
+							}
+						}
 					}
 				}
 			}
@@ -149,33 +175,197 @@ public class MemberActionsPatches
 
 	public static void MakeGradientDriver<T>(IField<T> field)
 	{
-		var vgd = field.FindNearestParent<Slot>().AttachComponent<ValueGradientDriver<T>>();
-		vgd.Points.Add().Value.Value = field.Value;
-		var p2 = vgd.Points.Add();
-		p2.Value.Value = field.Value;
-		p2.Position.Value = 1f;
-		vgd.Target.Target = field;
+		try
+		{
+			field.World.BeginUndoBatch("Create Gradient Driver");
+
+			var vgd = field.FindNearestParent<Slot>().AttachComponent<ValueGradientDriver<T>>();
+			
+			vgd.CreateSpawnUndoPoint();
+			vgd.Points.Add().Value.Value = field.Value;
+			var p2 = vgd.Points.Add();
+			p2.Value.Value = field.Value;
+			p2.Position.Value = 1f;
+			vgd.Target.Target = field;
+
+		}
+		catch (Exception e)
+		{
+			UniLog.Error($"Lenowo Tweaks / Exception in MakeGradientDriver:\n{e}");
+		}
+		finally
+		{
+			field.World.EndUndoBatch();
+		}
+	}
+
+	// not incredible to have to have multiple versions of the same function, however it allows things to be easier to modify
+	public static void MakeValueUserOverride<T>(IField<T> field)
+	{
+		try
+		{
+			field.World.BeginUndoBatch("Create Value Override");
+
+			var vuo = field.FindNearestParent<Slot>().AttachComponent<ValueUserOverride<T>>();
+
+			vuo.CreateSpawnUndoPoint();
+			vuo.PersistentOverrides.Value = true;
+			vuo.CreateOverrideOnWrite.Value = true;
+			vuo.Default.Value = field.Value;
+			vuo.Target.Target = field;
+
+		}
+		catch (Exception e)
+		{
+			UniLog.Error($"Lenowo Tweaks / Exception in MakeValueUserOverride:\n{e}");
+		}
+		finally
+		{
+			field.World.EndUndoBatch();
+		}
+	}
+	public static void MakeNumericUserOverride<T>(IField<T> field)
+	{
+		try
+		{
+			field.World.BeginUndoBatch("Create Numeric Override Gather");
+
+			var vuo = field.FindNearestParent<Slot>().AttachComponent<NumericUserOverrideGather<T>>();
+
+			vuo.CreateSpawnUndoPoint();
+			vuo.PersistentOverrides.Value = true;
+			vuo.CreateOverrideOnWrite.Value = true;
+			vuo.Default.Value = field.Value;
+			vuo.Target.Target = field;
+
+		}
+		catch (Exception e)
+		{
+			UniLog.Error($"Lenowo Tweaks / Exception in MakeNumericUserOverride:\n{e}");
+		}
+		finally
+		{
+			field.World.EndUndoBatch();
+		}
+	}
+	public static void MakeBooleanUserOverride(IField<bool> field)
+	{
+		try
+		{
+			field.World.BeginUndoBatch("Create Boolean Override Gather");
+
+			var vuo = field.FindNearestParent<Slot>().AttachComponent<BooleanUserOverrideGather>();
+
+			vuo.CreateSpawnUndoPoint();
+			vuo.PersistentOverrides.Value = true;
+			vuo.CreateOverrideOnWrite.Value = true;
+			vuo.Default.Value = field.Value;
+			vuo.Target.Target = field;
+
+		}
+		catch (Exception e)
+		{
+			UniLog.Error($"Lenowo Tweaks / Exception in MakeBooleanUserOverride:\n{e}");
+		}
+		finally
+		{
+			field.World.EndUndoBatch();
+		}
+	}
+
+	public static void MakeReferenceUserOverride<T>(SyncRef<T> field) where T : class, IWorldElement
+	{
+		try
+		{
+			field.World.BeginUndoBatch("Create Reference Override");
+
+			var vuo = field.FindNearestParent<Slot>().AttachComponent<ReferenceUserOverride<T>>();
+
+			vuo.CreateSpawnUndoPoint();
+			vuo.PersistentOverrides.Value = true;
+			vuo.CreateOverrideOnWrite.Value = true;
+			vuo.Default.Target = field.Target;
+			vuo.Target.Target = field;
+
+		}
+		catch (Exception e)
+		{
+			UniLog.Error($"Lenowo Tweaks / Exception in MakeReferenceUserOverride:\n{e}");
+		}
+		finally
+		{
+			field.World.EndUndoBatch();
+		}
 	}
 
 	public static void MakeBooleanValueDriver<T>(IField<T> field)
 	{
-		var bvd = field.FindNearestParent<Slot>().AttachComponent<BooleanValueDriver<T>>();
-		bvd.FalseValue.Value = field.Value;
-		bvd.TrueValue.Value = field.Value;
-		bvd.TargetField.Target = field;
+		try
+		{
+			field.World.BeginUndoBatch("Create Boolean Value Driver");
+
+			var bvd = field.FindNearestParent<Slot>().AttachComponent<BooleanValueDriver<T>>();
+
+			bvd.CreateSpawnUndoPoint();
+			bvd.FalseValue.Value = field.Value;
+			bvd.TrueValue.Value = field.Value;
+			bvd.TargetField.Target = field;
+
+		}
+		catch (Exception e)
+		{
+			UniLog.Error($"Lenowo Tweaks / Exception in MakeBooleanValueDriver:\n{e}");
+		}
+		finally
+		{
+			field.World.EndUndoBatch();
+		}
 	}
 	public static void MakeBooleanReferenceDriver<T>(SyncRef<T> field) where T : class, IWorldElement
 	{
-		var bvd = field.FindNearestParent<Slot>().AttachComponent<BooleanReferenceDriver<T>>();
-		bvd.FalseTarget.Target = field.Target;
-		bvd.TrueTarget.Target = field.Target;
-		bvd.TargetReference.Target = field;
+		try
+		{
+			field.World.BeginUndoBatch("Create Boolean Reference Driver");
+
+			var bvd = field.FindNearestParent<Slot>().AttachComponent<BooleanReferenceDriver<T>>();
+
+			bvd.CreateSpawnUndoPoint();
+			bvd.FalseTarget.Target = field.Target;
+			bvd.TrueTarget.Target = field.Target;
+			bvd.TargetReference.Target = field;
+
+		}
+		catch (Exception e)
+		{
+			UniLog.Error($"Lenowo Tweaks / Exception in MakeBooleanReferenceDriver:\n{e}");
+		}
+		finally
+		{
+			field.World.EndUndoBatch();
+		}
 	}
 	public static void MakeBooleanAssetDriver<T>(AssetRef<T> field) where T : class, IAsset
 	{
-		var bvd = field.FindNearestParent<Slot>().AttachComponent<BooleanAssetDriver<T>>();
-		bvd.FalseTarget.Target = field.Target;
-		bvd.TrueTarget.Target = field.Target;
-		bvd.Target.Target = field;
+		try
+		{
+			field.World.BeginUndoBatch("Create Boolean Asset Driver");
+
+			var bvd = field.FindNearestParent<Slot>().AttachComponent<BooleanAssetDriver<T>>();
+
+			bvd.CreateSpawnUndoPoint();
+			bvd.FalseTarget.Target = field.Target;
+			bvd.TrueTarget.Target = field.Target;
+			bvd.Target.Target = field;
+
+		}
+		catch (Exception e)
+		{
+			UniLog.Error($"Lenowo Tweaks / Exception in MakeBooleanAssetDriver:\n{e}");
+		}
+		finally
+		{
+			field.World.EndUndoBatch();
+		}
+		
 	}
 }
