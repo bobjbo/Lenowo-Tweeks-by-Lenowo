@@ -101,7 +101,7 @@ public class MemberActionsPatches
 					});
 				};
 			}
-			if (target is IField field && !field.IsDriven)
+			if (target is IField field && !field.IsDriven && field.IsDrivable)
 			{
 				if (target is ISyncRef fieldRef)
 				{
