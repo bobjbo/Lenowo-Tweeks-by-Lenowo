@@ -762,7 +762,7 @@ public class PrimitiveFields_Patch
 			parent2.OrderOffset = 2;
 
 			Slot root = Texts.Parent.AddSlot("BlendshapeSearch");
-			ValueField<string> field = root.AttachComponent<ValueField<string>>();
+			ValueTag<string> field = root.AttachComponent<ValueTag<string>>();
 			LayoutElement layout = root.GetComponentOrAttach<LayoutElement>();
 			SyncMemberEditorBuilder.BuildField(field.Value, field.GetSyncMemberFieldInfo("Value"), root, layout);
 			layout.MinHeight.Value = 24f;

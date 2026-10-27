@@ -766,7 +766,7 @@ public class WorkerInspector_Patches
 	{
 		var hl = ui.HorizontalLayout(5, 5);
 		ui.Text(name);
-		var field = hl.Slot.AttachComponent<ValueField<string>>();
+		var field = hl.Slot.AttachComponent<ValueTag<string>>();
 		field.Value.Value = defaultVal;
 		Text Text = ui.TextField(field.Value).Slot.FindChild("Text").GetComponent<Text>();
 
@@ -799,7 +799,7 @@ public class WorkerInspector_Patches
 	{
 		var hl = ui.HorizontalLayout(padding: 5);
 		ui.Text(name);
-		var field = hl.Slot.AttachComponent<ValueField<T>>().Value;
+		var field = hl.Slot.AttachComponent<ValueTag<T>>().Value;
 		field.Value = defaultVal;
 		EnumMemberEditor Editor = ui.EnumMemberEditor(field);
 		Editor.Slot.FindChild("Horizontal Layout").GetComponent<LayoutElement>().MinWidth.Value = 200f;
@@ -816,7 +816,7 @@ public class WorkerInspector_Patches
 	{
 		var hl = ui.HorizontalLayout(padding: 5);
 		ui.Text(name);
-		var field = hl.Slot.AttachComponent<ValueField<bool>>();
+		var field = hl.Slot.AttachComponent<ValueTag<bool>>();
 		field.Value.Value = defaultVal;
 
 		ui.NestInto(hl.Slot);
@@ -878,10 +878,10 @@ public class WorkerInspector_Patches
 
 				Layout.SetPadding(UIVerticalLayout.FindChild("Padding").FindChild("Button").GetComponent<FloatTextEditorParser>().ParsedValue.Value);
 				Layout.Spacing.Value = UIVerticalLayout.FindChild("Spacing").FindChild("Button").GetComponent<FloatTextEditorParser>().ParsedValue.Value;
-				Layout.ForceExpandWidth.Value = UIVerticalLayout.FindChild("Force Expand Width").GetComponent<ValueField<bool>>().Value;
-				Layout.ForceExpandHeight.Value = UIVerticalLayout.FindChild("Force Expand Height").GetComponent<ValueField<bool>>().Value;
-				Layout.VerticalAlign.Value = UIVerticalLayout.FindChild("Vertical Alignment").GetComponent<ValueField<LayoutVerticalAlignment>>().Value;
-				Layout.HorizontalAlign.Value = UIVerticalLayout.FindChild("Horizontal Alignment").GetComponent<ValueField<LayoutHorizontalAlignment>>().Value;
+				Layout.ForceExpandWidth.Value = UIVerticalLayout.FindChild("Force Expand Width").GetComponent<ValueTag<bool>>().Value;
+				Layout.ForceExpandHeight.Value = UIVerticalLayout.FindChild("Force Expand Height").GetComponent<ValueTag<bool>>().Value;
+				Layout.VerticalAlign.Value = UIVerticalLayout.FindChild("Vertical Alignment").GetComponent<ValueTag<LayoutVerticalAlignment>>().Value;
+				Layout.HorizontalAlign.Value = UIVerticalLayout.FindChild("Horizontal Alignment").GetComponent<ValueTag<LayoutHorizontalAlignment>>().Value;
 				ComponentView.Target = Layout.Slot;
 			}
 			else if (builderType == "Overlapping Layout")
@@ -894,10 +894,10 @@ public class WorkerInspector_Patches
 				Layout.PaddingLeft.Value = Padding;
 				Layout.PaddingRight.Value = Padding;
 
-				Layout.ForceExpandWidth.Value = UIVerticalLayout.FindChild("Force Expand Width").GetComponent<ValueField<bool>>().Value;
-				Layout.ForceExpandHeight.Value = UIVerticalLayout.FindChild("Force Expand Height").GetComponent<ValueField<bool>>().Value;
-				Layout.VerticalAlign.Value = UIVerticalLayout.FindChild("Vertical Alignment").GetComponent<ValueField<LayoutVerticalAlignment>>().Value;
-				Layout.HorizontalAlign.Value = UIVerticalLayout.FindChild("Horizontal Alignment").GetComponent<ValueField<LayoutHorizontalAlignment>>().Value;
+				Layout.ForceExpandWidth.Value = UIVerticalLayout.FindChild("Force Expand Width").GetComponent<ValueTag<bool>>().Value;
+				Layout.ForceExpandHeight.Value = UIVerticalLayout.FindChild("Force Expand Height").GetComponent<ValueTag<bool>>().Value;
+				Layout.VerticalAlign.Value = UIVerticalLayout.FindChild("Vertical Alignment").GetComponent<ValueTag<LayoutVerticalAlignment>>().Value;
+				Layout.HorizontalAlign.Value = UIVerticalLayout.FindChild("Horizontal Alignment").GetComponent<ValueTag<LayoutHorizontalAlignment>>().Value;
 				ComponentView.Target = Layout.Slot;
 			}
 			else if (builderType == "Scroll Rect")
@@ -915,11 +915,11 @@ public class WorkerInspector_Patches
 				VL.HorizontalAlign.Value = LayoutHorizontalAlignment.Center;
 				VL.VerticalAlign.Value = LayoutVerticalAlignment.Top;
 
-				Content.GetComponent<ContentSizeFitter>().VerticalFit.Value = UIVerticalLayout.FindChild("Vertical Fit").GetComponent<ValueField<SizeFit>>().Value;
-				Content.GetComponent<ContentSizeFitter>().HorizontalFit.Value = UIVerticalLayout.FindChild("Horizontal Fit").GetComponent<ValueField<SizeFit>>().Value;
+				Content.GetComponent<ContentSizeFitter>().VerticalFit.Value = UIVerticalLayout.FindChild("Vertical Fit").GetComponent<ValueTag<SizeFit>>().Value;
+				Content.GetComponent<ContentSizeFitter>().HorizontalFit.Value = UIVerticalLayout.FindChild("Horizontal Fit").GetComponent<ValueTag<SizeFit>>().Value;
 
-				Content.GetComponent<ScrollRect>().HorizontalAlign.Value = UIVerticalLayout.FindChild("Horizontal Alignment").GetComponent<ValueField<LayoutHorizontalAlignment>>().Value;
-				Content.GetComponent<ScrollRect>().VerticalAlign.Value = UIVerticalLayout.FindChild("Vertical Alignment").GetComponent<ValueField<LayoutVerticalAlignment>>().Value;
+				Content.GetComponent<ScrollRect>().HorizontalAlign.Value = UIVerticalLayout.FindChild("Horizontal Alignment").GetComponent<ValueTag<LayoutHorizontalAlignment>>().Value;
+				Content.GetComponent<ScrollRect>().VerticalAlign.Value = UIVerticalLayout.FindChild("Vertical Alignment").GetComponent<ValueTag<LayoutVerticalAlignment>>().Value;
 				ComponentView.Target = Content;
 			}
 			else if (builderType == "Button")
@@ -933,7 +933,7 @@ public class WorkerInspector_Patches
 
 
 				Slot Text = NewSlot.AddSlot("Text");
-				Text.AttachComponent<Text>().Content.Value = UIVerticalLayout.FindChild("Text").GetComponent<ValueField<string>>().Value;
+				Text.AttachComponent<Text>().Content.Value = UIVerticalLayout.FindChild("Text").GetComponent<ValueTag<string>>().Value;
 				Text TextText = Text.GetComponent<Text>();
 				TextText.Size.Value = 50f;
 				TextText.HorizontalAlign.Value = TextHorizontalAlignment.Center;
@@ -959,7 +959,7 @@ public class WorkerInspector_Patches
 				}
 				else if (builderType == "Bool Field")
 				{
-					var feld = NewSlot.AttachComponent<ValueField<bool>>();
+					var feld = NewSlot.AttachComponent<ValueTag<bool>>();
 					uitwo.NestInto(feld.Slot);
 					var field = uitwo.BooleanMemberEditor(feld.Value);
 					field.Slot.AttachComponent<LayoutElement>().MinHeight.Value = LenowoTweeks_Inspectors.buttonMinHeightDefault.Value;
@@ -978,7 +978,7 @@ public class WorkerInspector_Patches
 					image.NineSliceSizing.Value = NineSliceSizing.FixedSize;
 
 					NewSlot.AttachComponent<LayoutElement>().MinHeight.Value = LenowoTweeks_Inspectors.buttonMinHeightDefault.Value;
-					var feld = NewSlot.AttachComponent<ValueField<float>>();
+					var feld = NewSlot.AttachComponent<ValueTag<float>>();
 					uitwo.SliderMemberEditor(UIVerticalLayout.FindChild("Min").FindChild("Button").GetComponent<FloatTextEditorParser>().ParsedValue.Value, UIVerticalLayout.FindChild("Max").FindChild("Button").GetComponent<FloatTextEditorParser>().ParsedValue.Value, feld.Value);
 					feld.Slot.FindChild("Horizontal Layout").FindChild("Button").GetComponent<Image>().Sprite.Target = ui.Style.ButtonSprite;
 					feld.Slot.FindChild("Horizontal Layout").FindChild("Button").GetComponent<Image>().NineSliceSizing.Value = NineSliceSizing.FixedSize;
@@ -993,7 +993,7 @@ public class WorkerInspector_Patches
 			else if (builderType == "Text")
 			{
 				var Text = NewSlot.AttachComponent<Text>();
-				Text.Content.Value = UIVerticalLayout.FindChild("Text").GetComponent<ValueField<string>>().Value;
+				Text.Content.Value = UIVerticalLayout.FindChild("Text").GetComponent<ValueTag<string>>().Value;
 				NewSlot.AttachComponent<LayoutElement>().MinHeight.Value = LenowoTweeks_Inspectors.buttonMinHeightDefault.Value;
 
 			}
@@ -1001,7 +1001,7 @@ public class WorkerInspector_Patches
 			{
 				var Image = NewSlot.AttachComponent<Image>();
 				var Mask = NewSlot.AttachComponent<Mask>();
-				Mask.ShowMaskGraphic.Value = UIVerticalLayout.FindChild("Show Mash Graphic").GetComponent<ValueField<bool>>().Value;
+				Mask.ShowMaskGraphic.Value = UIVerticalLayout.FindChild("Show Mash Graphic").GetComponent<ValueTag<bool>>().Value;
 			}
 			else if (builderType == "Option Description Driver")
 			{

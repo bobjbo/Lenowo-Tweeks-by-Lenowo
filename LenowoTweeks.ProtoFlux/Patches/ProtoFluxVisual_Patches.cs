@@ -35,15 +35,22 @@ public class ProtoFluxVisual_Patches
 			int threshold = LenowoTweeks_ProtoFlux.collapseThreshold.Value;
 			bool makeCollapsable = totalInputCount > threshold || totalOutputCount > threshold;
 			// If either side is over the threshold, make the node collapsable.
-			ValueField<bool> toggle_field = null;
+			ValueTag<bool> toggle_field = null;
 			if (makeCollapsable)
 			{
-				toggle_field = fluxSlot.GetComponent<ValueField<bool>>(vf => vf.UpdateOrder == 7679);
+				toggle_field = fluxSlot.GetComponent<ValueTag<bool>>(vf => vf.UpdateOrder == 7679);
 				if (toggle_field == null)
 				{
-					toggle_field = fluxSlot.AttachComponent<ValueField<bool>>();
+					toggle_field = fluxSlot.AttachComponent<ValueTag<bool>>();
 					toggle_field.UpdateOrder = 7679; // Unique Identifier
 					toggle_field.Value.Value = true;
+
+					var old_toggle_field = fluxSlot.GetComponent<ValueField<bool>>(vf => vf.UpdateOrder == 7679);
+					if (old_toggle_field != null)
+					{
+						toggle_field.Value.Value = old_toggle_field.Value.Value;
+						old_toggle_field.Destroy();
+					}
 				}
 			}
 
@@ -52,7 +59,7 @@ public class ProtoFluxVisual_Patches
 
 			foreach (Slot s in connections)
 			{
-				var bv = s.AttachComponent<ValueField<bool>>();
+				var bv = s.AttachComponent<ValueTag<bool>>();
 
 				Slot connector = s.FindChild("Connector");
 				if (connector == null || connector.IsRemoved) continue;
@@ -133,14 +140,14 @@ public class ProtoFluxVisual_Patches
 	}
 
 
-	private static ReferenceEqualityDriver<T> SetupEqualityDriver<T>(Slot s, ValueField<bool> bv, SyncRef<T> field) where T : class, IWorldElement
+	private static ReferenceEqualityDriver<T> SetupEqualityDriver<T>(Slot s, ValueTag<bool> bv, SyncRef<T> field) where T : class, IWorldElement
 	{
 		var eq = s.AttachComponent<ReferenceEqualityDriver<T>>();
 		eq.Target.Target = bv.Value;
 		eq.TargetReference.Target = field;
 		eq.Invert.Value = true;
 		// if it sets up the equality driver, make sure that its actually updating
-		Helpers.DriveFromVariable(s.LocalUser, "TSD.Source", eq.EnabledField);
+		Helpers.DriveFromClock(s.LocalUser, eq.EnabledField);
 		return eq;
 	}
 

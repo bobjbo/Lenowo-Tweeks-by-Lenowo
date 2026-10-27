@@ -180,7 +180,7 @@ public class MemberActionsPatches
 			field.World.BeginUndoBatch("Create Gradient Driver");
 
 			var vgd = field.FindNearestParent<Slot>().AttachComponent<ValueGradientDriver<T>>();
-			
+
 			vgd.CreateSpawnUndoPoint();
 			vgd.Points.Add().Value.Value = field.Value;
 			var p2 = vgd.Points.Add();
@@ -188,12 +188,10 @@ public class MemberActionsPatches
 			p2.Position.Value = 1f;
 			vgd.Target.Target = field;
 
-		}
-		catch (Exception e)
+		} catch (Exception e)
 		{
 			UniLog.Error($"Lenowo Tweaks / Exception in MakeGradientDriver:\n{e}");
-		}
-		finally
+		} finally
 		{
 			field.World.EndUndoBatch();
 		}
@@ -214,12 +212,10 @@ public class MemberActionsPatches
 			vuo.Default.Value = field.Value;
 			vuo.Target.Target = field;
 
-		}
-		catch (Exception e)
+		} catch (Exception e)
 		{
 			UniLog.Error($"Lenowo Tweaks / Exception in MakeValueUserOverride:\n{e}");
-		}
-		finally
+		} finally
 		{
 			field.World.EndUndoBatch();
 		}
@@ -238,12 +234,10 @@ public class MemberActionsPatches
 			vuo.Default.Value = field.Value;
 			vuo.Target.Target = field;
 
-		}
-		catch (Exception e)
+		} catch (Exception e)
 		{
 			UniLog.Error($"Lenowo Tweaks / Exception in MakeNumericUserOverride:\n{e}");
-		}
-		finally
+		} finally
 		{
 			field.World.EndUndoBatch();
 		}
@@ -261,13 +255,10 @@ public class MemberActionsPatches
 			vuo.CreateOverrideOnWrite.Value = true;
 			vuo.Default.Value = field.Value;
 			vuo.Target.Target = field;
-
-		}
-		catch (Exception e)
+		} catch (Exception e)
 		{
 			UniLog.Error($"Lenowo Tweaks / Exception in MakeBooleanUserOverride:\n{e}");
-		}
-		finally
+		} finally
 		{
 			field.World.EndUndoBatch();
 		}
@@ -287,12 +278,10 @@ public class MemberActionsPatches
 			vuo.Default.Target = field.Target;
 			vuo.Target.Target = field;
 
-		}
-		catch (Exception e)
+		} catch (Exception e)
 		{
 			UniLog.Error($"Lenowo Tweaks / Exception in MakeReferenceUserOverride:\n{e}");
-		}
-		finally
+		} finally
 		{
 			field.World.EndUndoBatch();
 		}
@@ -311,12 +300,10 @@ public class MemberActionsPatches
 			bvd.TrueValue.Value = field.Value;
 			bvd.TargetField.Target = field;
 
-		}
-		catch (Exception e)
+		} catch (Exception e)
 		{
 			UniLog.Error($"Lenowo Tweaks / Exception in MakeBooleanValueDriver:\n{e}");
-		}
-		finally
+		} finally
 		{
 			field.World.EndUndoBatch();
 		}
@@ -334,12 +321,10 @@ public class MemberActionsPatches
 			bvd.TrueTarget.Target = field.Target;
 			bvd.TargetReference.Target = field;
 
-		}
-		catch (Exception e)
+		} catch (Exception e)
 		{
 			UniLog.Error($"Lenowo Tweaks / Exception in MakeBooleanReferenceDriver:\n{e}");
-		}
-		finally
+		} finally
 		{
 			field.World.EndUndoBatch();
 		}
@@ -357,15 +342,13 @@ public class MemberActionsPatches
 			bvd.TrueTarget.Target = field.Target;
 			bvd.Target.Target = field;
 
-		}
-		catch (Exception e)
+		} catch (Exception e)
 		{
 			UniLog.Error($"Lenowo Tweaks / Exception in MakeBooleanAssetDriver:\n{e}");
-		}
-		finally
+		} finally
 		{
 			field.World.EndUndoBatch();
 		}
-		
+
 	}
 }
