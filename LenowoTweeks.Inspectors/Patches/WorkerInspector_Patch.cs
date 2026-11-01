@@ -94,10 +94,55 @@ public class WorkerInspector_Patch
 			if (worker is not Slot && (!isComment || commentMode.HasFlag(CommentHeaderMode.ShowComponent) || worker.LocalUser.EditMode))
 			{
 				ui.Style.MinHeight = 32f;
-				ui.HorizontalLayout(4f);
+				var hl = ui.HorizontalLayout(4f);
 				ui.Style.MinHeight = 24f;
 				ui.Style.FlexibleWidth = 1000f;
+				Component? workerComp = null;
+				if (worker is Component comp)
+				{
+					workerComp = comp;
+					if (LenowoTweeks_Inspectors.componentHeaderBaseFields.Value)
+					{
+						// some silly shit idk
+						ui.PushStyle();
+						ui.Style.MinWidth = 24f;
+						ui.Style.FlexibleWidth = 16f;
+
+						var persistentField = Traverse.Create(comp).Field<Sync<bool>>("persistent").Value;
+						
+						var enabledContainer = ui.Panel();
+						var enabledEditor = ui.BooleanMemberEditor(comp.EnabledField);
+						ui.NestOut();
+						var persistentContainer = ui.Panel();
+						var persistentEditor = ui.BooleanMemberEditor(persistentField);
+						ui.NestOut();
+						
+						var enabledButton = enabledContainer.Slot.Children[0].Children[0].GetComponent<Button>(); //Traverse.Create(enabledEditor).Field<SyncRef<Button>>("_button").Value.Target;
+						var persistentButton = persistentContainer.Slot.Children[0].Children[0].GetComponent<Button>(); //Traverse.Create(persistentEditor).Field<SyncRef<Button>>("_button").Value.Target;
+						// its not like you can drag out the value of a bool field, so may as well allow for field ref grabbing
+						// this allows for sourcing, driving and referencing, so i think this makes it a lot better (no need to turn off the setting to drive it)
+						// update order is a different case, but i also have no idea why you would even want to drive update order so only these 2 get it
+						enabledButton.Slot.AttachComponent<ReferenceProxySource>().Reference.Target = comp.EnabledField;
+						persistentButton.Slot.AttachComponent<ReferenceProxySource>().Reference.Target = persistentField;
+						enabledContainer.Slot.Name = "Enabled";
+						persistentContainer.Slot.Name = "Persistent";
+						ui.PopStyle();
+					}
+				}
 				Button button = ui.Button(GetComponentHeaderName(worker), new colorX?(RadiantUI_Constants.BUTTON_COLOR));
+
+				if (workerComp != null && LenowoTweeks_Inspectors.componentHeaderBaseFields.Value)
+				{
+					ui.PushStyle();
+					ui.Style.MinWidth = 28f;
+					ui.Style.FlexibleWidth = 16f;
+					var updateOrderSlot = ui.Panel().Slot;
+					SyncMemberEditorBuilder.BuildField(Traverse.Create(workerComp).Field<Sync<int>>("updateOrder").Value, null, updateOrderSlot, null);
+					updateOrderSlot.Name = "Update Order";
+					ui.NestOut();
+					ui.PopStyle();
+				}
+
 				button.Label.Color.Value = RadiantUI_Constants.LABEL_COLOR;
 				if (allowRemove || allowDuplicate || allowContainer)
 				{
@@ -145,6 +190,8 @@ public class WorkerInspector_Patch
 							if (__instance == null || __instance.IsRemoved || __instance.Slot == null || __instance.Slot.IsRemoved || worker == null || worker.IsRemoved) return;
 							// try a bit more to prevent random crashes from other users expanding the component
 							if (ui == null || content == null || content.IsRemoved) return;
+							if (hl == null || hl.IsRemoved) return;
+							
 							if (content.ChildrenCount == 0 && v)
 							{
 								ui.NestInto(content);
@@ -171,6 +218,45 @@ public class WorkerInspector_Patch
 								{
 									WorkerInspector.BuildInspectorUI(worker, ui, memberFilter);
 								}
+								if (workerComp != null && LenowoTweeks_Inspectors.componentHeaderBaseFields.Value && LenowoTweeks_Inspectors.componentHeaderBaseFieldsRemoveOriginal.Value)
+								{
+									// if the base fields are collapsed into the header, they should probably be removed from the top of the component
+									// some components do provide a custom before/after for generation, so cant just *not* generate those, at least not without something weird
+									// while not optimal, it is possible to just remove them afterwards, which is what is done here.
+
+									int found = 0;
+									List<Slot> fieldChildren = [.. ui.Root.Children];
+									foreach (var slot in fieldChildren)
+									{
+										var field = slot.FindChild("Field");
+										if (field == null) continue;
+										var fieldCompSlot = field.Children.FirstOrDefault();
+										if (fieldCompSlot == null) continue;
+										var boolEditor = fieldCompSlot.GetComponent<BooleanMemberEditor>();
+										var pme = fieldCompSlot.GetComponent<PrimitiveMemberEditor>();
+										// stupid and dumb but works
+										if (boolEditor != null)
+										{
+											var targetField = Traverse.Create(boolEditor).Field<RelayRef<IField>>("_target").Value.Target;
+											if (targetField.Name == "Enabled" || targetField.Name == "persistent")
+											{
+												found++;
+												slot.Destroy();
+											}
+										}
+										else if (pme != null)
+										{
+											var targetField = Traverse.Create(pme).Field<RelayRef<IField>>("_target").Value.Target;
+											if (targetField.Name == "UpdateOrder")
+											{
+												found++;
+												slot.Destroy();
+											}
+										}
+
+										if (found == 3) break;
+									}
+								}
 								ui.Style.MinHeight = 8f;
 								ui.Panel();
 								ui.NestOut();
@@ -185,7 +271,7 @@ public class WorkerInspector_Patch
 					};
 					if (__instance.TargetWorker is Slot container)
 					{
-						if (container.ComponentCount < LenowoTweeks_Inspectors.collapseMinComponents.Value && worker.SyncMemberCount < LenowoTweeks_Inspectors.collapseMinFields.Value)
+						if (container.ComponentCount < LenowoTweeks_Inspectors.collapseMinComponents.Value && (workerComp != null ? workerComp.SyncMemberCount - 3 : worker.SyncMemberCount) < LenowoTweeks_Inspectors.collapseMinFields.Value)
 						{
 							content.ActiveSelf_Field.Value = true;
 						}

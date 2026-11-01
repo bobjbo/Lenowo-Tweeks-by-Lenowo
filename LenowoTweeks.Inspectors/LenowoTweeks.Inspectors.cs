@@ -46,7 +46,7 @@ public class LenowoTweeks_Inspectors : LenowoTweak
 	public static ModConfigKey<bool> expandedStringInputs = new("Expanded String Inputs", "This toggles if string fields on inspectors should get bigger based on the text in them.", false);
 
 	public static ModConfigKey<bool> modifiedInspectorUIX = new("Modified Inspector UIX", "This toggles if the inspector UIX Fields should load in the custom way.", false);
-	public static ModConfigKey<Patches.FieldNameMode> fieldNameMode = new("Field Name Mode", "This controls how the fields are named in the inspector.", Patches.FieldNameMode.Normal);
+	public static ModConfigKey<FieldNameMode> fieldNameMode = new("Field Name Mode", "This controls how the fields are named in the inspector.", Patches.FieldNameMode.Normal);
 	public static ModConfigKey<bool> slotInspectorResetAll = new("Slot Inspector Reset All", "This toggles if a 'Reset All' button is created on inspectors", false);
 
 	public static ModConfigKey<bool> extraMemberActions = new("Extra Member Actions", "If clicking on the left bit of fields has more actions", false);
@@ -59,7 +59,10 @@ public class LenowoTweeks_Inspectors : LenowoTweak
 	public static ModConfigKey<colorX> expandedComponentColor = new("Expanded Component Color", "This text color of a expanded component.", RadiantUI_Constants.LABEL_COLOR);
 
 	public static ModConfigKey<int> collapseMinComponents = new("Auto Collapse: Minimum Components", "How many components are required to be on a slot before it collapses by default. 0 or less will always collapse components.", 0);
-	public static ModConfigKey<int> collapseMinFields = new("Auto Collapse: Minimum Fields", "How many fields on the component before it collapses by default, useful if you want to only show smaller components. 0 or less will always collapse components.", 12);
+	public static ModConfigKey<int> collapseMinFields = new("Auto Collapse: Minimum Fields", "How many fields on the component (excluding enabled, persistent and update order) before it collapses by default, useful if you want to only show smaller components. 0 or less will always collapse components.", 6);
+
+	public static ModConfigKey<bool> componentHeaderBaseFields = new("Component Header Base Fields", "If the base fields on components (enabled, persistent, update order) should be in the component header.", false);
+	public static ModConfigKey<bool> componentHeaderBaseFieldsRemoveOriginal = new("Component Header Base Fields: Remove Normal Fields", "If enabled/persistent/update order should be removed from the component content.", true);
 
 	public static ModConfigKey<bool> modifiedComponentHeaders = new("Modified Component Headers", "This toggles if the component headers can be modified on certain types", true);
 	public static ModConfigKey<string> dynvarComponentHeaderName = new("Dynvar Component Header Name", "Replaces ['Variable','Field','Reference'] with the provided text on dynamic variables in the component header (Formatted as 'Variable;Field;Reference')", "");
@@ -93,7 +96,7 @@ public class LenowoTweeks_Inspectors : LenowoTweak
 			"Inspectors", new()
 			{
 				{ "Base", [ modifiedInspectorUIX, fieldNameMode, /*copyComponentsToButtons,*/ nohelp, expandedStringInputs, slotInspectorResetAll, extraMemberActions, moreMemberActions, defaultUIXPanelColor, variableSpaceForWorkers ] },
-				{ "Components", [ collapseComponents, collapsedComponentColor, expandedComponentColor, collapseMinComponents, collapseMinFields, modifiedComponentHeaders, dynvarComponentHeaderName, sortComponentsByUpdateOrder, commentHeaderMode ]},
+				{ "Components", [ collapseComponents, collapsedComponentColor, expandedComponentColor, collapseMinComponents, collapseMinFields, componentHeaderBaseFields, componentHeaderBaseFieldsRemoveOriginal, modifiedComponentHeaders, dynvarComponentHeaderName, sortComponentsByUpdateOrder, commentHeaderMode ]},
 				{ "Lists", [ listCollapsing, maxListElementsForAutoCollapse, bagCollapsing, maxBagElementsForAutoCollapse ]},
 				{ "Blendshapes", [ displayIndexWithBlendshape, allowSearchingBlendshapes ] },
 				{ "Actions", [ enableAddChildrenBuilder, childrenBuilderOnlyUIX ] }
