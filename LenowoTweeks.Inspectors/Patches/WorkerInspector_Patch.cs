@@ -126,6 +126,11 @@ public class WorkerInspector_Patch
 						persistentButton.Slot.AttachComponent<ReferenceProxySource>().Reference.Target = persistentField;
 						enabledContainer.Slot.Name = "Enabled";
 						persistentContainer.Slot.Name = "Persistent";
+
+						// fix the component destroy button not destroying the component ui
+						// this is caused by the referenceproxysource, as WorkerInspector does GetComponentInChildren which will find the enabled source, not the worker itself
+						hl.Slot.AttachComponent<ReferenceProxySource>().Reference.Target = worker;
+
 						ui.PopStyle();
 					}
 				}
