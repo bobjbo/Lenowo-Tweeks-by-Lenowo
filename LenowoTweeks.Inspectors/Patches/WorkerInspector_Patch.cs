@@ -117,8 +117,8 @@ public class WorkerInspector_Patch
 						var persistentEditor = ui.BooleanMemberEditor(persistentField);
 						ui.NestOut();
 						
-						var enabledButton = enabledContainer.Slot.Children[0].Children[0].GetComponent<Button>(); //Traverse.Create(enabledEditor).Field<SyncRef<Button>>("_button").Value.Target;
-						var persistentButton = persistentContainer.Slot.Children[0].Children[0].GetComponent<Button>(); //Traverse.Create(persistentEditor).Field<SyncRef<Button>>("_button").Value.Target;
+						var enabledButton = enabledContainer.Slot.Children[0].Children[0].GetComponent<Button>();
+						var persistentButton = persistentContainer.Slot.Children[0].Children[0].GetComponent<Button>();
 						// its not like you can drag out the value of a bool field, so may as well allow for field ref grabbing
 						// this allows for sourcing, driving and referencing, so i think this makes it a lot better (no need to turn off the setting to drive it)
 						// update order is a different case, but i also have no idea why you would even want to drive update order so only these 2 get it
@@ -390,22 +390,41 @@ public class WorkerInspector_Patch
 				string referenceHeader = split.Length >= 3 ? split[2] : "";
 				if (string.IsNullOrEmpty(referenceHeader)) referenceHeader = "Reference";
 
-				headerName = $"{((workerType == typeof(DynamicTypeVariable) || workerType == typeof(DynamicTypeField)) ? "Type" : workerType.GenericTypeArguments.First().GetNiceName())} Variable: {(string.IsNullOrWhiteSpace(dynVar.VariableName) ? "<i>unset</i>" : dynVar.VariableName)}";
-				string niceName = workerType.GetNiceName();
-				if (niceName.Contains("Variable") && !niceName.Contains("Variable<") && !niceName.Contains("Type"))
+				string varTypeName = (workerType == typeof(DynamicTypeVariable) || workerType == typeof(DynamicTypeField)) ? "Type" : workerType.GenericTypeArguments.First().GetNiceName();
+				string varName = string.IsNullOrWhiteSpace(dynVar.VariableName) ? "<i>unset</i>" : dynVar.VariableName;
+
+				var genericType = workerType.IsGenericType ? workerType.GetGenericTypeDefinition() : workerType;
+				string variableType = varHeader;
+
+				if (workerType == typeof(DynamicTypeField))
 				{
-					string variableComponentName = niceName.Substring(niceName.IndexOf("Variable"), MathX.Clamp(niceName.IndexOf('<') - niceName.IndexOf("Variable"), 0, 1000));
-					headerName = headerName.Replace("Variable", Regex.Replace(variableComponentName, "(?<!^)([A-Z])", " $1"));
+					variableType = fieldHeader;
 				}
-				else if (workerType == typeof(DynamicTypeVariable) || workerType == typeof(DynamicTypeField))
+				else if (genericType == typeof(DynamicField<>))
 				{
-					headerName = headerName.Replace("Variable", workerType == typeof(DynamicTypeField) ? fieldHeader : "Variable");
+					variableType = fieldHeader;
 				}
-				else if (workerType.GetGenericTypeDefinition() == typeof(DynamicField<>) || workerType.GetGenericTypeDefinition() == typeof(DynamicReference<>))
+				else if (genericType == typeof(DynamicReference<>))
 				{
-					headerName = headerName.Replace("Variable", (workerType.GetGenericTypeDefinition() == typeof(DynamicField<>)) ? fieldHeader : referenceHeader);
+					variableType = referenceHeader;
 				}
-				headerName = headerName.Replace("Variable", varHeader);
+
+				string niceName = genericType.GetNiceName();
+				
+				// find DynamicVariableDrivers and show the rest of the type name
+				if (genericType != workerType && niceName.Contains("Variable"))
+				{
+					int nameStart = niceName.IndexOf("Variable") + 8;
+					int nameEnd = niceName.IndexOf("<");
+					if (nameStart < nameEnd)
+					{
+						string variableComponentName = niceName[nameStart..nameEnd];
+						var splitName = SplitByUppercase(variableComponentName);
+						variableType += " " + string.Join(" ", splitName);
+					}
+				}
+				
+				headerName = $"{varTypeName} {variableType}: {varName}";
 			}
 			else if (worker is DynamicVariableSpace space)
 			{
