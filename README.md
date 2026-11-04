@@ -25,3 +25,5 @@ When it comes to using the mod, you ***must*** have `LenowoTweeks.Core` installe
 1. Install [ResoniteModLoader](https://github.com/resonite-modding-group/ResoniteModLoader).
 1. Download and Extract [LenowoTweeks.All.zip](https://github.com/bobjbo/Lenowo-Tweeks-by-Lenowo/releases/latest/download/LenowoTweeks.All.zip) into your `rml_mods` folder. This folder should be at `C:\Program Files (x86)\Steam\steamapps\common\Resonite\rml_mods` for a default install. You can create it if it's missing, or if you launch the game once with ResoniteModLoader installed it will create this folder for you.
 1. Start the game. If the mods have loaded properly, you should be able to find and edit the config through [ResoniteModSettings](https://github.com/badhaloninja/ResoniteModSettings) or [RMLModSettings](https://github.com/NepuShiro/RMLModSettings) (For BepisLoader)
+
+tldr if you are using monkey loader, turn off the custominspector injector setting for the inspector patches to work.
