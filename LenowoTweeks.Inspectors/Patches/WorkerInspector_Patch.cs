@@ -136,6 +136,13 @@ public class WorkerInspector_Patch
 				}
 				Button button = ui.Button(GetComponentHeaderName(worker), new colorX?(RadiantUI_Constants.BUTTON_COLOR));
 
+				if (LenowoTweeks_Inspectors.modifiedComponentHeaders.Value && LenowoTweeks_Inspectors.driveComponentHeaders.Value)
+				{
+					var textSlot = button.Slot.Children.First();
+					var textComp = textSlot.GetComponent<Text>();
+					TryMakeHeaderNameDrive(worker, textComp);
+				}
+
 				if (workerComp != null && LenowoTweeks_Inspectors.componentHeaderBaseFields.Value)
 				{
 					ui.PushStyle();
@@ -519,6 +526,183 @@ public class WorkerInspector_Patch
 		}
 
 		return $"<b>{headerName}</b>";
+	}
+
+	private static void TryMakeHeaderNameDrive(Worker worker, Text text)
+	{
+		try
+		{
+			Type workerType = worker.GetType();
+			Type baseType = workerType.BaseType;
+			Type baseParentType = baseType.IsGenericType ? baseType.GetGenericTypeDefinition() : baseType;
+			Type workerGenericArg = workerType.IsGenericType ? workerType.GenericTypeArguments.First() : null;
+			
+			var categoryAttribute = workerType.GetCustomAttribute<CategoryAttribute>();
+			string workerCategory = categoryAttribute?.Paths.FirstOrDefault();
+
+			var textSlot = text.Slot;
+
+			string baseFormat = null;
+			IField<string> source = null;
+
+			if (worker is IDynamicVariable dynVar)
+			{
+				string dynvarCustomHeader = LenowoTweeks_Inspectors.dynvarComponentHeaderName.Value ?? "";
+				string[] split = dynvarCustomHeader.Split(';');
+				string varHeader = split.Length >= 1 ? split[0] : "";
+				if (string.IsNullOrEmpty(varHeader)) varHeader = "Variable";
+				string fieldHeader = split.Length >= 2 ? split[1] : "";
+				if (string.IsNullOrEmpty(fieldHeader)) fieldHeader = "Field";
+				string referenceHeader = split.Length >= 3 ? split[2] : "";
+				if (string.IsNullOrEmpty(referenceHeader)) referenceHeader = "Reference";
+
+				string varTypeName = (workerType == typeof(DynamicTypeVariable) || workerType == typeof(DynamicTypeField)) ? "Type" : workerType.GenericTypeArguments.First().GetNiceName();
+				string varName = string.IsNullOrWhiteSpace(dynVar.VariableName) ? "<i>unset</i>" : dynVar.VariableName;
+
+				var genericType = workerType.IsGenericType ? workerType.GetGenericTypeDefinition() : workerType;
+				string variableType = varHeader;
+
+				if (workerType == typeof(DynamicTypeField))
+				{
+					variableType = fieldHeader;
+				}
+				else if (genericType == typeof(DynamicField<>))
+				{
+					variableType = fieldHeader;
+				}
+				else if (genericType == typeof(DynamicReference<>))
+				{
+					variableType = referenceHeader;
+				}
+
+				string niceName = genericType.GetNiceName();
+				
+				// find DynamicVariableDrivers and show the rest of the type name
+				if (genericType != workerType && niceName.Contains("Variable"))
+				{
+					int nameStart = niceName.IndexOf("Variable") + 8;
+					int nameEnd = niceName.IndexOf("<");
+					if (nameStart < nameEnd)
+					{
+						string variableComponentName = niceName[nameStart..nameEnd];
+						var splitName = SplitByUppercase(variableComponentName);
+						variableType += " " + string.Join(" ", splitName);
+					}
+				}
+
+				Sync<string> varNameField = Traverse.Create(worker).Field<Sync<string>>("VariableName").Value;
+
+				source = varNameField;
+				baseFormat = $"{varTypeName} {variableType}: {{0}}";
+			}
+			else if (worker is DynamicVariableSpace space)
+			{
+				source = space.SpaceName;
+				baseFormat = $"{workerType.GetNiceName()}: {{0}}";
+			}
+			else if (baseParentType == typeof(DynamicVariableResetBase<>))
+			{
+				Type dataType = workerType.GenericTypeArguments[0];
+
+				Sync<string> varNameField = Traverse.Create(worker).Field<Sync<string>>("VariableName").Value;
+
+				source = varNameField;
+				baseFormat = $"{dataType.GetNiceName()} Variable Reset: {{0}}";
+			}
+
+			else if (baseParentType == typeof(ParentData<>))
+			{
+				dynamic parentData = worker;
+				Sync<string> tagField = parentData.Tag;
+
+				Type dataType = workerType.GenericTypeArguments[0];
+				string typeType = typeof(IWorldElement).IsAssignableFrom(dataType) ? "Reference" : "Value";
+				
+				source = tagField;
+				baseFormat = $"{dataType.GetNiceName()} Parent {typeType}: {{0}}";
+			}
+			else if (baseParentType == typeof(ParentDataLink<>))
+			{
+				dynamic parentData = worker;
+				
+				Sync<string> tagField = parentData.MatchTag;
+
+				Type dataType = workerType.GenericTypeArguments[0];
+				string typeType = typeof(IWorldElement).IsAssignableFrom(dataType) ? "Reference" : "Value";
+				
+				source = tagField;
+				baseFormat = $"{dataType.GetNiceName()} Parent {typeType} Link: {{0}}";
+			}
+
+			else if (worker is ISpatialVariable spatialVar)
+			{
+				Type spatialType = workerType.GenericTypeArguments[0];
+				string typeName = workerType.GetNiceName();
+				int endOfStart = typeName.IndexOf("Value");
+				if (endOfStart == -1) endOfStart = typeName.IndexOf("Reference");
+				var split = SplitByUppercase(typeName[..endOfStart]);
+				string ShapeType = split[0];
+				string ValueType = string.Join(" ", split[1..]);
+
+				source = Traverse.Create(worker).Field<Sync<string>>("VariableName").Value;
+				baseFormat = $"{spatialType.GetNiceName()} {ShapeType} {ValueType} Variable: {{0}}";
+			}
+			else if (workerCategory == "Data/Spatial/Samplers" && workerType != typeof(SpatialVariableBlendDriver))
+			{
+				// this is also just stupid in general
+				dynamic spatial2 = worker;
+				// variable type
+				Type? varType = workerType.IsGenericType ? workerType.GenericTypeArguments[0] : null;
+				if (varType == null && workerType == typeof(TypeSpatialVariableDriver)) varType = typeof(Type);
+				// BooleanSpatialVariableDriver has no generics and as such i must read it a stupid way
+				if (varType == null && spatial2.DefaultValue != null) varType = spatial2.DefaultValue.Value.GetType();
+				// extract its end type (driver, collector, partial derivative driver)
+				string typeName = workerType.GetNiceName();
+				int nameEnd = typeName.IndexOf("<");
+				int nameStart = typeName.IndexOf("SpatialVariable") + 15;
+				var split = SplitByUppercase(nameEnd < 0 ? typeName[nameStart..] : typeName[nameStart..nameEnd]);
+				string compType = string.Join(" ", split);
+				// extract its start type (numeric, minmax, cloning)
+				var split2 = SplitByUppercase(typeName[..(nameStart - 15)]);
+				string specialType = string.Join(" ", split2[..(split2.Count() - 1)]);
+				if (specialType != "") specialType += " ";
+
+				source = Traverse.Create(worker).Field<Sync<string>>("VariableName").Value;
+				baseFormat = $"{varType.GetNiceName()} {specialType}Spatial {compType}: {{0}}";
+			}
+
+			else if (worker is CloudVariableBase cloudVar)
+			{
+				string typeName = workerType.GetNiceName();
+				var split = SplitByUppercase(typeName[..typeName.IndexOf("<")]);
+				string varType = split.Last();
+				string activeName = split[0] == "Active" ? "Active " : "";
+				
+				source = cloudVar.Path;
+				baseFormat = $"{workerType.GenericTypeArguments[0].GetNiceName()} {activeName}Cloud {varType}: {{0}}";
+			}
+
+			if (source != null && baseFormat != null)
+			{
+				var formatDriver = textSlot.AttachComponent<ValueTextFormatDriver<string>>();
+				formatDriver.Source.Target = source;
+				formatDriver.Text.Target = text.Content;
+
+				var formatSwitcher = textSlot.AttachComponent<BooleanValueDriver<string>>();
+				formatSwitcher.TrueValue.Value = "<b>" + baseFormat + "</b>";
+				formatSwitcher.FalseValue.Value = "<b>" + string.Format(baseFormat, "<i>unset</i>") + "</b>";
+				formatSwitcher.TargetField.Target = formatDriver.Format;
+
+				var eqDriver = textSlot.AttachComponent<ValueEqualityDriver<string>>();
+				eqDriver.TargetValue.Target = source;
+				eqDriver.Invert.Value = true;
+				eqDriver.Target.Target = formatSwitcher.State;
+			}
+		}
+		catch (Exception e)
+		{
+			UniLog.Error($"LenowoTweeks // Exception in TryMakeHeaderNameDrive:\n{e}");
+		}
 	}
 
 	static string[] SplitByUppercase(string input)

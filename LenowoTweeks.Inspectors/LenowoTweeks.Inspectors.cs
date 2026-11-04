@@ -65,6 +65,8 @@ public class LenowoTweeks_Inspectors : LenowoTweak
 	public static ModConfigKey<bool> componentHeaderBaseFieldsRemoveOriginal = new("Component Header Base Fields: Remove Normal Fields", "If enabled/persistent/update order should be removed from the component content.", true);
 
 	public static ModConfigKey<bool> modifiedComponentHeaders = new("Modified Component Headers", "This toggles if the component headers can be modified on certain types", true);
+	public static ModConfigKey<bool> driveComponentHeaders = new("Drive Component Headers", "If using modified component headers, this controls if the name is driven. This is useful for Dynamic Variables to see the actual variable name without refreshing the inspector.", true);
+
 	public static ModConfigKey<string> dynvarComponentHeaderName = new("Dynvar Component Header Name", "Replaces ['Variable','Field','Reference'] with the provided text on dynamic variables in the component header (Formatted as 'Variable;Field;Reference')", "");
 
 	public static ModConfigKey<bool> sortComponentsByUpdateOrder = new("Sort Components By Update Order", "If components should be sorted by their update order first, rather than by refid", false);
@@ -96,7 +98,7 @@ public class LenowoTweeks_Inspectors : LenowoTweak
 			"Inspectors", new()
 			{
 				{ "Base", [ modifiedInspectorUIX, fieldNameMode, /*copyComponentsToButtons,*/ nohelp, expandedStringInputs, slotInspectorResetAll, extraMemberActions, moreMemberActions, defaultUIXPanelColor, variableSpaceForWorkers ] },
-				{ "Components", [ collapseComponents, collapsedComponentColor, expandedComponentColor, collapseMinComponents, collapseMinFields, componentHeaderBaseFields, componentHeaderBaseFieldsRemoveOriginal, modifiedComponentHeaders, dynvarComponentHeaderName, sortComponentsByUpdateOrder, commentHeaderMode ]},
+				{ "Components", [ collapseComponents, collapsedComponentColor, expandedComponentColor, collapseMinComponents, collapseMinFields, componentHeaderBaseFields, componentHeaderBaseFieldsRemoveOriginal, modifiedComponentHeaders, driveComponentHeaders, dynvarComponentHeaderName, sortComponentsByUpdateOrder, commentHeaderMode ]},
 				{ "Lists", [ listCollapsing, maxListElementsForAutoCollapse, bagCollapsing, maxBagElementsForAutoCollapse ]},
 				{ "Blendshapes", [ displayIndexWithBlendshape, allowSearchingBlendshapes ] },
 				{ "Actions", [ enableAddChildrenBuilder, childrenBuilderOnlyUIX ] }
