@@ -55,6 +55,8 @@ public class LenowoTweeks_ProtoFlux : LenowoTweak
 	public static ModConfigKey<bool> GreedyGooberUnpack = new("GooberPrint Unpack - Greedy Mode", "If the held slot is a GooberPrint packed slot, A GPFolder tagged slot, or has a child tagged GPFolder, allow spawning a gooberprint on that slot.", false);
 
 	public static ModConfigKey<bool> InspectNodeShortcut = new("Allow Opening Inspector On Nodes", "If enabled, adds a new context menu item, which will open an inspector on the hovered ProtoFluxNode", false, "Node Quick Inspect");
+	public static ModConfigKey<bool> InspectNodeSource = new("Allow Opening Inspector On Source", "If enabled, adds a new context menu item, which will open an inspector on the slot/component of the field from the source/drive node", false);
+
 
 	public static ModConfigKey<bool> useCustomProtofluxConnections = new("Use Custom Protoflux Connections", "This toggles if protoflux should use the above uris when generating.", false);
 	public static ModConfigKey<bool> AllowFluxVisualsOverride = new("Allow Flux Visuals Override", "If enabled, allows you to override the wires/connectors with another users. set in the context menu while hovering a node, clear in the context menu when set", false);
@@ -91,7 +93,7 @@ public class LenowoTweeks_ProtoFlux : LenowoTweak
 			{
 				{ "Base", [ disableRelayBackground, expandedProtofluxStringInputs, nohelp, disablePhysicalInteraction, initializeProtofluxGlobals, useProperDelegateNames ] },
 				{ "Node Renaming", [ protofluxEditableNames, allProtofluxEditableNames ] },
-				{ "Context Menu", [ AllowGooberUnpack, GreedyGooberUnpack, InspectNodeShortcut ] },
+				{ "Context Menu", [ AllowGooberUnpack, GreedyGooberUnpack, InspectNodeShortcut, InspectNodeSource ] },
 				{ "Custom Connections", [ useCustomProtofluxConnections, AllowFluxVisualsOverride, wireImageWrapMode, wireTextureFilterMode, wireConnectorFlipUV, wireTextureColor, connectorTextureColor ] },
 				{ "Custom Connections - Image URLs", [ customProtofluxWireUIX, customProtofluxConnectorUIX, customProtofluxEmptyConnectorUIX ] },
 				{ "Collapsing", [ collapsibleProtoflux, collapseThreshold, collapseAwakeDelay ]}

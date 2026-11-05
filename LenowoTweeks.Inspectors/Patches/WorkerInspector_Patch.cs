@@ -689,8 +689,9 @@ public class WorkerInspector_Patch
 				formatDriver.Text.Target = text.Content;
 
 				var formatSwitcher = textSlot.AttachComponent<BooleanValueDriver<string>>();
-				formatSwitcher.TrueValue.Value = "<b>" + baseFormat + "</b>";
-				formatSwitcher.FalseValue.Value = "<b>" + string.Format(baseFormat, "<i>unset</i>") + "</b>";
+				var fmt = $"<b>{baseFormat}</b>";
+				formatSwitcher.TrueValue.Value = fmt;
+				formatSwitcher.FalseValue.Value = string.Format(fmt, "<i>unset</i>");
 				formatSwitcher.TargetField.Target = formatDriver.Format;
 
 				var eqDriver = textSlot.AttachComponent<ValueEqualityDriver<string>>();

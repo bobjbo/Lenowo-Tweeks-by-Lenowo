@@ -4,6 +4,7 @@ using System.Reflection.Emit;
 using Elements.Core;
 
 using FrooxEngine;
+using FrooxEngine.FrooxEngine.ProtoFlux.CoreNodes;
 using FrooxEngine.ProtoFlux;
 
 using HarmonyLib;
@@ -33,6 +34,42 @@ public class ProtofluxToolContextMenu_Patch
 				{
 					targetNode.OpenInspectorForTarget();
 				};
+			}
+
+			if (LenowoTweeks_ProtoFlux.InspectNodeSource.Value)
+			{
+				IWorldElement? possibleTarget = null;
+				Type nodeType = targetNode.GetType();
+				Type baseType = nodeType.IsGenericType ? nodeType.GetGenericTypeDefinition() : nodeType;
+				if (baseType == typeof(ValueSource<>) || baseType == typeof(ObjectValueSource<>) || baseType == typeof(ReferenceSource<>) || baseType == typeof(ElementSource<>))
+				{
+					possibleTarget = Traverse.Create(targetNode).Property<ISyncRef>("RootSourceReference").Value.Target;
+				}
+				else if (baseType == typeof(ValueFieldDrive<>) || baseType == typeof(ObjectFieldDrive<>))
+				{
+					MethodInfo getRootProxy = nodeType.GetMethod("GetRootProxy");
+					dynamic proxy = getRootProxy.Invoke(targetNode, new object[] { false });
+					possibleTarget = proxy?.Drive.Target;
+
+				}
+				else if (baseType == typeof(ReferenceDrive<>))
+				{
+					MethodInfo _getRefProxy = typeof(ProtofluxToolContextMenu_Patch).GetMethod(nameof(GetRefProxy));
+					Type nodeInnerType = nodeType.GetGenericArguments()[0];
+					MethodInfo getRefProxy = _getRefProxy?.MakeGenericMethod(nodeInnerType);
+					dynamic proxy = getRefProxy.Invoke(null, new object[] { targetNode });
+					possibleTarget = proxy?.Drive.Target;
+				}
+
+				if (possibleTarget != null)
+				{
+					var newItem = menu.AddItem("Open Source", new Uri("resdb:///bce306daeb7aec97fee14ea9d6f3320c86fd9a102554167c520e5feb048aba94.png"), new colorX?(colorX.Orange));
+					newItem.Button.LocalPressed += (_, _) =>
+					{
+						possibleTarget.OpenInspectorForTarget(openWorkerOnly: true);
+						menu.Close();
+					};
+				}
 			}
 
 			// 500 nested if statements
@@ -153,6 +190,11 @@ public class ProtofluxToolContextMenu_Patch
 		if (!LenowoTweeks_ProtoFlux.nohelp.Value) return Hyperlink.AttachForWikiPage(slot, type);
 		slot.Destroy();
 		return null;
+	}
+
+	public static FrooxEngine.ProtoFlux.CoreNodes.ReferenceDrive<T>.Proxy GetRefProxy<T>(ProtoFluxNode node) where T : class, IWorldElement
+	{
+		return node.Slot.GetComponent((global::FrooxEngine.ProtoFlux.CoreNodes.ReferenceDrive<T>.Proxy p) => p.Node.Target == node);
 	}
 
 	[HarmonyReversePatch]
