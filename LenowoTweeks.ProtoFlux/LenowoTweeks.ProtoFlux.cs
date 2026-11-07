@@ -68,6 +68,8 @@ public class LenowoTweeks_ProtoFlux : LenowoTweak
 	public static ModConfigKey<colorX> wireTextureColor = new("Wire Texture Color", "This controls the color to be multiplied with the type color of the wires. white=normal, black=black, red=string normal but int black", new colorX(1f));
 	public static ModConfigKey<colorX> connectorTextureColor = new("Connector Texture Color", "This controls the color to be multiplied with the type color of the connectors. white=normal, black=black, red=string normal but int black", new colorX(1f));
 
+	public static ModConfigKey<int> wireRenderQueue = new("Wire Render Queue", "This controls the render queue of the wire material", 2000);
+
 	public static ModConfigKey<Uri> customProtofluxWireUIX = new("Custom Protoflux Wire Image", "This url is used to replace the wires on protoflux nodes.", new("resdb:///1199546a9976a6a907aebfd4e4b45663f7559efd007f03e28e93f26773812f99.png"), "Custom Protoflux Wire UIX");
 	public static ModConfigKey<Uri> customProtofluxConnectorUIX = new("Custom Protoflux Connector Image", "This url is used to replace the connectors on protoflux nodes.", new("resdb:///b09b97338a59244be33fcf1b3366f23bf823c09dd556d7818b65b79801611b47.png"), "Custom Protoflux Connector UIX");
 	public static ModConfigKey<Uri?> customProtofluxEmptyConnectorUIX = new("Custom Protoflux Empty Connector Image", "This url is used to replace the connectors on protoflux nodes when nothing is connected.", null, "Custom Protoflux Empty Connector UIX");
@@ -94,7 +96,7 @@ public class LenowoTweeks_ProtoFlux : LenowoTweak
 				{ "Base", [ disableRelayBackground, expandedProtofluxStringInputs, nohelp, disablePhysicalInteraction, initializeProtofluxGlobals, useProperDelegateNames ] },
 				{ "Node Renaming", [ protofluxEditableNames, allProtofluxEditableNames ] },
 				{ "Context Menu", [ AllowGooberUnpack, GreedyGooberUnpack, InspectNodeShortcut, InspectNodeSource ] },
-				{ "Custom Connections", [ useCustomProtofluxConnections, AllowFluxVisualsOverride, wireImageWrapMode, wireTextureFilterMode, wireConnectorFlipUV, wireTextureColor, connectorTextureColor ] },
+				{ "Custom Connections", [ useCustomProtofluxConnections, AllowFluxVisualsOverride, wireImageWrapMode, wireTextureFilterMode, wireConnectorFlipUV, wireTextureColor, connectorTextureColor, wireRenderQueue ] },
 				{ "Custom Connections - Image URLs", [ customProtofluxWireUIX, customProtofluxConnectorUIX, customProtofluxEmptyConnectorUIX ] },
 				{ "Collapsing", [ collapsibleProtoflux, collapseThreshold, collapseAwakeDelay ]}
 			}

@@ -39,7 +39,7 @@ public class ProtoFluxWireManager_Patches
 		//unlitMaterial.UseVertexColors.Value = true;
 		ui_unlitMaterial.BlendMode.Value = BlendMode.Alpha;
 		ui_unlitMaterial.ZWrite.Value = ZWrite.On;
-		ui_unlitMaterial.RenderQueue.Value = 2000;
+		ui_unlitMaterial.RenderQueue.Value = LenowoTweeks_ProtoFlux.wireRenderQueue.Value;
 
 		return ui_unlitMaterial;
 	}

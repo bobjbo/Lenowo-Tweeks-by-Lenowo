@@ -37,7 +37,11 @@ public class LenowoTweeks_General : LenowoTweak
 	public static ModConfigKey<ValueFieldDropMode> valueFieldDroppingMode = new("Valuefield Dropping Mode", "This controls how ValueFields are allowed to drop into TextFields.\t <size=90%>AlwaysAllow = Works as normal, AllowIfNotSelf = Prevent ValueFields under the same ObjectRoot as the TextField, NeverAllow = Never drop ValueFields</size>", ValueFieldDropMode.AlwaysAllow);
 	public static ModConfigKey<string> worldSearchGlobalTags = new("Global World Search Filter", "Global Tags to apply to all world searches.", "", "World Search Global Tags");
 
-	public static ModConfigKey<bool> getItemLink = new("Get Item Link", "If enabled, adds some buttons to the dash for getting a resdb or resrec. Same as the GetItemLink mod, but part of here for rml support", false);
+	public static ModConfigKey<bool> getItemLink = new("Get Item Link", "If enabled, adds some buttons to the dash for getting a resdb or resrec. Same as the GetItemLink mod", false);
+
+	public static ModConfigKey<bool> smallPrimitives = new("Small Primitives", "Adds a new option to the 'Create New' menu, to create smaller versions of the base primitives.", false);
+	public static ModConfigKey<bool> removeMeshDefaultGizmo = new("Remove Mesh Default Gizmo", "When creating a mesh from 'Create New', the gizmo will be cleared by default.", false);
+
 
 	public static ModConfiguration? Config;
 
@@ -46,7 +50,8 @@ public class LenowoTweeks_General : LenowoTweak
 		{
 			"General", new()
 			{
-				{ "Base", [ valueFieldDroppingMode, worldSearchGlobalTags, getItemLink ] }
+				{ "Base", [ valueFieldDroppingMode, worldSearchGlobalTags, getItemLink ] },
+				{ "Create New", [ smallPrimitives, removeMeshDefaultGizmo ] }
 			}
 		}
 	};
