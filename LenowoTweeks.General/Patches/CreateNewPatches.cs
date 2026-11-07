@@ -2,9 +2,7 @@ using HarmonyLib;
 using FrooxEngine;
 
 using System.Collections;
-using System.Reflection;
 using FrooxEngine.UIX;
-using Elements.Core;
 
 namespace LenowoTweeks.General;
 
@@ -24,17 +22,17 @@ public static class CreateNewPatches
 				DevCreateNewForm.AddAction("/Mod:Small3DModels", "Box", (slot) =>
 				{
 					DevCreateNewForm.SpawnMesh(slot, typeof(BoxMesh));
-					slot.GetComponent<BoxMesh>().Size.Value = float3.One * 0.1f;
+					slot.GetComponent<BoxMesh>().Size.Value *= LenowoTweeks_General.smallPrimitiveScale.Value;
 				});
 				DevCreateNewForm.AddAction("/Mod:Small3DModels", "Sphere", (slot) =>
 				{
 					DevCreateNewForm.SpawnMesh(slot, typeof(SphereMesh));
-					slot.GetComponent<SphereMesh>().Radius.Value = 0.05f;
+					slot.GetComponent<SphereMesh>().Radius.Value *= LenowoTweeks_General.smallPrimitiveScale.Value;
 				});
 				DevCreateNewForm.AddAction("/Mod:Small3DModels", "Quad", (slot) =>
 				{
 					DevCreateNewForm.SpawnMesh(slot, typeof(QuadMesh));
-					slot.GetComponent<QuadMesh>().Size.Value = float2.One * 0.1f;
+					slot.GetComponent<QuadMesh>().Size.Value *= LenowoTweeks_General.smallPrimitiveScale.Value;
 				});
 			}
 		}

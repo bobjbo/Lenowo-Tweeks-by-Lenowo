@@ -40,6 +40,7 @@ public class LenowoTweeks_General : LenowoTweak
 	public static ModConfigKey<bool> getItemLink = new("Get Item Link", "If enabled, adds some buttons to the dash for getting a resdb or resrec. Same as the GetItemLink mod", false);
 
 	public static ModConfigKey<bool> smallPrimitives = new("Small Primitives", "Adds a new option to the 'Create New' menu, to create smaller versions of the base primitives.", false);
+	public static ModConfigKey<float> smallPrimitiveScale = new("Small Primitive Scale Multiplier", "How small the meshes should be if created through the 'Small 3D Models' Category.", 0.1f);
 	public static ModConfigKey<bool> removeMeshDefaultGizmo = new("Remove Mesh Default Gizmo", "When creating a mesh from 'Create New', the gizmo will be cleared by default.", false);
 
 
@@ -51,7 +52,7 @@ public class LenowoTweeks_General : LenowoTweak
 			"General", new()
 			{
 				{ "Base", [ valueFieldDroppingMode, worldSearchGlobalTags, getItemLink ] },
-				{ "Create New", [ smallPrimitives, removeMeshDefaultGizmo ] }
+				{ "Create New", [ smallPrimitives, smallPrimitiveScale, removeMeshDefaultGizmo ] }
 			}
 		}
 	};
