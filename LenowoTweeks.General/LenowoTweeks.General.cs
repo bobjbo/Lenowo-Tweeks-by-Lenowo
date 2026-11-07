@@ -100,6 +100,7 @@ public class LenowoTweeks_General : LenowoTweak
 #if DEBUG
 	static void BeforeHotReload()
 	{
+		CreateNewPatches.ClearModCategories();
 		harmony.UnpatchAll(harmonyID);
 	}
 

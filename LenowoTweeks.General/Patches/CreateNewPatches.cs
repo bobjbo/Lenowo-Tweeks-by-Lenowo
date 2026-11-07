@@ -85,4 +85,17 @@ public static class CreateNewPatches
 		if (!LenowoTweeks_General.removeMeshDefaultGizmo.Value) return;
 		slot.GetComponent<GizmoLink>().RemoveGizmo();
 	}
+
+#if DEBUG
+	public static void ClearModCategories()
+	{
+		var categoryKeys = (IDictionary)Traverse.Create(typeof(DevCreateNewForm)).Field("root").Field("_subcategories").GetValue();
+		var curKeys = (IEnumerable<string>)categoryKeys.Keys;
+		List<string> toRemove = [.. curKeys.Where(s => s.StartsWith("Mod:"))];
+		foreach (var key in toRemove)
+		{
+			categoryKeys.Remove(key);
+		}
+	}
+#endif
 }
