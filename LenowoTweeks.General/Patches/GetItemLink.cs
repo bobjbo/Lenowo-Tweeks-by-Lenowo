@@ -9,7 +9,7 @@ using FrooxEngine.UIX;
 
 using HarmonyLib;
 
-namespace LenowoTweeks.General;
+namespace LenowoTweeks.General.Patches;
 
 // directly copied from https://github.com/EIA485/NeosGetItemLink/blob/master/GetItemLink/GetItemLink.cs
 // mainly here as an rml version of the mod as its pure bepisloader now

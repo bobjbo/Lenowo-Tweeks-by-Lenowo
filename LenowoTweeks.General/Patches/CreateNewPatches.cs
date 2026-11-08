@@ -4,7 +4,7 @@ using FrooxEngine;
 using System.Collections;
 using FrooxEngine.UIX;
 
-namespace LenowoTweeks.General;
+namespace LenowoTweeks.General.Patches;
 
 [HarmonyPatch]
 public static class CreateNewPatches
