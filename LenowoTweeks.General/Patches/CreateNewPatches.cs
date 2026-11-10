@@ -83,7 +83,7 @@ public static class CreateNewPatches
 	public static void AfterMeshSpawn(Slot slot)
 	{
 		if (!LenowoTweeks_General.removeMeshDefaultGizmo.Value) return;
-		slot.GetComponent<GizmoLink>().RemoveGizmo();
+		slot.GetComponent<GizmoLink>()?.RemoveGizmo();
 	}
 
 #if DEBUG
