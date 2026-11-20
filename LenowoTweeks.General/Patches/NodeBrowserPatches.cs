@@ -42,8 +42,17 @@ public class NodeBrowserPatches
     
     static void AddDefaults(UIBuilder ui, Type baseType)
     {
-        //UniLog.Warning(ui.ToString());
-        ui.Text("LenowoTweeks: Added default components for " + baseType.Name);
+        List<string> messages = ["Hello, $USER.", "HAIIIIIIIIIIIIIIIIIIII", "Whatcha here for?", "$USER is stinky.", "Lookin' for an illegal type?", "What if it could be SH64?"];
+        var msg = RandomX.Range(messages.Count);
+        ui.Text("<size=400%><color=hero.purple>" + messages[msg].Replace("$USER", ui.World.LocalUser.UserName) + "</size>");
+
+        List<Type> DefaultTypes = [typeof(Slot), typeof(User), typeof(IAssetProvider<Material>), typeof(IAssetProvider<ITexture2D>)];
+        
+        foreach (var type in DefaultTypes)
+        {
+           
+        }
+
     }
 
 }
