@@ -41,6 +41,50 @@ public class NodeBrowserPatches
 		}
 		return codes.AsEnumerable();
 	}
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ComponentSelector), "BuildUI")]
+    public static void AfterBuildGenericTypes(ComponentSelector __instance)
+    {
+        var num = RandomX.Hue;
+        __instance.Slot.FindChild("Image").GetComponent<Image>().Tint.Value = num;
+        var headertext = __instance.Slot.FindChild("Image").FindChild("Header").FindChildInHierarchy("Text").GetComponent<Text>();
+        headertext.Color.Value = RandomX.Hue;
+
+        //Horifying Wobbler
+        var wobble = __instance.Slot.GetComponentOrAttach<Wobbler2D>(out bool attached2);
+        if (attached2)
+        {
+            wobble.Target.Target =  __instance.Slot.GetComponent<Canvas>().Size;
+            wobble.Offset.Value = new float2(800f,1200f);
+            Traverse.Create(wobble).Field<Sync<float2>>("Speed").Value.Value = new(0.05f, 0.05f);
+            Traverse.Create(wobble).Field<Sync<float2>>("Magnitude").Value.Value = new(200f, 200f);
+
+
+        }
+
+        List<string> messages = ["OH GREAT HEAVENS", "ruh roh raggy", "oh so colorful", ";3"];
+
+		var msg = RandomX.Range(messages.Count);
+
+        headertext.Content.Value = messages[msg];
+
+        var AudioClip = __instance.Slot.GetComponentOrAttach<StaticAudioClip>(out bool attached);
+        if (attached)
+        {
+            AudioClip.URL.Value = new("resdb:///bdc6be11fdeede104a4b0cb3ea2f583bbe48c6aed97731313a818af08d3609c1");
+            var ClipPlayer = __instance.Slot.GetComponentOrAttach<AudioClipPlayer>();
+            ClipPlayer.Clip.Target = AudioClip;
+            ClipPlayer.Loop = true;
+            var Output = __instance.Slot.GetComponentOrAttach<AudioOutput>();
+            Output.Source.Target = ClipPlayer;
+            Output.DistanceSpace.Value = AudioDistanceSpace.Global;
+            Output.DopplerLevel.Value = 0f;
+            Output.Volume.Value = 0.1f;
+            ClipPlayer.Play();
+        }
+        
+    }
 	
 	static void AddDefaults(ComponentSelector instance, UIBuilder ui, Type baseType)
 	{
@@ -170,6 +214,8 @@ public class NodeBrowserPatches
 
 			// this is default but i remove the rest of the normal code so like, gotta do it here
 			button.Label.ParseRichText.Value = false;
+            //the horrors
+            //button.Label.Content.Value = "<size=300%>" + button.Label.Content.Value + "                                  <color=hero.red><size=200%>OwO?";
 		}
 	}
 
