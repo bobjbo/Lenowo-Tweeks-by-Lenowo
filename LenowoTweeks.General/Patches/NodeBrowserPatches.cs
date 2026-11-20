@@ -47,9 +47,21 @@ public class NodeBrowserPatches
 
         if (msg == 6)
         {
-            ui.Text("");
-            ui.Text("");
-            ui.Text("");
+            var text = ui.Text("").Slot;
+            text.AttachComponent<Button>();
+            var clip = text.AttachComponent<StaticAudioClip>();
+            text.AttachComponent<ButtonAudioClipPlayer>().PressedClips.Add().Clip.Target = clip;
+            for (int i = 0; i < 2; i++)
+            {
+                var text2 = ui.Text("").Slot;
+                text2.AttachComponent<Button>();
+                var player = text2.AttachComponent<ButtonAudioClipPlayer>();
+                player.PressedClips.Add().Clip.Target = clip;
+                player.PressedClips[0].MinVolume.Value = 0.1f;
+                player.PressedClips[0].MaxVolume.Value = 0.1f;
+                player.PressedClips[0].MaxSpeed.Value = 2f;
+            }
+			clip.URL.Value = new("resdb:///1ed74a85e7d9a8e2456fadbd276cb9dd223ad96377ad230409693d408524606e.wav");
         }
 
         ui.Text("<size=400%><color=hero.purple>" + messages[msg].Replace("$USER", ui.World.LocalUser.UserName) + "</size>");
@@ -57,15 +69,25 @@ public class NodeBrowserPatches
         if (msg == 6)
         {
             //resdb:///1ed74a85e7d9a8e2456fadbd276cb9dd223ad96377ad230409693d408524606e.wav
-            ui.Text("");
-            ui.Text("");
-            var text = ui.Text("");
-            var clip = text.Slot.AttachComponent<StaticAudioClip>();
+            var text = ui.Text("").Slot;
+            text.AttachComponent<Button>();
+            var clip = text.AttachComponent<StaticAudioClip>();
+            text.AttachComponent<ButtonAudioClipPlayer>().PressedClips.Add().Clip.Target = clip;
+            for (int i = 0; i < 2; i++)
+            {
+                var text2 = ui.Text("").Slot;
+                text2.AttachComponent<Button>();
+                var player = text2.AttachComponent<ButtonAudioClipPlayer>();
+                player.PressedClips.Add().Clip.Target = clip;
+                player.PressedClips[0].MinVolume.Value = 0.1f;
+                player.PressedClips[0].MaxVolume.Value = 0.1f;
+                player.PressedClips[0].MaxSpeed.Value = 2f;
+            }
 			clip.URL.Value = new("resdb:///1ed74a85e7d9a8e2456fadbd276cb9dd223ad96377ad230409693d408524606e.wav");
             var speed = RandomX.Range(.5f,2f);
             for (int i = 0; i < 100; i++)
             {
-                text.Slot.PlayOneShot(clip,distanceSpace: AudioDistanceSpace.Global,speed: speed).MinDistance.Value = 10f;
+                text.PlayOneShot(clip,distanceSpace: AudioDistanceSpace.Global,speed: speed).MinDistance.Value = 10f;
             }
         }
 
