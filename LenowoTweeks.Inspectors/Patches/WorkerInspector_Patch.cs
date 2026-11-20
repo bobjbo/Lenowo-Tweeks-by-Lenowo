@@ -109,14 +109,14 @@ public class WorkerInspector_Patch
 						ui.Style.FlexibleWidth = 16f;
 
 						var persistentField = Traverse.Create(comp).Field<Sync<bool>>("persistent").Value;
-						
+
 						var enabledContainer = ui.Panel();
 						var enabledEditor = ui.BooleanMemberEditor(comp.EnabledField);
 						ui.NestOut();
 						var persistentContainer = ui.Panel();
 						var persistentEditor = ui.BooleanMemberEditor(persistentField);
 						ui.NestOut();
-						
+
 						var enabledButton = enabledContainer.Slot.Children[0].Children[0].GetComponent<Button>();
 						var persistentButton = persistentContainer.Slot.Children[0].Children[0].GetComponent<Button>();
 						// its not like you can drag out the value of a bool field, so may as well allow for field ref grabbing
@@ -203,7 +203,7 @@ public class WorkerInspector_Patch
 							// try a bit more to prevent random crashes from other users expanding the component
 							if (ui == null || content == null || content.IsRemoved) return;
 							if (hl == null || hl.IsRemoved) return;
-							
+
 							if (content.ChildrenCount == 0 && v)
 							{
 								ui.NestInto(content);
@@ -417,7 +417,7 @@ public class WorkerInspector_Patch
 				}
 
 				string niceName = genericType.GetNiceName();
-				
+
 				// find DynamicVariableDrivers and show the rest of the type name
 				if (genericType != workerType && niceName.Contains("Variable"))
 				{
@@ -430,7 +430,7 @@ public class WorkerInspector_Patch
 						variableType += " " + string.Join(" ", splitName);
 					}
 				}
-				
+
 				headerName = $"{varTypeName} {variableType}: {varName}";
 			}
 			else if (worker is DynamicVariableSpace space)
@@ -536,7 +536,7 @@ public class WorkerInspector_Patch
 			Type baseType = workerType.BaseType;
 			Type baseParentType = baseType.IsGenericType ? baseType.GetGenericTypeDefinition() : baseType;
 			Type workerGenericArg = workerType.IsGenericType ? workerType.GenericTypeArguments.First() : null;
-			
+
 			var categoryAttribute = workerType.GetCustomAttribute<CategoryAttribute>();
 			string workerCategory = categoryAttribute?.Paths.FirstOrDefault();
 
@@ -576,7 +576,7 @@ public class WorkerInspector_Patch
 				}
 
 				string niceName = genericType.GetNiceName();
-				
+
 				// find DynamicVariableDrivers and show the rest of the type name
 				if (genericType != workerType && niceName.Contains("Variable"))
 				{
@@ -617,19 +617,19 @@ public class WorkerInspector_Patch
 
 				Type dataType = workerType.GenericTypeArguments[0];
 				string typeType = typeof(IWorldElement).IsAssignableFrom(dataType) ? "Reference" : "Value";
-				
+
 				source = tagField;
 				baseFormat = $"{dataType.GetNiceName()} Parent {typeType}: {{0}}";
 			}
 			else if (baseParentType == typeof(ParentDataLink<>))
 			{
 				dynamic parentData = worker;
-				
+
 				Sync<string> tagField = parentData.MatchTag;
 
 				Type dataType = workerType.GenericTypeArguments[0];
 				string typeType = typeof(IWorldElement).IsAssignableFrom(dataType) ? "Reference" : "Value";
-				
+
 				source = tagField;
 				baseFormat = $"{dataType.GetNiceName()} Parent {typeType} Link: {{0}}";
 			}
@@ -677,7 +677,7 @@ public class WorkerInspector_Patch
 				var split = SplitByUppercase(typeName[..typeName.IndexOf("<")]);
 				string varType = split.Last();
 				string activeName = split[0] == "Active" ? "Active " : "";
-				
+
 				source = cloudVar.Path;
 				baseFormat = $"{workerType.GenericTypeArguments[0].GetNiceName()} {activeName}Cloud {varType}: {{0}}";
 			}
@@ -699,8 +699,7 @@ public class WorkerInspector_Patch
 				eqDriver.Invert.Value = true;
 				eqDriver.Target.Target = formatSwitcher.State;
 			}
-		}
-		catch (Exception e)
+		} catch (Exception e)
 		{
 			UniLog.Error($"LenowoTweeks // Exception in TryMakeHeaderNameDrive:\n{e}");
 		}
