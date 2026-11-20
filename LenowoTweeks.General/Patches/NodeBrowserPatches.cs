@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Reflection.Emit;
 
 using Elements.Core;
@@ -14,9 +15,9 @@ namespace LenowoTweeks.General.Patches;
 [HarmonyPatch]
 public class NodeBrowserPatches
 {
-    
+    [HarmonyTranspiler]
     [HarmonyPatch(typeof(ComponentSelector), "BuildUI")]
-    public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+    public static IEnumerable<CodeInstruction> BeforeBuildGenericTypes(IEnumerable<CodeInstruction> instructions)
     {
         var codes = new List<CodeInstruction>(instructions);
 		object find1 = null;
@@ -31,18 +32,22 @@ public class NodeBrowserPatches
             {
                 UniLog.Warning("LENOWO TWEEKS INJECTING DEFAULTS");
                 codes.Insert(i+1,new(OpCodes.Call, ((Delegate)AddDefaults).Method));
-                codes.Insert(i+1,new(OpCodes.Ldloc,2));
+                codes.Insert(i+1,new(OpCodes.Ldloc_2));
                 codes.Insert(i+1,new(OpCodes.Ldfld,find1));
                 codes.Insert(i+1,new(OpCodes.Ldloc_0));
+                codes.Insert(i+1,new(OpCodes.Ldarg_0));
                 return codes.AsEnumerable();
             }
         }
         return codes.AsEnumerable();
     }
     
-    static void AddDefaults(UIBuilder ui, Type baseType)
+    static void AddDefaults(ComponentSelector instance, UIBuilder ui, Type baseType)
     {
+		AddItemPatches.CurrentTypes.Clear();
+
         List<string> messages = ["Hello, $USER.", "HAIIIIIIIIIIIIIIIIIIII", "Whatcha here for?", "$USER is stinky.", "Lookin' for an illegal type?", "What if it could be SH64?", "<size=700%><color=red>F</color>IH"];
+
         var msg = RandomX.Range(messages.Count);
 
         if (msg == 6)
@@ -95,9 +100,68 @@ public class NodeBrowserPatches
         
         foreach (var type in DefaultTypes)
         {
-           
+           AddTypeCustom(instance, ui, type);
         }
 
     }
+
+	public static void AddTypeCustom(ComponentSelector instance, UIBuilder ui, Type type)
+	{
+		var button = ui.Button((LocaleString)type.GetNiceName(), new colorX?(RadiantUI_Constants.Sub.CYAN), instance.GetMethodDelegate<ButtonEventHandler<string>>("OnAddComponentPressed"), instance.World.Types.EncodeType(type), 0.35f);
+		AddItemPatches.OnAddNewButton(button, instance, ui, type);
+	}
+
+	[HarmonyPatch]
+	public static class AddItemPatches
+	{
+		public static HashSet<Type> CurrentTypes = [];
+		
+		public static MethodInfo? TargetMethod()
+		{
+			var t1 = typeof(ComponentSelector).InnerTypes().First(t => t.Name == "<>c__DisplayClass16_0");
+			return t1.GetMethod("<BuildUI>g__AddGenericTypeButton|0", BindingFlags.NonPublic | BindingFlags.Instance);
+		}
+		
+		public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+		{
+			var codes = instructions.ToList();
+
+			var getLabelMethod = typeof(Button).GetMethod("get_Label");
+			object find1 = null;
+			for (int i = 0; i < codes.Count; i++)
+			{
+				var code = codes[i];
+				if (code.opcode == OpCodes.Ldfld && codes[i - 1].opcode == OpCodes.Ldarg_0)
+				{
+					find1 = code.operand;
+				}
+				if (code.Calls(getLabelMethod))
+				{
+					yield return new(OpCodes.Ldarg_0);
+					yield return new(OpCodes.Ldarg_0);
+					yield return new(OpCodes.Ldfld, find1);
+					yield return new(OpCodes.Ldarg_1);
+					yield return new(OpCodes.Call, ((Delegate)OnAddNewButton).Method);
+					yield return new(OpCodes.Ret);
+					yield break;
+				}
+
+				yield return code;
+			}
+		}
+
+		public static void OnAddNewButton(Button button, ComponentSelector instance, UIBuilder ui, Type innerType)
+		{
+			if (CurrentTypes.Contains(innerType))
+			{
+				button.Slot.Destroy();
+				return;
+			}
+			CurrentTypes.Add(innerType);
+
+			// this is default but i remove the rest of the normal code so like, gotta do it here
+			button.Label.ParseRichText.Value = false;
+		}
+	}
 
 }
