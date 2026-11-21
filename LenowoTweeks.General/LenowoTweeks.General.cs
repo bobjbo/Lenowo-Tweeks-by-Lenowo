@@ -54,6 +54,7 @@ public class LenowoTweeks_General : LenowoTweak
 
 	public static ModConfigKey<bool> partyMode = new("Party Mode", "Turns any component selector into a party!!!", true);
 	public static ModConfigKey<bool> shareTheParty = new("Share The Party", "No fun in a party if you are alone!", true);
+	public static ModConfigKey<bool> noParty = new("No Party", ":(", false);
 
 	public static ModConfigKey<bool> attacherMessages = new("Node Attacher Messages", "Makes Node Attachers have little messages", true);
 	public static ModConfigKey<bool> changeBGColor = new("Override Node Attacher Background Color", "Makes Node Attachers have a custom backround color from your secondary UI Color", false);
@@ -102,7 +103,7 @@ public class LenowoTweeks_General : LenowoTweak
 				{ "Create New", [ smallPrimitives, smallPrimitiveScale, removeMeshDefaultGizmo ] },
 				{ "Component Selector",
 				[
-					partyMode, shareTheParty,
+					partyMode, shareTheParty, noParty,
 					changeBGColor, attacherMessages, addSpacesInNames, addDefaultTypes,
 					categoryColor, groupingColor, genericFolderColor, normalColor, backgroundColorOverride,
 					defaultPreset, midPreset, darkPreset, brightPreset, rgbPreset, rosaPreset

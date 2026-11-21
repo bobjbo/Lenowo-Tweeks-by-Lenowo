@@ -15,8 +15,19 @@ namespace LenowoTweeks.General.Patches;
 [HarmonyPatch]
 public class NodeBrowserPatches
 {
-	public static bool ShouldBeAParty(IWorldElement instance) =>
-		(LenowoTweeks_General.partyMode.Value && (LenowoTweeks_General.shareTheParty.Value || (instance.GetAllocatingUser()?.IsLocalUser ?? false))) || IsAlreadyAParty(instance.FindNearestParent<Slot>());
+	public static bool ShouldBeAParty(IWorldElement instance)
+	{
+		Slot s = instance.FindNearestParent<Slot>();
+		if (IsPartyDenied(s)) return false;
+		if (IsAlreadyAParty(s)) return true;
+		if (!LenowoTweeks_General.partyMode.Value) return false;
+		if (LenowoTweeks_General.shareTheParty.Value) return true;
+		if (instance.GetAllocatingUser()?.IsLocalUser ?? false) return true;
+		return false;
+	}
+
+	public static bool IsPartyDenied(Slot slot) =>
+		slot.GetObjectRoot().GetComponent<Comment>(c => c.Text.Value == "ThisIsNotAParty") != null;
 
 	public static bool IsAlreadyAParty(Slot slot) =>
 		slot.GetObjectRoot().GetComponent<Comment>(c => c.Text.Value == "ThisIsAParty") != null;
@@ -122,6 +133,17 @@ public class NodeBrowserPatches
 		// in case of setting for customizable randomized messages, this is out here for that
 		var headertext = slot.FindChild("Image").FindChild("Header").FindChildInHierarchy("Text").GetComponent<Text>();
 
+		if (LenowoTweeks_General.noParty.Value)
+		{
+			if (__instance.GetAllocatingUser()?.IsLocalUser ?? false)
+			{
+				if (slot.GetComponent<Comment>(c => c.Text.Value == "ThisIsNotAParty") == null)
+				{
+					slot.AttachComponent<Comment>().Text.Value = "ThisIsNotAParty";
+				}
+			}
+		}
+
 		if (ShouldBeAParty(__instance))
 		{
 			if (slot.GetComponent<Comment>(c => c.Text.Value == "ThisIsAParty") == null)
@@ -210,10 +232,11 @@ public class NodeBrowserPatches
 					var text2 = ui.Text("").Slot;
 					text2.AttachComponent<Button>();
 					var player = text2.AttachComponent<ButtonAudioClipPlayer>();
-					player.PressedClips.Add().Clip.Target = clip;
-					player.PressedClips[0].MinVolume.Value = 0.1f;
-					player.PressedClips[0].MaxVolume.Value = 0.1f;
-					player.PressedClips[0].MaxSpeed.Value = 2f;
+					var clipData = player.PressedClips.Add();
+					clipData.Clip.Target = clip;
+					clipData.MinVolume.Value = 0.1f;
+					clipData.MaxVolume.Value = 0.1f;
+					clipData.MaxSpeed.Value = 2f;
 				}
 				clip.URL.Value = new("resdb:///1ed74a85e7d9a8e2456fadbd276cb9dd223ad96377ad230409693d408524606e.wav");
 			}
@@ -232,10 +255,11 @@ public class NodeBrowserPatches
 					var text2 = ui.Text("").Slot;
 					text2.AttachComponent<Button>();
 					var player = text2.AttachComponent<ButtonAudioClipPlayer>();
-					player.PressedClips.Add().Clip.Target = clip;
-					player.PressedClips[0].MinVolume.Value = 0.1f;
-					player.PressedClips[0].MaxVolume.Value = 0.1f;
-					player.PressedClips[0].MaxSpeed.Value = 2f;
+					var clipData = player.PressedClips.Add();
+					clipData.Clip.Target = clip;
+					clipData.MinVolume.Value = 0.1f;
+					clipData.MaxVolume.Value = 0.1f;
+					clipData.MaxSpeed.Value = 2f;
 				}
 				clip.URL.Value = new("resdb:///1ed74a85e7d9a8e2456fadbd276cb9dd223ad96377ad230409693d408524606e.wav");
 				var speed = RandomX.Range(.5f, 2f);
@@ -288,9 +312,12 @@ public class NodeBrowserPatches
 	{
 		bool globalDoSpaces = LenowoTweeks_General.addSpacesInNames.Value;
 
+		var label = button.Label;
+		var tint = button.Slot.GetComponent<Image>().Tint;
+
 		if (globalDoSpaces && dospaces)
 		{
-			var content = button.Label.Content;
+			var content = label.Content;
 			content.Value = content.Value.Replace("_", " ");
 
 			bool lastUpper = false;
@@ -326,27 +353,28 @@ public class NodeBrowserPatches
 
 		if (ShouldBeAParty(button.Slot))
 		{
-			button.Label.Color.Value = RandomX.Hue;
+			label.Color.Value = RandomX.Hue;
 			button.Slot.GetComponent<Image>().Tint.Value = RandomX.Hue.MulValue(0.2f);
 		}
 
 		else
 		{
-			if (button.Slot.GetComponent<Image>().Tint.Value == RadiantUI_Constants.Sub.PURPLE)
+			
+			if (tint.Value == RadiantUI_Constants.Sub.PURPLE)
 			{
-				button.Slot.GetComponent<Image>().Tint.Value = LenowoTweeks_General.groupingColor.Value;
+				tint.Value = LenowoTweeks_General.groupingColor.Value;
 			}
-			else if (button.Slot.GetComponent<Image>().Tint.Value == RadiantUI_Constants.Sub.CYAN)
+			else if (tint.Value == RadiantUI_Constants.Sub.CYAN)
 			{
-				button.Slot.GetComponent<Image>().Tint.Value = LenowoTweeks_General.normalColor.Value;
+				tint.Value = LenowoTweeks_General.normalColor.Value;
 			}
-			else if (button.Slot.GetComponent<Image>().Tint.Value == RadiantUI_Constants.Sub.GREEN)
+			else if (tint.Value == RadiantUI_Constants.Sub.GREEN)
 			{
-				button.Slot.GetComponent<Image>().Tint.Value = LenowoTweeks_General.genericFolderColor.Value;
+				tint.Value = LenowoTweeks_General.genericFolderColor.Value;
 			}
-			else if (button.Slot.GetComponent<Image>().Tint.Value == RadiantUI_Constants.Sub.YELLOW)
+			else if (tint.Value == RadiantUI_Constants.Sub.YELLOW)
 			{
-				button.Slot.GetComponent<Image>().Tint.Value = LenowoTweeks_General.categoryColor.Value;
+				tint.Value = LenowoTweeks_General.categoryColor.Value;
 			}
 		}
 
