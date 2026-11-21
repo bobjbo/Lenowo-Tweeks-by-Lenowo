@@ -68,19 +68,25 @@ public class LenowoTweeks_General : LenowoTweak
 	public static ModConfigKey<colorX> groupingColor = new("Node Group Color", "The color of node groups in the node browser",RadiantUI_Constants.Sub.PURPLE);
 	public static ModConfigKey<colorX> normalColor = new("Normal Color", "The color of normal types in the node browser",RadiantUI_Constants.Sub.CYAN);
 
+	public static ModConfigKey<colorX?> backgroundColorOverride = new("Background Color", "The color of the background in the node browser",null);
+
 	// Color Presets
 	public static ModConfigButton defaultPreset = new("Preset: Default", () => SetBrowserColors(RadiantUI_Constants.Sub.YELLOW, RadiantUI_Constants.Sub.GREEN, RadiantUI_Constants.Sub.PURPLE, RadiantUI_Constants.Sub.CYAN));
 	public static ModConfigButton midPreset = new("Preset: Mid", () => SetBrowserColors(RadiantUI_Constants.MidLight.YELLOW, RadiantUI_Constants.MidLight.GREEN, RadiantUI_Constants.MidLight.PURPLE, RadiantUI_Constants.MidLight.CYAN));
 	public static ModConfigButton darkPreset = new("Preset: Dark", () => SetBrowserColors(RadiantUI_Constants.Dark.YELLOW, RadiantUI_Constants.Dark.GREEN, RadiantUI_Constants.Dark.PURPLE, RadiantUI_Constants.Dark.CYAN));
 	public static ModConfigButton brightPreset = new("Preset: Bright", () => SetBrowserColors(RadiantUI_Constants.Hero.YELLOW, RadiantUI_Constants.Hero.GREEN, RadiantUI_Constants.Hero.PURPLE, RadiantUI_Constants.Hero.CYAN));
-	public static ModConfigButton rosaPreset = new("Preset: Rosa", () => SetBrowserColors(RadiantUI_Constants.Sub.PURPLE, RadiantUI_Constants.Sub.GREEN, RadiantUI_Constants.Dark.PURPLE, RadiantUI_Constants.Dark.CYAN));
+	public static ModConfigButton rgbPreset = new("Preset: RGB", () => SetBrowserColors(new(0.2f, 0f, 0f), new(0f, 0.2f, 0f), new(0f, 0f, 0.2f), new(0.1f), new(0f)));
+	public static ModConfigButton rosaPreset = new("Preset: Rosa", () => SetBrowserColors(RadiantUI_Constants.Sub.PURPLE, RadiantUI_Constants.Sub.GREEN, RadiantUI_Constants.Dark.PURPLE, RadiantUI_Constants.Dark.CYAN, RadiantUI_Constants.Dark.PURPLE));
 
-	public static void SetBrowserColors(colorX category, colorX generic, colorX grouping, colorX normal)
+
+
+	public static void SetBrowserColors(colorX category, colorX generic, colorX grouping, colorX normal, colorX? bg = null)
 	{
 		categoryColor.Value = category;
 		genericFolderColor.Value = generic;
 		groupingColor.Value = grouping;
 		normalColor.Value = normal;
+		backgroundColorOverride.Value = bg;
 	}
 
 
@@ -96,9 +102,9 @@ public class LenowoTweeks_General : LenowoTweak
 				{ "Component Selector", 
 				[
 					partyMode, shareTheParty,
-					changeBGColor, attacherMessages,
-					categoryColor, groupingColor, genericFolderColor, normalColor,
-					defaultPreset, midPreset, darkPreset, brightPreset, rosaPreset
+					changeBGColor, attacherMessages, addSpacesInNames, addDefaultTypes,
+					categoryColor, groupingColor, genericFolderColor, normalColor, backgroundColorOverride,
+					defaultPreset, midPreset, darkPreset, brightPreset, rgbPreset, rosaPreset
 				] },
 			}
 		}

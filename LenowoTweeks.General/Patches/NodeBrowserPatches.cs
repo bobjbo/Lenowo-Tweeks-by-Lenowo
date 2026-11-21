@@ -163,9 +163,14 @@ public class NodeBrowserPatches
 		}
 		else
 		{
-			if (LenowoTweeks_General.changeBGColor.Value)
+			var bg = __instance.Slot.FindChild("Image").GetComponent<Image>();
+			if (LenowoTweeks_General.backgroundColorOverride.Value.HasValue)
 			{
-				__instance.Slot.FindChild("Image").GetComponent<Image>().Tint.Value = LenowoTweeks_Core.secondaryUIColor.Value;
+				bg.Tint.Value = LenowoTweeks_General.backgroundColorOverride.Value.Value;
+			}
+			else if (LenowoTweeks_General.changeBGColor.Value)
+			{
+				bg.Tint.Value = LenowoTweeks_Core.secondaryUIColor.Value;
 			}
 		}
 	}
