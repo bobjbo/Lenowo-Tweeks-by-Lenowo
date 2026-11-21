@@ -18,7 +18,7 @@ namespace LenowoTweeks.Core;
 using KeyType = Dictionary<string, Dictionary<string, List<IModConfigItem>>>;
 
 #region Config Types
-public interface IModConfigItem {}
+public interface IModConfigItem { }
 
 public class ModConfigKey(string keyName, string name, string description, Type type, ModConfigurationKey key) : IModConfigItem
 {
@@ -402,7 +402,8 @@ public class ConfigUIBuilder()
 		ui.PushStyle();
 		ui.Style.MinHeight = 24;
 		var element = ui.Button(button.ButtonLabel);
-		element.LocalPressed += (_, _) => {
+		element.LocalPressed += (_, _) =>
+		{
 			button.OnClicked();
 			RefreshConfig(element.Slot);
 		};

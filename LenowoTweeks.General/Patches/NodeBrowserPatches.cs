@@ -61,20 +61,20 @@ public class NodeBrowserPatches
 			else if (!inject2 && codes[i].Calls(getLabelMethod) && inject1 && found1 && found2)
 			{
 				codes[i] = new(OpCodes.Ldarg_0);
-				codes[i+1] = new(OpCodes.Ldloc_0);
-				codes[i+2] = new(OpCodes.Ldfld, find1);
-				codes[i+3] = new(OpCodes.Ldloc, 20);
+				codes[i + 1] = new(OpCodes.Ldloc_0);
+				codes[i + 2] = new(OpCodes.Ldfld, find1);
+				codes[i + 3] = new(OpCodes.Ldloc, 20);
 				codes.Insert(i + 4, new(OpCodes.Call, ((Delegate)Catagory).Method));
 				inject2 = true;
 			}
-			else if (!inject3 && inject1 && inject2 && found1 && found2 && codes[i-1].opcode == OpCodes.Ldloc_S && codes[i-1].operand.ToString().Contains("(25)") && codes[i].Calls(getLabelMethod))
+			else if (!inject3 && inject1 && inject2 && found1 && found2 && codes[i - 1].opcode == OpCodes.Ldloc_S && codes[i - 1].operand.ToString().Contains("(25)") && codes[i].Calls(getLabelMethod))
 			{
-				codes.Insert(i+4, new(OpCodes.Call, ((Delegate)Otherbutton).Method));
-				codes.Insert(i+4, new(OpCodes.Ldarg_3)); //group
-				codes.Insert(i+4,new(OpCodes.Ldfld,find1)); //ui pt1
-				codes.Insert(i+4, new(OpCodes.Ldloc_0)); //ui pt2
-				codes.Insert(i+4, new(OpCodes.Ldarg_0)); //component selector
-				codes.Insert(i+4, new(OpCodes.Ldloc_S, 25)); // button
+				codes.Insert(i + 4, new(OpCodes.Call, ((Delegate)Otherbutton).Method));
+				codes.Insert(i + 4, new(OpCodes.Ldarg_3)); //group
+				codes.Insert(i + 4, new(OpCodes.Ldfld, find1)); //ui pt1
+				codes.Insert(i + 4, new(OpCodes.Ldloc_0)); //ui pt2
+				codes.Insert(i + 4, new(OpCodes.Ldarg_0)); //component selector
+				codes.Insert(i + 4, new(OpCodes.Ldloc_S, 25)); // button
 				inject3 = true;
 			}
 		}
@@ -87,7 +87,7 @@ public class NodeBrowserPatches
 		{
 			if (button.Label.Content.Value.Contains("Fire"))
 			{
-				button.Label.Content.Value =  button.Label.Content.Value.Replace("True","Deez").Replace("False","Dose").Replace("Change","NutsChange");
+				button.Label.Content.Value = button.Label.Content.Value.Replace("True", "Deez").Replace("False", "Dose").Replace("Change", "NutsChange");
 				//var index = button.Label.Content.Value.IndexOf("O");
 				//var containsLocal = button.Label.Content.Value.Substring(index).Contains("Local");
 				//var containsTrue = button.Label.Content.Value.Substring(index).Contains("True");
@@ -95,23 +95,23 @@ public class NodeBrowserPatches
 			}
 			if (button.Label.Content.Value.Contains("Async"))
 			{
-				button.Label.Content.Value = button.Label.Content.Value.Replace("Async","ASink");
+				button.Label.Content.Value = button.Label.Content.Value.Replace("Async", "ASink");
 			}
 		}
 
 
-		ModifyButton(button,true);
+		ModifyButton(button, true);
 
 
 	}
 
-	public static void Catagory(Button button,ComponentSelector instance, UIBuilder ui, CategoryNode<Type> catagory)
+	public static void Catagory(Button button, ComponentSelector instance, UIBuilder ui, CategoryNode<Type> catagory)
 	{
 		button.Label.ParseRichText.Value = ShouldBeAParty(instance);
 		button.Label.Content.Value = catagory.Name + " (" + catagory.ElementCount + (ShouldBeAParty(instance) ? ") <color=hero.purple>:3" : ") >");
-		
 
-		ModifyButton(button,false);
+
+		ModifyButton(button, false);
 	}
 
 	[HarmonyPostfix]
@@ -146,7 +146,7 @@ public class NodeBrowserPatches
 			var AudioClip = slot.GetComponentOrAttach<StaticAudioClip>(out bool audioClipAttached);
 			if (audioClipAttached)
 			{
-				List<string> clips = ["resdb:///bdc6be11fdeede104a4b0cb3ea2f583bbe48c6aed97731313a818af08d3609c1", "resdb:///9de8c4e33701c7d74f047c5f4075296ee34e475fdf196fabb2b5a9491a92704c","resdb:///bacee42662807e1bec7bf33f20b211bcbd05b7584be81787817c2f3af44a3130.ogg","resdb:///bff1f05cd334eee789951cdbcf05c937486db23cb9279f04a27cae8d583e1b9e.ogg","resdb:///994288f0f8348673bf427ff5234a61f7db93e8392f16a3b0871217506e7fa2ad","resdb:///fe5cc5988d68caeb4c67d112115cdda4ffaeece9ba0a0d9033134a8523279f9e.wav"];
+				List<string> clips = ["resdb:///bdc6be11fdeede104a4b0cb3ea2f583bbe48c6aed97731313a818af08d3609c1", "resdb:///9de8c4e33701c7d74f047c5f4075296ee34e475fdf196fabb2b5a9491a92704c", "resdb:///bacee42662807e1bec7bf33f20b211bcbd05b7584be81787817c2f3af44a3130.ogg", "resdb:///bff1f05cd334eee789951cdbcf05c937486db23cb9279f04a27cae8d583e1b9e.ogg", "resdb:///994288f0f8348673bf427ff5234a61f7db93e8392f16a3b0871217506e7fa2ad", "resdb:///fe5cc5988d68caeb4c67d112115cdda4ffaeece9ba0a0d9033134a8523279f9e.wav"];
 				bool doRandom = RandomX.Chance(0.5f);
 
 				AudioClip.URL.Value = new(doRandom ? clips[RandomX.Range(clips.Count)] : clips[0]);
@@ -249,7 +249,7 @@ public class NodeBrowserPatches
 			// resdb:///68c34cbf6375b257ca4175412b6f8a9033af0e39c74cf78485488513b689fbdf
 			// resdb:///7d57871b41c93e4e83d597af1dd723d81adef3f7579ccc025ed563d4383bf28e
 			// resdb:///e4195228e77008e6c4dfe887d973080bd8c5c7f480373917789acdf3a64f64a4.wav
-			
+
 		}
 
 		if (LenowoTweeks_General.addDefaultTypes.Value)
@@ -287,32 +287,41 @@ public class NodeBrowserPatches
 	public static void ModifyButton(Button button, bool dospaces)
 	{
 		bool globalDoSpaces = LenowoTweeks_General.addSpacesInNames.Value;
-		
-		if (globalDoSpaces) {
-			button.Label.Content.Value = button.Label.Content.Value.Replace("_"," ");
 
-			for (int i = 0; i < button.Label.Content.Value.Length; i++)
+		if (globalDoSpaces && dospaces)
+		{
+			var content = button.Label.Content;
+			content.Value = content.Value.Replace("_", " ");
+
+			bool lastUpper = false;
+			for (int i = 0; i < content.Value.Length && i < 100; i++)
 			{
-
-				if (dospaces && button.Label.Content.Value.Substring(i,1).ToUpper() == button.Label.Content.Value.Substring(i,1) && !int.TryParse(button.Label.Content.Value.Substring(i,1), out _) )
+				var cur = content.Value[i];
+				if (cur == '<')
 				{
-					button.Label.Content.Value = button.Label.Content.Value.Substring(0,i) + " " + button.Label.Content.Value.Substring(i);
-					i+=1;
-				}
-
-				if (button.Label.Content.Value.Substring(i,1) == "<")
-				{
-					dospaces = false;
-				}
-
-				if (i > 100)
-				{
+					content.Value = content.Value.Insert(i, " ");
 					break;
 				}
+				
+				if (char.IsUpper(cur) && !char.IsDigit(cur))
+				{
+					bool temp = lastUpper;
+					lastUpper = true;
+					if (i == 0) continue;
+					if (i > 3 && content.Value.Substring(i - 2, 3) == "NaN") continue;
+					if (!temp)
+					{
+						content.Value = content.Value.Insert(i, " ");
+						i++;
+					}
+					continue;
+				}
+
+				lastUpper = false;
 			}
 
-			button.Label.Content.Value = button.Label.Content.Value.Replace("   "," ");
-			button.Label.Content.Value = button.Label.Content.Value.Replace("  "," ");
+			// prevent double/triple spaces with this one simple trick!
+			content.Value = content.Value.Replace("  ", " ").Replace("  ", " ").Replace("  ", " ");
 		}
 
 		if (ShouldBeAParty(button.Slot))
@@ -340,7 +349,7 @@ public class NodeBrowserPatches
 				button.Slot.GetComponent<Image>().Tint.Value = LenowoTweeks_General.categoryColor.Value;
 			}
 		}
-		
+
 	}
 
 
@@ -401,7 +410,7 @@ public class NodeBrowserPatches
 
 			//button.Label.Content.Value = button.Label.Content.Value.Replace("_","");
 
-			ModifyButton(button,true);
+			ModifyButton(button, true);
 		}
 	}
 

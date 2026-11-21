@@ -323,7 +323,7 @@ public static class Helpers
 			{
 				modOperand = label.Value.Id;
 			}
-			
+
 			msg += $"{i++:0000}: {opcode} \t{modOperand} \t\tLabels=[{labels}] \tBlocks=[{blocks}]\n";
 		}
 

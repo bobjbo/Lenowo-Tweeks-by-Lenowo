@@ -10,6 +10,7 @@ using LenowoTweeks.Core;
 using LenowoTweeks.General.Patches;
 
 using Elements.Core;
+
 using FrooxEngine;
 
 
@@ -63,12 +64,12 @@ public class LenowoTweeks_General : LenowoTweak
 
 
 
-	public static ModConfigKey<colorX> categoryColor = new("Catagory Color", "The color of catagories in the node browser",RadiantUI_Constants.Sub.YELLOW);
-	public static ModConfigKey<colorX> genericFolderColor = new("Generic Folder Color", "The color of generic node folders in the node browser",RadiantUI_Constants.Sub.GREEN);
-	public static ModConfigKey<colorX> groupingColor = new("Node Group Color", "The color of node groups in the node browser",RadiantUI_Constants.Sub.PURPLE);
-	public static ModConfigKey<colorX> normalColor = new("Normal Color", "The color of normal types in the node browser",RadiantUI_Constants.Sub.CYAN);
+	public static ModConfigKey<colorX> categoryColor = new("Catagory Color", "The color of catagories in the node browser", RadiantUI_Constants.Sub.YELLOW);
+	public static ModConfigKey<colorX> genericFolderColor = new("Generic Folder Color", "The color of generic node folders in the node browser", RadiantUI_Constants.Sub.GREEN);
+	public static ModConfigKey<colorX> groupingColor = new("Node Group Color", "The color of node groups in the node browser", RadiantUI_Constants.Sub.PURPLE);
+	public static ModConfigKey<colorX> normalColor = new("Normal Color", "The color of normal types in the node browser", RadiantUI_Constants.Sub.CYAN);
 
-	public static ModConfigKey<colorX?> backgroundColorOverride = new("Background Color", "The color of the background in the node browser",null);
+	public static ModConfigKey<colorX?> backgroundColorOverride = new("Background Color", "The color of the background in the node browser", null);
 
 	// Color Presets
 	public static ModConfigButton defaultPreset = new("Preset: Default", () => SetBrowserColors(RadiantUI_Constants.Sub.YELLOW, RadiantUI_Constants.Sub.GREEN, RadiantUI_Constants.Sub.PURPLE, RadiantUI_Constants.Sub.CYAN));
@@ -99,7 +100,7 @@ public class LenowoTweeks_General : LenowoTweak
 			{
 				{ "Base", [ valueFieldDroppingMode, worldSearchGlobalTags, getItemLink ] },
 				{ "Create New", [ smallPrimitives, smallPrimitiveScale, removeMeshDefaultGizmo ] },
-				{ "Component Selector", 
+				{ "Component Selector",
 				[
 					partyMode, shareTheParty,
 					changeBGColor, attacherMessages, addSpacesInNames, addDefaultTypes,
@@ -129,7 +130,7 @@ public class LenowoTweeks_General : LenowoTweak
 				foreach (var configKey in configKeys)
 				{
 					if (configKey is ModConfigKey key)
-					{	
+					{
 						builder.Key(key.ConfigKey);
 					}
 				}

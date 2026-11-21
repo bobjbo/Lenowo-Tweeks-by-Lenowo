@@ -80,7 +80,7 @@ public class LenowoTweeks_Core : LenowoTweak
 				foreach (var configKey in configKeys)
 				{
 					if (configKey is ModConfigKey key)
-					{	
+					{
 						builder.Key(key.ConfigKey);
 					}
 				}

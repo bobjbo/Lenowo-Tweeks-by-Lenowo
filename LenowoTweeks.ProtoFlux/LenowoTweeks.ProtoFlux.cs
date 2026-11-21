@@ -131,7 +131,7 @@ public class LenowoTweeks_ProtoFlux : LenowoTweak
 				foreach (var configKey in configKeys)
 				{
 					if (configKey is ModConfigKey key)
-					{	
+					{
 						builder.Key(key.ConfigKey);
 					}
 				}
