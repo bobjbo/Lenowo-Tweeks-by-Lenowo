@@ -16,8 +16,10 @@ namespace LenowoTweeks.General.Patches;
 public class NodeBrowserPatches
 {
 	public static bool ShouldBeAParty(IWorldElement instance) =>
-		LenowoTweeks_General.partyMode.Value && (LenowoTweeks_General.shareTheParty.Value || (instance.GetAllocatingUser()?.IsLocalUser ?? false));
+		(LenowoTweeks_General.partyMode.Value && (LenowoTweeks_General.shareTheParty.Value || (instance.GetAllocatingUser()?.IsLocalUser ?? false))) || IsAlreadyAParty(instance.FindNearestParent<Slot>());
 
+	public static bool IsAlreadyAParty(Slot slot) =>
+		slot.GetObjectRoot().GetComponent<Comment>(c => c.Text.Value == "ThisIsAParty") != null;
 
 	[HarmonyTranspiler]
 	[HarmonyPatch(typeof(ComponentSelector), "BuildUI")]
@@ -116,27 +118,32 @@ public class NodeBrowserPatches
 	[HarmonyPatch(typeof(ComponentSelector), "BuildUI")]
 	public static void AfterBuildGenericTypes(ComponentSelector __instance)
 	{
+		var slot = __instance.Slot;
 		// in case of setting for customizable randomized messages, this is out here for that
-		var headertext = __instance.Slot.FindChild("Image").FindChild("Header").FindChildInHierarchy("Text").GetComponent<Text>();
+		var headertext = slot.FindChild("Image").FindChild("Header").FindChildInHierarchy("Text").GetComponent<Text>();
 
 		if (ShouldBeAParty(__instance))
-		{	
+		{
+			if (slot.GetComponent<Comment>(c => c.Text.Value == "ThisIsAParty") == null)
+			{
+				slot.AttachComponent<Comment>().Text.Value = "ThisIsAParty";
+			}
 			// its a party!!
 			var num = RandomX.Hue;
-			__instance.Slot.FindChild("Image").GetComponent<Image>().Tint.Value = num;
+			slot.FindChild("Image").GetComponent<Image>().Tint.Value = num;
 			headertext.Color.Value = RandomX.Hue;
 
 			//Horifying Wobbler
-			var wobble = __instance.Slot.GetComponentOrAttach<Wobbler2D>(out bool wobblerAttached);
+			var wobble = slot.GetComponentOrAttach<Wobbler2D>(out bool wobblerAttached);
 			if (wobblerAttached)
 			{
-				wobble.Target.Target = __instance.Slot.GetComponent<Canvas>().Size;
+				wobble.Target.Target = slot.GetComponent<Canvas>().Size;
 				wobble.Offset.Value = new float2(800f, 1200f);
 				Traverse.Create(wobble).Field<Sync<float2>>("Speed").Value.Value = new(0.05f, 0.05f);
 				Traverse.Create(wobble).Field<Sync<float2>>("Magnitude").Value.Value = new(200f, 200f);
 			}
 
-			var AudioClip = __instance.Slot.GetComponentOrAttach<StaticAudioClip>(out bool audioClipAttached);
+			var AudioClip = slot.GetComponentOrAttach<StaticAudioClip>(out bool audioClipAttached);
 			if (audioClipAttached)
 			{
 				List<string> clips = ["resdb:///bdc6be11fdeede104a4b0cb3ea2f583bbe48c6aed97731313a818af08d3609c1", "resdb:///9de8c4e33701c7d74f047c5f4075296ee34e475fdf196fabb2b5a9491a92704c","resdb:///bacee42662807e1bec7bf33f20b211bcbd05b7584be81787817c2f3af44a3130.ogg","resdb:///bff1f05cd334eee789951cdbcf05c937486db23cb9279f04a27cae8d583e1b9e.ogg","resdb:///994288f0f8348673bf427ff5234a61f7db93e8392f16a3b0871217506e7fa2ad","resdb:///fe5cc5988d68caeb4c67d112115cdda4ffaeece9ba0a0d9033134a8523279f9e.wav"];
@@ -144,10 +151,10 @@ public class NodeBrowserPatches
 
 				AudioClip.URL.Value = new(doRandom ? clips[RandomX.Range(clips.Count)] : clips[0]);
 
-				var ClipPlayer = __instance.Slot.GetComponentOrAttach<AudioClipPlayer>();
+				var ClipPlayer = slot.GetComponentOrAttach<AudioClipPlayer>();
 				ClipPlayer.Clip.Target = AudioClip;
 				ClipPlayer.Loop = true;
-				var Output = __instance.Slot.GetComponentOrAttach<AudioOutput>();
+				var Output = slot.GetComponentOrAttach<AudioOutput>();
 				Output.Source.Target = ClipPlayer;
 				Output.DistanceSpace.Value = AudioDistanceSpace.Global;
 				Output.DopplerLevel.Value = 0f;
@@ -163,7 +170,7 @@ public class NodeBrowserPatches
 		}
 		else
 		{
-			var bg = __instance.Slot.FindChild("Image").GetComponent<Image>();
+			var bg = slot.FindChild("Image").GetComponent<Image>();
 			if (LenowoTweeks_General.backgroundColorOverride.Value.HasValue)
 			{
 				bg.Tint.Value = LenowoTweeks_General.backgroundColorOverride.Value.Value;
@@ -183,11 +190,16 @@ public class NodeBrowserPatches
 
 		if (LenowoTweeks_General.attacherMessages.Value)
 		{
-			List<string> messages = ["Hello, $USER.", "HAIIIIIIIIIIIIIIIIIIII", "Whatcha here for?", "$USER is stinky.", "Lookin' for an illegal type?", "What if it could be SH64?", "<size=700%><color=red>F</color>IH"];
+			List<string> messages = ["Hello, $USER.", "HAIIIIIIIIIIIIIIIIIIII", "Whatcha here for?", "$USER is stinky.", "Lookin' for an illegal type?", "What if it could be SH64?"];
+			List<string> partyMessages = ["<size=700%><color=red>F</color>IH"];
 
-			var msg = RandomX.Range(messages.Count);
+			bool doPartyMessages = ShouldBeAParty(instance) && RandomX.Chance(0.15f);
+			var msgs = doPartyMessages ? partyMessages : messages;
 
-			if (msg == 6)
+			var msg = RandomX.Range(msgs.Count);
+
+			bool fish = msgs[msg] == partyMessages[0];
+			if (fish)
 			{
 				var text = ui.Text("").Slot;
 				text.AttachComponent<Button>();
@@ -208,7 +220,7 @@ public class NodeBrowserPatches
 
 			ui.Text("<size=400%><color=hero.purple>" + messages[msg].Replace("$USER", ui.World.LocalUser.UserName) + "</size>");
 
-			if (msg == 6)
+			if (fish)
 			{
 				// fish!
 				var text = ui.Text("").Slot;
@@ -227,7 +239,7 @@ public class NodeBrowserPatches
 				}
 				clip.URL.Value = new("resdb:///1ed74a85e7d9a8e2456fadbd276cb9dd223ad96377ad230409693d408524606e.wav");
 				var speed = RandomX.Range(.5f, 2f);
-				for (int i = 0; i < 100; i++)
+				for (int i = 0; i < 15; i++)
 				{
 					text.PlayOneShot(clip, distanceSpace: AudioDistanceSpace.Global, speed: speed).MinDistance.Value = 10f;
 				}
