@@ -141,8 +141,8 @@ public class NodeBrowserPatches
 			var AudioClip = __instance.Slot.GetComponentOrAttach<StaticAudioClip>(out bool audioClipAttached);
 			if (audioClipAttached)
 			{
-				List<string> clips = ["resdb:///bdc6be11fdeede104a4b0cb3ea2f583bbe48c6aed97731313a818af08d3609c1", "resdb:///9de8c4e33701c7d74f047c5f4075296ee34e475fdf196fabb2b5a9491a92704c"];
-				bool doRandom = RandomX.Chance(0.2f);
+				List<string> clips = ["resdb:///bdc6be11fdeede104a4b0cb3ea2f583bbe48c6aed97731313a818af08d3609c1", "resdb:///9de8c4e33701c7d74f047c5f4075296ee34e475fdf196fabb2b5a9491a92704c","resdb:///bacee42662807e1bec7bf33f20b211bcbd05b7584be81787817c2f3af44a3130.ogg","resdb:///bff1f05cd334eee789951cdbcf05c937486db23cb9279f04a27cae8d583e1b9e.ogg","resdb:///994288f0f8348673bf427ff5234a61f7db93e8392f16a3b0871217506e7fa2ad","resdb:///fe5cc5988d68caeb4c67d112115cdda4ffaeece9ba0a0d9033134a8523279f9e.wav"];
+				bool doRandom = RandomX.Chance(0.5f);
 
 				AudioClip.URL.Value = new(doRandom ? clips[RandomX.Range(clips.Count)] : clips[0]);
 
@@ -162,6 +162,13 @@ public class NodeBrowserPatches
 			var msg = RandomX.Range(messages.Count);
 
 			headertext.Content.Value = messages[msg];
+		}
+		else
+		{
+			if (LenowoTweeks_General.changeBGColor.Value)
+			{
+				__instance.Slot.FindChild("Image").GetComponent<Image>().Tint.Value = LenowoTweeks_Core.secondaryUIColor.Value;
+			}
 		}
 	}
 

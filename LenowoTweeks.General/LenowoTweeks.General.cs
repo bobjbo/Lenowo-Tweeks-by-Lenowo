@@ -55,6 +55,8 @@ public class LenowoTweeks_General : LenowoTweak
 	public static ModConfigKey<bool> shareTheParty = new("Share The Party", "No fun in a party if you are alone!", true);
 
 	public static ModConfigKey<bool> attacherMessages = new("Node Attacher Messages", "Makes Node Attachers have little messages", true);
+	public static ModConfigKey<bool> changeBGColor = new("Override Node Attacher Background Color", "Makes Node Attachers have a custom backround color from your secondary UI Color", true);
+
 	public static ModConfigKey<colorX> catagoryColor = new("Catagory Color", "The color of catagories in the node browser",RadiantUI_Constants.Sub.YELLOW);
 	public static ModConfigKey<colorX> genericFolderColor = new("Generic Folder Color", "The color of generic node folders in the node browser",RadiantUI_Constants.Sub.GREEN);
 	public static ModConfigKey<colorX> nodeFolderColor = new("Node Folder Color", "The color of node groups in the node browser",RadiantUI_Constants.Sub.PURPLE);
@@ -79,7 +81,7 @@ public class LenowoTweeks_General : LenowoTweak
 			{
 				{ "Base", [ valueFieldDroppingMode, worldSearchGlobalTags, getItemLink ] },
 				{ "Create New", [ smallPrimitives, smallPrimitiveScale, removeMeshDefaultGizmo ] },
-				{ "Component Selector", [ partyMode, shareTheParty, attacherMessages, catagoryColor, nodeFolderColor, genericFolderColor, genericColor ] },
+				{ "Component Selector", [ partyMode, shareTheParty, changeBGColor, attacherMessages, catagoryColor, nodeFolderColor, genericFolderColor, genericColor ] },
 			}
 		}
 	};
