@@ -34,6 +34,7 @@ public class ModConfigKey(string keyName, string name, string description, Type 
 	public virtual void OnConfigExists() { }
 
 	public virtual void BuildField(ConfigUIBuilder builder, UIBuilder ui) { }
+	public virtual void SetDynamicVariable(DynamicVariableSpace space, string confKey) { }
 }
 
 public class ModConfigKey<T> : ModConfigKey
@@ -62,6 +63,11 @@ public class ModConfigKey<T> : ModConfigKey
 	{
 		builder.BuildGenericField(ui, this);
 	}
+
+	public override void SetDynamicVariable(DynamicVariableSpace space, string confKey)
+	{
+		space.TryWriteValue(confKey, Value);
+	}
 }
 
 public class ModConfigButton(string name, Action onClicked) : IModConfigItem
@@ -79,6 +85,8 @@ public class ConfigUIBuilder()
 	public List<LenowoTweak> CurModules = [];
 	public Dictionary<LenowoTweak, KeyValuePair<ModConfiguration, KeyType>> mappings = [];
 	public Dictionary<ModConfiguration, List<IModConfigItem>> keyMappings = [];
+
+	public List<IModConfigItem> allKeys = [];
 
 	public int currentConfigIndex = 0;
 
@@ -101,6 +109,12 @@ public class ConfigUIBuilder()
 			List<IModConfigItem> singlelist = [];
 			foreach (var v in doublelist) singlelist.AddRange(v);
 			keyMappings.Add(mapping.Value.Key, singlelist);
+		}
+
+		allKeys = [];
+		foreach (var key in keyMappings)
+		{
+			allKeys.AddRange(key.Value);
 		}
 	}
 
@@ -385,7 +399,27 @@ public class ConfigUIBuilder()
 
 	public void BuildButton(UIBuilder ui, ModConfigButton button)
 	{
-		ui.Button(button.ButtonLabel);
+		ui.PushStyle();
+		ui.Style.MinHeight = 24;
+		var element = ui.Button(button.ButtonLabel);
+		element.LocalPressed += (_, _) => {
+			button.OnClicked();
+			RefreshConfig(element.Slot);
+		};
+		ui.PopStyle();
+	}
+
+	public void RefreshConfig(Slot slot)
+	{
+		var space = slot.FindSpace("Config");
+		foreach (var key in allKeys)
+		{
+			if (key is ModConfigKey k)
+			{
+				string configName = $"{LenowoTweeks_Core.harmonyID}.{k.ConfigKeyName}";
+				k.SetDynamicVariable(space, configName);
+			}
+		}
 	}
 }
 #endregion
