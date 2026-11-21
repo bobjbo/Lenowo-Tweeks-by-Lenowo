@@ -1,6 +1,10 @@
+using System.Reflection.Emit;
+
 using Elements.Core;
 
 using FrooxEngine;
+
+using HarmonyLib;
 
 namespace LenowoTweeks.Core;
 
@@ -296,5 +300,35 @@ public static class Helpers
 	{
 		await root.LoadObjectAsync(uri);
 		root.GetComponent<InventoryItem>()?.Unpack();
+	}
+
+
+
+
+	public static void DumpIL(string title, IEnumerable<CodeInstruction> instructions)
+	{
+		string msg = $"Lenowo Tweaks // IL Dump ({title})\n";
+
+		int i = 0;
+
+		foreach (var instruction in instructions)
+		{
+			var labels = string.Join(", ", instruction.labels.Select(l => l.Id));
+			var blocks = string.Join(", ", instruction.blocks.Select(b => $"{b} ({b.blockType}, {b.catchType})"));
+
+			var opcode = instruction.opcode;
+			var modOperand = instruction.operand;
+
+			if (instruction.Branches(out Label? label) && label != null)
+			{
+				modOperand = label.Value.Id;
+			}
+			
+			msg += $"{i++:0000}: {opcode} \t{modOperand} \t\tLabels=[{labels}] \tBlocks=[{blocks}]\n";
+		}
+
+		msg += $"======== End Dump ({title}) ========";
+
+		UniLog.Warning(msg);
 	}
 }
