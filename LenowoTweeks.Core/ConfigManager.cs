@@ -15,26 +15,19 @@ using ResoniteModLoader;
 
 namespace LenowoTweeks.Core;
 
-using KeyType = Dictionary<string, Dictionary<string, List<ModConfigKey>>>;
+using KeyType = Dictionary<string, Dictionary<string, List<IModConfigItem>>>;
 
 #region Config Types
-public class ModConfigKey
+public interface IModConfigItem {}
+
+public class ModConfigKey(string keyName, string name, string description, Type type, ModConfigurationKey key) : IModConfigItem
 {
-	private readonly Type defaultType;
-	public ModConfigurationKey ConfigKey;
+	private readonly Type defaultType = type;
+	public ModConfigurationKey ConfigKey = key;
 
-	public string ConfigName;
-	public string ConfigKeyName;
-	public string ConfigDescription;
-
-	public ModConfigKey(string keyName, string name, string description, Type type, ModConfigurationKey key)
-	{
-		defaultType = type;
-		ConfigKey = key;
-		ConfigName = name;
-		ConfigKeyName = keyName;
-		ConfigDescription = description;
-	}
+	public string ConfigName = name;
+	public string ConfigKeyName = keyName;
+	public string ConfigDescription = description;
 
 	public Type ValueType() => defaultType;
 
@@ -70,6 +63,14 @@ public class ModConfigKey<T> : ModConfigKey
 		builder.BuildGenericField(ui, this);
 	}
 }
+
+public class ModConfigButton(string name, Action onClicked) : IModConfigItem
+{
+	public string ButtonLabel = name;
+
+	public Action OnClicked = onClicked;
+}
+
 #endregion
 
 #region Config UI Builder
@@ -77,7 +78,7 @@ public class ConfigUIBuilder()
 {
 	public List<LenowoTweak> CurModules = [];
 	public Dictionary<LenowoTweak, KeyValuePair<ModConfiguration, KeyType>> mappings = [];
-	public Dictionary<ModConfiguration, List<ModConfigKey>> keyMappings = [];
+	public Dictionary<ModConfiguration, List<IModConfigItem>> keyMappings = [];
 
 	public int currentConfigIndex = 0;
 
@@ -95,9 +96,9 @@ public class ConfigUIBuilder()
 		foreach (var mapping in mappings)
 		{
 			var triplelist = mapping.Value.Value.Select(v1 => v1.Value.Select(v2 => v2.Value));
-			List<List<ModConfigKey>> doublelist = [];
+			List<List<IModConfigItem>> doublelist = [];
 			foreach (var v in triplelist) doublelist.AddRange(v);
-			List<ModConfigKey> singlelist = [];
+			List<IModConfigItem> singlelist = [];
 			foreach (var v in doublelist) singlelist.AddRange(v);
 			keyMappings.Add(mapping.Value.Key, singlelist);
 		}
@@ -141,7 +142,7 @@ public class ConfigUIBuilder()
 		}
 	}
 
-	public void BuildSection(UIBuilder ui, string name, Dictionary<string, List<ModConfigKey>> SubGroups)
+	public void BuildSection(UIBuilder ui, string name, Dictionary<string, List<IModConfigItem>> SubGroups)
 	{
 		VerticalLayout? sectionLayout = null;
 		BuildTitle(ui, name, 48, () =>
@@ -163,7 +164,14 @@ public class ConfigUIBuilder()
 			groupLayout = ui.VerticalLayout(4, 0, Alignment.TopLeft, true, false);
 			foreach (var item in kv.Value)
 			{
-				item.BuildField(this, ui);
+				if (item is ModConfigKey key)
+				{
+					key.BuildField(this, ui);
+				}
+				else if (item is ModConfigButton button)
+				{
+					BuildButton(ui, button);
+				}
 				currentConfigIndex++;
 			}
 			ui.NestOut();
@@ -373,6 +381,11 @@ public class ConfigUIBuilder()
 		configKey.Value = syncField.Value;
 
 		modConfiguration.Save(true);
+	}
+
+	public void BuildButton(UIBuilder ui, ModConfigButton button)
+	{
+		ui.Button(button.ButtonLabel);
 	}
 }
 #endregion

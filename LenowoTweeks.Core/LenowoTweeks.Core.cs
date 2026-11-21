@@ -44,7 +44,7 @@ public class LenowoTweeks_Core : LenowoTweak
 
 	public static ModConfiguration? Config;
 
-	public static readonly Dictionary<string, Dictionary<string, List<ModConfigKey>>> SortedConfigKeys = new()
+	public static readonly Dictionary<string, Dictionary<string, List<IModConfigItem>>> SortedConfigKeys = new()
 	{
 		{
 			"Mod Specific", new()
@@ -55,7 +55,7 @@ public class LenowoTweeks_Core : LenowoTweak
 	};
 
 	public override ModConfiguration? GetConfig => instance.GetConfiguration();
-	public override Dictionary<string, Dictionary<string, List<ModConfigKey>>> GetKeys => SortedConfigKeys;
+	public override Dictionary<string, Dictionary<string, List<IModConfigItem>>> GetKeys => SortedConfigKeys;
 	public override int ConfigOrder => -10;
 
 	public static void GenerateUI(UIBuilder ui)
@@ -79,7 +79,10 @@ public class LenowoTweeks_Core : LenowoTweak
 			{
 				foreach (var configKey in configKeys)
 				{
-					builder.Key(configKey.ConfigKey);
+					if (configKey is ModConfigKey key)
+					{	
+						builder.Key(key.ConfigKey);
+					}
 				}
 			}
 		}

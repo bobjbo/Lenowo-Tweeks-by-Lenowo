@@ -303,11 +303,11 @@ public class NodeBrowserPatches
 		{
 			if (button.Slot.GetComponent<Image>().Tint.Value == RadiantUI_Constants.Sub.PURPLE)
 			{
-				button.Slot.GetComponent<Image>().Tint.Value = LenowoTweeks_General.nodeFolderColor.Value;
+				button.Slot.GetComponent<Image>().Tint.Value = LenowoTweeks_General.groupingColor.Value;
 			}
 			else if (button.Slot.GetComponent<Image>().Tint.Value == RadiantUI_Constants.Sub.CYAN)
 			{
-				button.Slot.GetComponent<Image>().Tint.Value = LenowoTweeks_General.genericColor.Value;
+				button.Slot.GetComponent<Image>().Tint.Value = LenowoTweeks_General.normalColor.Value;
 			}
 			else if (button.Slot.GetComponent<Image>().Tint.Value == RadiantUI_Constants.Sub.GREEN)
 			{
@@ -315,7 +315,7 @@ public class NodeBrowserPatches
 			}
 			else if (button.Slot.GetComponent<Image>().Tint.Value == RadiantUI_Constants.Sub.YELLOW)
 			{
-				button.Slot.GetComponent<Image>().Tint.Value = LenowoTweeks_General.catagoryColor.Value;
+				button.Slot.GetComponent<Image>().Tint.Value = LenowoTweeks_General.categoryColor.Value;
 			}
 		}
 		

@@ -57,37 +57,49 @@ public class LenowoTweeks_General : LenowoTweak
 	public static ModConfigKey<bool> attacherMessages = new("Node Attacher Messages", "Makes Node Attachers have little messages", true);
 	public static ModConfigKey<bool> changeBGColor = new("Override Node Attacher Background Color", "Makes Node Attachers have a custom backround color from your secondary UI Color", true);
 
-	public static ModConfigKey<colorX> catagoryColor = new("Catagory Color", "The color of catagories in the node browser",RadiantUI_Constants.Sub.YELLOW);
+	public static ModConfigKey<colorX> categoryColor = new("Catagory Color", "The color of catagories in the node browser",RadiantUI_Constants.Sub.YELLOW);
 	public static ModConfigKey<colorX> genericFolderColor = new("Generic Folder Color", "The color of generic node folders in the node browser",RadiantUI_Constants.Sub.GREEN);
-	public static ModConfigKey<colorX> nodeFolderColor = new("Node Folder Color", "The color of node groups in the node browser",RadiantUI_Constants.Sub.PURPLE);
-	public static ModConfigKey<colorX> genericColor = new("Generic Color", "The color of generics in the node browser",RadiantUI_Constants.Sub.CYAN);
+	public static ModConfigKey<colorX> groupingColor = new("Node Group Color", "The color of node groups in the node browser",RadiantUI_Constants.Sub.PURPLE);
+	public static ModConfigKey<colorX> normalColor = new("Normal Color", "The color of normal types in the node browser",RadiantUI_Constants.Sub.CYAN);
 
 	// Color Presets
-	// catagoryColor, genercFolderColor, nodeFolderColor, genericColor
-	// default: RadiantUI_Constants.Sub.YELLOW, RadiantUI_Constants.Sub.GREEN, RadiantUI_Constants.Sub.PURPLE, RadiantUI_Constants.Sub.CYAN
-	// mid: RadiantUI_Constants.Mid.YELLOW, RadiantUI_Constants.Mid.GREEN, RadiantUI_Constants.Mid.PURPLE, RadiantUI_Constants.Mid.CYAN
-	// dark: RadiantUI_Constants.Dark.YELLOW, RadiantUI_Constants.Dark.GREEN, RadiantUI_Constants.Dark.PURPLE, RadiantUI_Constants.Dark.CYAN
-	// bright: RadiantUI_Constants.Hero.YELLOW, RadiantUI_Constants.Hero.GREEN, RadiantUI_Constants.Hero.PURPLE, RadiantUI_Constants.Hero.CYAN
-	// Rosa: RadientUI_Constants.Sub.PURPLE, RadiantUI_Constants.Sub.GREEN, RadiantUI_Constants.Dark.PURPLE, RadiantUI_Constants.Dark.CYAN
+	public static ModConfigButton defaultPreset = new("Preset: Default", () => SetBrowserColors(RadiantUI_Constants.Sub.YELLOW, RadiantUI_Constants.Sub.GREEN, RadiantUI_Constants.Sub.PURPLE, RadiantUI_Constants.Sub.CYAN));
+	public static ModConfigButton midPreset = new("Preset: Mid", () => SetBrowserColors(RadiantUI_Constants.MidLight.YELLOW, RadiantUI_Constants.MidLight.GREEN, RadiantUI_Constants.MidLight.PURPLE, RadiantUI_Constants.MidLight.CYAN));
+	public static ModConfigButton darkPreset = new("Preset: Dark", () => SetBrowserColors(RadiantUI_Constants.Dark.YELLOW, RadiantUI_Constants.Dark.GREEN, RadiantUI_Constants.Dark.PURPLE, RadiantUI_Constants.Dark.CYAN));
+	public static ModConfigButton brightPreset = new("Preset: Bright", () => SetBrowserColors(RadiantUI_Constants.Hero.YELLOW, RadiantUI_Constants.Hero.GREEN, RadiantUI_Constants.Hero.PURPLE, RadiantUI_Constants.Hero.CYAN));
+	public static ModConfigButton rosaPreset = new("Preset: Rosa", () => SetBrowserColors(RadiantUI_Constants.Sub.PURPLE, RadiantUI_Constants.Sub.GREEN, RadiantUI_Constants.Dark.PURPLE, RadiantUI_Constants.Dark.CYAN));
 
+	public static void SetBrowserColors(colorX category, colorX generic, colorX grouping, colorX normal)
+	{
+		categoryColor.Value = category;
+		genericFolderColor.Value = generic;
+		groupingColor.Value = grouping;
+		normalColor.Value = normal;
+	}
 
 
 	public static ModConfiguration? Config;
 
-	public static readonly Dictionary<string, Dictionary<string, List<ModConfigKey>>> SortedConfigKeys = new()
+	public static readonly Dictionary<string, Dictionary<string, List<IModConfigItem>>> SortedConfigKeys = new()
 	{
 		{
 			"General", new()
 			{
 				{ "Base", [ valueFieldDroppingMode, worldSearchGlobalTags, getItemLink ] },
 				{ "Create New", [ smallPrimitives, smallPrimitiveScale, removeMeshDefaultGizmo ] },
-				{ "Component Selector", [ partyMode, shareTheParty, changeBGColor, attacherMessages, catagoryColor, nodeFolderColor, genericFolderColor, genericColor ] },
+				{ "Component Selector", 
+				[
+					partyMode, shareTheParty,
+					changeBGColor, attacherMessages,
+					categoryColor, groupingColor, genericFolderColor, normalColor,
+					defaultPreset, midPreset, darkPreset, brightPreset, rosaPreset
+				] },
 			}
 		}
 	};
 
 	public override ModConfiguration? GetConfig => instance.GetConfiguration();
-	public override Dictionary<string, Dictionary<string, List<ModConfigKey>>> GetKeys => SortedConfigKeys;
+	public override Dictionary<string, Dictionary<string, List<IModConfigItem>>> GetKeys => SortedConfigKeys;
 	public override int ConfigOrder => -9;
 
 	public static void ModSettings_BuildModUi(UIBuilder ui)
@@ -104,7 +116,10 @@ public class LenowoTweeks_General : LenowoTweak
 			{
 				foreach (var configKey in configKeys)
 				{
-					builder.Key(configKey.ConfigKey);
+					if (configKey is ModConfigKey key)
+					{	
+						builder.Key(key.ConfigKey);
+					}
 				}
 			}
 		}
