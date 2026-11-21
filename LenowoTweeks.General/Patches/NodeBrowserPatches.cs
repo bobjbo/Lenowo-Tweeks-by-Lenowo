@@ -235,24 +235,27 @@ public class NodeBrowserPatches
 			
 		}
 
-		List<Type> DefaultTypes = [
-			typeof(Slot), typeof(User),
-			typeof(IAssetProvider<Material>), typeof(IAssetProvider<ITexture2D>), typeof(IAssetProvider<AudioClip>), typeof(StaticAudioClip), typeof(IWorldAudioDataSource),
-			typeof(string), typeof(IWorldElement), typeof(RefID),
-			typeof(IField<float3>), typeof(IField<float>), typeof(IField<floatQ>),
-			typeof(float3), typeof(floatQ)
-		];
-
-		foreach (var type in DefaultTypes)
+		if (LenowoTweeks_General.addDefaultTypes.Value)
 		{
-			try
+			List<Type> DefaultTypes = [
+				typeof(Slot), typeof(User),
+				typeof(IAssetProvider<Material>), typeof(IAssetProvider<ITexture2D>), typeof(IAssetProvider<AudioClip>), typeof(StaticAudioClip), typeof(IWorldAudioDataSource),
+				typeof(string), typeof(IWorldElement), typeof(RefID),
+				typeof(IField<float3>), typeof(IField<float>), typeof(IField<floatQ>),
+				typeof(float3), typeof(floatQ)
+			];
+
+			foreach (var type in DefaultTypes)
 			{
-				var gt = baseType.MakeGenericType(type);
-				if (!gt.IsValidGenericType(true) || !instance.World.Types.IsSupported(gt)) continue;
-				AddTypeCustom(instance, ui, gt);
-			} catch
-			{
-				// the type is not anywhere near valid. nice one!
+				try
+				{
+					var gt = baseType.MakeGenericType(type);
+					if (!gt.IsValidGenericType(true) || !instance.World.Types.IsSupported(gt)) continue;
+					AddTypeCustom(instance, ui, gt);
+				} catch
+				{
+					// the type is not anywhere near valid. nice one!
+				}
 			}
 		}
 
@@ -266,32 +269,34 @@ public class NodeBrowserPatches
 
 	public static void ModifyButton(Button button, bool dospaces)
 	{
+		bool globalDoSpaces = LenowoTweeks_General.addSpacesInNames.Value;
 		
-		button.Label.Content.Value = button.Label.Content.Value.Replace("_"," ");
+		if (globalDoSpaces) {
+			button.Label.Content.Value = button.Label.Content.Value.Replace("_"," ");
 
-		bool dont = !dospaces;
-		for (int i = 0; i < button.Label.Content.Value.Length; i++)
-		{
-
-			if (button.Label.Content.Value.Substring(i,1).ToUpper() == button.Label.Content.Value.Substring(i,1) && !dont && !int.TryParse(button.Label.Content.Value.Substring(i,1), out _) )
+			for (int i = 0; i < button.Label.Content.Value.Length; i++)
 			{
-				button.Label.Content.Value = button.Label.Content.Value.Substring(0,i) + " " + button.Label.Content.Value.Substring(i);
-				i+=1;
+
+				if (dospaces && button.Label.Content.Value.Substring(i,1).ToUpper() == button.Label.Content.Value.Substring(i,1) && !int.TryParse(button.Label.Content.Value.Substring(i,1), out _) )
+				{
+					button.Label.Content.Value = button.Label.Content.Value.Substring(0,i) + " " + button.Label.Content.Value.Substring(i);
+					i+=1;
+				}
+
+				if (button.Label.Content.Value.Substring(i,1) == "<")
+				{
+					dospaces = false;
+				}
+
+				if (i > 100)
+				{
+					break;
+				}
 			}
 
-			if (button.Label.Content.Value.Substring(i,1) == "<")
-			{
-				dont = true;
-			}
-
-			if (i > 100)
-			{
-				break;
-			}
+			button.Label.Content.Value = button.Label.Content.Value.Replace("   "," ");
+			button.Label.Content.Value = button.Label.Content.Value.Replace("  "," ");
 		}
-
-		button.Label.Content.Value = button.Label.Content.Value.Replace("   "," ");
-		button.Label.Content.Value = button.Label.Content.Value.Replace("  "," ");
 
 		if (ShouldBeAParty(button.Slot))
 		{
@@ -299,7 +304,7 @@ public class NodeBrowserPatches
 			button.Slot.GetComponent<Image>().Tint.Value = RandomX.Hue.MulValue(0.2f);
 		}
 
-		if (!ShouldBeAParty(button.Slot))
+		else
 		{
 			if (button.Slot.GetComponent<Image>().Tint.Value == RadiantUI_Constants.Sub.PURPLE)
 			{
@@ -380,13 +385,6 @@ public class NodeBrowserPatches
 			//button.Label.Content.Value = button.Label.Content.Value.Replace("_","");
 
 			ModifyButton(button,true);
-
-
-
-			// ok now the silly stuff
-
-			//the horrors
-			//button.Label.Content.Value = "<size=300%>" + button.Label.Content.Value + "                                  <color=hero.red><size=200%>OwO?";
 		}
 	}
 

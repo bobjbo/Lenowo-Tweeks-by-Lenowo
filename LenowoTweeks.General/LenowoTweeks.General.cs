@@ -55,7 +55,13 @@ public class LenowoTweeks_General : LenowoTweak
 	public static ModConfigKey<bool> shareTheParty = new("Share The Party", "No fun in a party if you are alone!", true);
 
 	public static ModConfigKey<bool> attacherMessages = new("Node Attacher Messages", "Makes Node Attachers have little messages", true);
-	public static ModConfigKey<bool> changeBGColor = new("Override Node Attacher Background Color", "Makes Node Attachers have a custom backround color from your secondary UI Color", true);
+	public static ModConfigKey<bool> changeBGColor = new("Override Node Attacher Background Color", "Makes Node Attachers have a custom backround color from your secondary UI Color", false);
+
+	public static ModConfigKey<bool> addSpacesInNames = new("Add Spaces In Names", "Adds spaces in the component names, like 'Cast_colorX_To_float4' with 'Cast color X To float4'", false);
+
+	public static ModConfigKey<bool> addDefaultTypes = new("Add Default Types", "When picking a generic type with this enabled, some types will be added by default at the top.", true);
+
+
 
 	public static ModConfigKey<colorX> categoryColor = new("Catagory Color", "The color of catagories in the node browser",RadiantUI_Constants.Sub.YELLOW);
 	public static ModConfigKey<colorX> genericFolderColor = new("Generic Folder Color", "The color of generic node folders in the node browser",RadiantUI_Constants.Sub.GREEN);
