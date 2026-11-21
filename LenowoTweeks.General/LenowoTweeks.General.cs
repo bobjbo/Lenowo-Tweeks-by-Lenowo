@@ -9,6 +9,11 @@ using FrooxEngine.UIX;
 using LenowoTweeks.Core;
 using LenowoTweeks.General.Patches;
 
+using Elements.Core;
+using FrooxEngine;
+
+
+
 
 
 
@@ -49,6 +54,21 @@ public class LenowoTweeks_General : LenowoTweak
 	public static ModConfigKey<bool> partyMode = new("Party Mode", "Turns any component selector into a party!!!", true);
 	public static ModConfigKey<bool> shareTheParty = new("Share The Party", "No fun in a party if you are alone!", true);
 
+	public static ModConfigKey<bool> attacherMessages = new("Node Attacher Messages", "Makes Node Attachers have little messages", true);
+	public static ModConfigKey<colorX> catagoryColor = new("Catagory Color", "The color of catagories in the node browser",RadiantUI_Constants.Sub.YELLOW);
+	public static ModConfigKey<colorX> genericFolderColor = new("Generic Folder Color", "The color of generic node folders in the node browser",RadiantUI_Constants.Sub.GREEN);
+	public static ModConfigKey<colorX> nodeFolderColor = new("Node Folder Color", "The color of node groups in the node browser",RadiantUI_Constants.Sub.PURPLE);
+	public static ModConfigKey<colorX> genericColor = new("Generic Color", "The color of generics in the node browser",RadiantUI_Constants.Sub.CYAN);
+
+	// Color Presets
+	// catagoryColor, genercFolderColor, nodeFolderColor, genericColor
+	// default: RadiantUI_Constants.Sub.YELLOW, RadiantUI_Constants.Sub.GREEN, RadiantUI_Constants.Sub.PURPLE, RadiantUI_Constants.Sub.CYAN
+	// mid: RadiantUI_Constants.Mid.YELLOW, RadiantUI_Constants.Mid.GREEN, RadiantUI_Constants.Mid.PURPLE, RadiantUI_Constants.Mid.CYAN
+	// dark: RadiantUI_Constants.Dark.YELLOW, RadiantUI_Constants.Dark.GREEN, RadiantUI_Constants.Dark.PURPLE, RadiantUI_Constants.Dark.CYAN
+	// bright: RadiantUI_Constants.Hero.YELLOW, RadiantUI_Constants.Hero.GREEN, RadiantUI_Constants.Hero.PURPLE, RadiantUI_Constants.Hero.CYAN
+	// Rosa: RadientUI_Constants.Sub.PURPLE, RadiantUI_Constants.Sub.GREEN, RadiantUI_Constants.Dark.PURPLE, RadiantUI_Constants.Dark.CYAN
+
+
 
 	public static ModConfiguration? Config;
 
@@ -59,7 +79,7 @@ public class LenowoTweeks_General : LenowoTweak
 			{
 				{ "Base", [ valueFieldDroppingMode, worldSearchGlobalTags, getItemLink ] },
 				{ "Create New", [ smallPrimitives, smallPrimitiveScale, removeMeshDefaultGizmo ] },
-				{ "Component Selector", [ partyMode, shareTheParty ] },
+				{ "Component Selector", [ partyMode, shareTheParty, attacherMessages, catagoryColor, nodeFolderColor, genericFolderColor, genericColor ] },
 			}
 		}
 	};

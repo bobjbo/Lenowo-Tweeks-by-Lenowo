@@ -17,6 +17,9 @@ public class NodeBrowserPatches
 {
 	public static bool ShouldBeAParty(ComponentSelector instance) =>
 		LenowoTweeks_General.partyMode.Value && (LenowoTweeks_General.shareTheParty.Value || (instance.GetAllocatingUser()?.IsLocalUser ?? false));
+	public static bool ShouldBeAParty2(Slot instance) =>
+		LenowoTweeks_General.partyMode.Value && (LenowoTweeks_General.shareTheParty.Value || (instance.GetAllocatingUser()?.IsLocalUser ?? false));
+
 
 	[HarmonyTranspiler]
 	[HarmonyPatch(typeof(ComponentSelector), "BuildUI")]
@@ -82,18 +85,24 @@ public class NodeBrowserPatches
 	{
 		if (ShouldBeAParty(instance))
 		{
-			button.Label.Color.Value = RandomX.Hue;
-			button.Slot.GetComponent<Image>().Tint.Value = RandomX.Hue.MulValue(0.2f);
-
 			if (button.Label.Content.Value.Contains("Fire"))
 			{
-				button.Label.Content.Value =  button.Label.Content.Value.Replace("Fire"," Fire").Replace("On"," On").Replace("Local"," Local").Replace("True"," Deez").Replace("False"," Dose").Replace("While", " While").Replace("Change"," Nuts Change");
+				button.Label.Content.Value =  button.Label.Content.Value.Replace("True","Deez").Replace("False","Dose").Replace("Change","NutsChange");
 				//var index = button.Label.Content.Value.IndexOf("O");
 				//var containsLocal = button.Label.Content.Value.Substring(index).Contains("Local");
 				//var containsTrue = button.Label.Content.Value.Substring(index).Contains("True");
 				//button.Label.Content.Value = button.Label.Content.Value.Substring(0,index) + " On" + (containsTrue ? " Dose": " Deez") + (containsLocal ? "" : " Local") + " Nuts";
 			}
+			if (button.Label.Content.Value.Contains("Async"))
+			{
+				button.Label.Content.Value = button.Label.Content.Value.Replace("Async","ASink");
+			}
 		}
+
+
+		ModifyButton(button,true);
+
+
 	}
 
 	public static void Catagory(Button button,ComponentSelector instance, UIBuilder ui, CategoryNode<Type> catagory)
@@ -101,11 +110,8 @@ public class NodeBrowserPatches
 		button.Label.ParseRichText.Value = ShouldBeAParty(instance);
 		button.Label.Content.Value = catagory.Name + " (" + catagory.ElementCount + (ShouldBeAParty(instance) ? ") <color=hero.purple>:3" : ") >");
 		
-		if (ShouldBeAParty(instance))
-		{
-			button.Label.Color.Value = RandomX.Hue;
-			button.Slot.GetComponent<Image>().Tint.Value = RandomX.Hue.MulValue(0.2f);
-		}
+
+		ModifyButton(button,false);
 	}
 
 	[HarmonyPostfix]
@@ -165,7 +171,7 @@ public class NodeBrowserPatches
 		// this should always run no matter what
 		AddItemPatches.CurrentTypes.Clear();
 
-		if (ShouldBeAParty(instance))
+		if (LenowoTweeks_General.attacherMessages.Value)
 		{
 			List<string> messages = ["Hello, $USER.", "HAIIIIIIIIIIIIIIIIIIII", "Whatcha here for?", "$USER is stinky.", "Lookin' for an illegal type?", "What if it could be SH64?", "<size=700%><color=red>F</color>IH"];
 
@@ -241,6 +247,65 @@ public class NodeBrowserPatches
 		AddItemPatches.OnAddNewButton(button, instance, ui, type);
 	}
 
+	public static void ModifyButton(Button button, bool dospaces)
+	{
+		
+		button.Label.Content.Value = button.Label.Content.Value.Replace("_"," ");
+
+		bool dont = !dospaces;
+		for (int i = 0; i < button.Label.Content.Value.Length; i++)
+		{
+
+			if (button.Label.Content.Value.Substring(i,1).ToUpper() == button.Label.Content.Value.Substring(i,1) && !dont && !int.TryParse(button.Label.Content.Value.Substring(i,1), out _) )
+			{
+				button.Label.Content.Value = button.Label.Content.Value.Substring(0,i) + " " + button.Label.Content.Value.Substring(i);
+				i+=1;
+			}
+
+			if (button.Label.Content.Value.Substring(i,1) == "<")
+			{
+				dont = true;
+			}
+
+			if (i > 100)
+			{
+				break;
+			}
+		}
+
+		button.Label.Content.Value = button.Label.Content.Value.Replace("   "," ");
+		button.Label.Content.Value = button.Label.Content.Value.Replace("  "," ");
+
+		if (ShouldBeAParty2(button.Slot))
+		{
+			button.Label.Color.Value = RandomX.Hue;
+			button.Slot.GetComponent<Image>().Tint.Value = RandomX.Hue.MulValue(0.2f);
+		}
+
+		if (!ShouldBeAParty2(button.Slot))
+		{
+			if (button.Slot.GetComponent<Image>().Tint.Value == RadiantUI_Constants.Sub.PURPLE)
+			{
+				button.Slot.GetComponent<Image>().Tint.Value = LenowoTweeks_General.nodeFolderColor.Value;
+			}
+			else if (button.Slot.GetComponent<Image>().Tint.Value == RadiantUI_Constants.Sub.CYAN)
+			{
+				button.Slot.GetComponent<Image>().Tint.Value = LenowoTweeks_General.genericColor.Value;
+			}
+			else if (button.Slot.GetComponent<Image>().Tint.Value == RadiantUI_Constants.Sub.GREEN)
+			{
+				button.Slot.GetComponent<Image>().Tint.Value = LenowoTweeks_General.genericFolderColor.Value;
+			}
+			else if (button.Slot.GetComponent<Image>().Tint.Value == RadiantUI_Constants.Sub.YELLOW)
+			{
+				button.Slot.GetComponent<Image>().Tint.Value = LenowoTweeks_General.catagoryColor.Value;
+			}
+		}
+		
+	}
+
+
+
 	[HarmonyPatch]
 	public static class AddItemPatches
 	{
@@ -294,6 +359,12 @@ public class NodeBrowserPatches
 
 			// this is default but i remove the rest of the normal code so like, gotta do it here
 			button.Label.ParseRichText.Value = false;
+
+			//button.Label.Content.Value = button.Label.Content.Value.Replace("_","");
+
+			ModifyButton(button,true);
+
+
 
 			// ok now the silly stuff
 
