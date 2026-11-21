@@ -15,9 +15,7 @@ namespace LenowoTweeks.General.Patches;
 [HarmonyPatch]
 public class NodeBrowserPatches
 {
-	public static bool ShouldBeAParty(ComponentSelector instance) =>
-		LenowoTweeks_General.partyMode.Value && (LenowoTweeks_General.shareTheParty.Value || (instance.GetAllocatingUser()?.IsLocalUser ?? false));
-	public static bool ShouldBeAParty2(Slot instance) =>
+	public static bool ShouldBeAParty(IWorldElement instance) =>
 		LenowoTweeks_General.partyMode.Value && (LenowoTweeks_General.shareTheParty.Value || (instance.GetAllocatingUser()?.IsLocalUser ?? false));
 
 
@@ -229,16 +227,28 @@ public class NodeBrowserPatches
 					text.PlayOneShot(clip, distanceSpace: AudioDistanceSpace.Global, speed: speed).MinDistance.Value = 10f;
 				}
 			}
+
+			// todo:
+			// resdb:///68c34cbf6375b257ca4175412b6f8a9033af0e39c74cf78485488513b689fbdf
+			// resdb:///7d57871b41c93e4e83d597af1dd723d81adef3f7579ccc025ed563d4383bf28e
+			// resdb:///e4195228e77008e6c4dfe887d973080bd8c5c7f480373917789acdf3a64f64a4.wav
+			
 		}
 
-		List<Type> DefaultTypes = [typeof(Slot), typeof(User), typeof(IAssetProvider<Material>), typeof(IAssetProvider<ITexture2D>), typeof(IAssetProvider<AudioClip>), typeof(StaticAudioClip), typeof(IWorldAudioDataSource), typeof(string), typeof(IWorldElement), typeof(RefID), typeof(IField<float3>), typeof(IField<float>), typeof(IField<floatQ>), typeof(float3), typeof(floatQ)];
+		List<Type> DefaultTypes = [
+			typeof(Slot), typeof(User),
+			typeof(IAssetProvider<Material>), typeof(IAssetProvider<ITexture2D>), typeof(IAssetProvider<AudioClip>), typeof(StaticAudioClip), typeof(IWorldAudioDataSource),
+			typeof(string), typeof(IWorldElement), typeof(RefID),
+			typeof(IField<float3>), typeof(IField<float>), typeof(IField<floatQ>),
+			typeof(float3), typeof(floatQ)
+		];
 
 		foreach (var type in DefaultTypes)
 		{
 			try
 			{
 				var gt = baseType.MakeGenericType(type);
-				if (!type.IsValidGenericType(true) || !instance.World.Types.IsSupported(gt)) continue;
+				if (!gt.IsValidGenericType(true) || !instance.World.Types.IsSupported(gt)) continue;
 				AddTypeCustom(instance, ui, gt);
 			} catch
 			{
@@ -283,13 +293,13 @@ public class NodeBrowserPatches
 		button.Label.Content.Value = button.Label.Content.Value.Replace("   "," ");
 		button.Label.Content.Value = button.Label.Content.Value.Replace("  "," ");
 
-		if (ShouldBeAParty2(button.Slot))
+		if (ShouldBeAParty(button.Slot))
 		{
 			button.Label.Color.Value = RandomX.Hue;
 			button.Slot.GetComponent<Image>().Tint.Value = RandomX.Hue.MulValue(0.2f);
 		}
 
-		if (!ShouldBeAParty2(button.Slot))
+		if (!ShouldBeAParty(button.Slot))
 		{
 			if (button.Slot.GetComponent<Image>().Tint.Value == RadiantUI_Constants.Sub.PURPLE)
 			{
