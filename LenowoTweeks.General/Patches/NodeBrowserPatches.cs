@@ -22,7 +22,14 @@ public class NodeBrowserPatches
 	[HarmonyPatch(typeof(ComponentSelector), "BuildUI")]
 	public static IEnumerable<CodeInstruction> BeforeBuildGenericTypes(IEnumerable<CodeInstruction> instructions)
 	{
+		bool inject1 = false;
+		bool inject2 = false;
+		bool inject3 = false;
+		bool found1 = false;
+		bool found2 = false;
 		var codes = new List<CodeInstruction>(instructions);
+
+		var getLabelMethod = typeof(Button).GetMethod("get_Label");
 		object find1 = null;
 
 		for (int i = 0; i < codes.Count; i++)
@@ -31,17 +38,74 @@ public class NodeBrowserPatches
 			{
 				find1 = codes[i].operand;
 			}
-			if (codes[i].opcode == OpCodes.Stloc_S && codes[i].operand.ToString().Contains("(12)"))
+			if (codes[i].opcode == OpCodes.Stloc_S && codes[i].operand.ToString().Contains("(12)") && !inject1)
 			{
 				codes.Insert(i + 1, new(OpCodes.Call, ((Delegate)AddDefaults).Method));
 				codes.Insert(i + 1, new(OpCodes.Ldloc_2));
 				codes.Insert(i + 1, new(OpCodes.Ldfld, find1));
 				codes.Insert(i + 1, new(OpCodes.Ldloc_0));
 				codes.Insert(i + 1, new(OpCodes.Ldarg_0));
-				return codes.AsEnumerable();
+				inject1 = true;
+			}
+			else if (codes[i].opcode == OpCodes.Ldstr && codes[i].operand.ToString().Contains(" >") && inject1 && !found1)
+			{
+				found1 = true;
+			}
+			else if (codes[i].opcode == OpCodes.Ldstr && codes[i].operand.ToString().Contains("/") && inject1 && found1)
+			{
+				found2 = true;
+			}
+			else if (!inject2 && codes[i].Calls(getLabelMethod) && inject1 && found1 && found2)
+			{
+				codes[i] = new(OpCodes.Ldarg_0);
+				codes[i+1] = new(OpCodes.Ldloc_0);
+				codes[i+2] = new(OpCodes.Ldfld, find1);
+				codes[i+3] = new(OpCodes.Ldloc, 20);
+				codes.Insert(i + 4, new(OpCodes.Call, ((Delegate)Catagory).Method));
+				inject2 = true;
+			}
+			else if (!inject3 && inject1 && inject2 && found1 && found2 && codes[i-1].opcode == OpCodes.Ldloc_S && codes[i-1].operand.ToString().Contains("(25)") && codes[i].Calls(getLabelMethod))
+			{
+				codes.Insert(i+4, new(OpCodes.Call, ((Delegate)Otherbutton).Method));
+				codes.Insert(i+4, new(OpCodes.Ldarg_3)); //group
+				codes.Insert(i+4,new(OpCodes.Ldfld,find1)); //ui pt1
+				codes.Insert(i+4, new(OpCodes.Ldloc_0)); //ui pt2
+				codes.Insert(i+4, new(OpCodes.Ldarg_0)); //component selector
+				codes.Insert(i+4, new(OpCodes.Ldloc_S, 25)); // button
+				inject3 = true;
 			}
 		}
 		return codes.AsEnumerable();
+	}
+
+	public static void Otherbutton(Button button, ComponentSelector instance, UIBuilder ui, string catagory)
+	{
+		if (ShouldBeAParty(instance))
+		{
+			button.Label.Color.Value = RandomX.Hue;
+			button.Slot.GetComponent<Image>().Tint.Value = RandomX.Hue.MulValue(0.2f);
+
+			if (button.Label.Content.Value.Contains("Fire"))
+			{
+				button.Label.Content.Value =  button.Label.Content.Value.Replace("Fire"," Fire").Replace("On"," On").Replace("Local"," Local").Replace("True"," Deez").Replace("False"," Dose").Replace("While", " While").Replace("Change"," Nuts Change");
+				//var index = button.Label.Content.Value.IndexOf("O");
+				//var containsLocal = button.Label.Content.Value.Substring(index).Contains("Local");
+				//var containsTrue = button.Label.Content.Value.Substring(index).Contains("True");
+				//button.Label.Content.Value = button.Label.Content.Value.Substring(0,index) + " On" + (containsTrue ? " Dose": " Deez") + (containsLocal ? "" : " Local") + " Nuts";
+			}
+		}
+	}
+
+	public static void Catagory(Button button,ComponentSelector instance, UIBuilder ui, CategoryNode<Type> catagory)
+	{
+		button.Label.ParseRichText.Value = ShouldBeAParty(instance);
+		button.Label.Content.Value = catagory.Name + " (" + catagory.ElementCount + (ShouldBeAParty(instance) ? ") <color=hero.purple>:3" : ") >");
+		
+		if (ShouldBeAParty(instance))
+		{
+			button.Label.Color.Value = RandomX.Hue;
+			button.Slot.GetComponent<Image>().Tint.Value = RandomX.Hue.MulValue(0.2f);
+		}
 	}
 
 	[HarmonyPostfix]
@@ -154,7 +218,7 @@ public class NodeBrowserPatches
 			}
 		}
 
-		List<Type> DefaultTypes = [typeof(Slot), typeof(User), typeof(IAssetProvider<Material>), typeof(IAssetProvider<ITexture2D>), typeof(decimal)];
+		List<Type> DefaultTypes = [typeof(Slot), typeof(User), typeof(IAssetProvider<Material>), typeof(IAssetProvider<ITexture2D>), typeof(IAssetProvider<AudioClip>), typeof(StaticAudioClip), typeof(IWorldAudioDataSource), typeof(string), typeof(IWorldElement), typeof(RefID), typeof(IField<float3>), typeof(IField<float>), typeof(IField<floatQ>), typeof(float3), typeof(floatQ)];
 
 		foreach (var type in DefaultTypes)
 		{
