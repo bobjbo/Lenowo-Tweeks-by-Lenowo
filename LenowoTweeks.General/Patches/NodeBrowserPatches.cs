@@ -212,11 +212,21 @@ public class NodeBrowserPatches
 
 		if (LenowoTweeks_General.attacherMessages.Value)
 		{
-			List<string> messages = ["Hello, $USER.", "HAIIIIIIIIIIIIIIIIIIII", "Whatcha here for?", "$USER is stinky.", "Lookin' for an illegal type?", "What if it could be SH64?"];
+			var world = ui.World;
+
+			List<string> messages = [
+				"Hello, $USER.", "HAIIIIIIIIIIIIIIIIIIII", "Whatcha here for?", "Lookin' for an illegal type?", "What if it could be SH64?",
+				// if alone, twice the chance of calling the user stinky :D
+				"$USER is stinky.", "$RANDOMUSER is stinky."
+			];
+			List<string> aloneMessages = ["Where did everyone go?", "It's quiet here.", "Maybe join another session?"];
+			List<string> otherUserMessages = ["$HOST is watching.", "Where did $RANDOMUSER go?"];
 			List<string> partyMessages = ["<size=700%><color=red>F</color>IH"];
 
-			bool doPartyMessages = ShouldBeAParty(instance) && RandomX.Chance(0.15f);
-			var msgs = doPartyMessages ? partyMessages : messages;
+			var partyMsg = ShouldBeAParty(instance) ? partyMessages : [];
+			var userCountBasedMsgs = world.ActiveUserCount == 1 ? aloneMessages : otherUserMessages;
+
+			var msgs = messages.Concat(userCountBasedMsgs).Concat(partyMsg).ToList();
 
 			var msg = RandomX.Range(msgs.Count);
 
@@ -241,7 +251,14 @@ public class NodeBrowserPatches
 				clip.URL.Value = new("resdb:///1ed74a85e7d9a8e2456fadbd276cb9dd223ad96377ad230409693d408524606e.wav");
 			}
 
-			ui.Text("<size=400%><color=hero.purple>" + messages[msg].Replace("$USER", ui.World.LocalUser.UserName) + "</size>");
+			var randomUser = ui.World.AllUsers.ToList().GetRandom();
+
+			var realMsg = msgs[msg]
+				.Replace("$USER", ui.World.LocalUser.UserName)
+				.Replace("$HOST", ui.World.HostUser.UserName)
+				.Replace("$RANDOMUSER", randomUser.UserName);
+
+			ui.Text($"<size=400%><color=hero.purple>{realMsg}</size>");
 
 			if (fish)
 			{
