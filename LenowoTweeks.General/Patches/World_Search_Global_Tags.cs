@@ -46,15 +46,8 @@ public class World_Search_Global_Tags
 		return true;
 	}
 
-	// Automatically find the MoveNext method of the UpdateList async state machine
-	static MethodBase? TargetMethod()
-	{
-		var method = AccessTools.Method(typeof(LegacyWorldListManager), "UpdateList");
-		var stateMachineAttr = method.GetCustomAttribute<AsyncStateMachineAttribute>();
-		return stateMachineAttr.StateMachineType.GetMethod("MoveNext", BindingFlags.NonPublic | BindingFlags.Instance);
-	}
-
 	// Go through the instructions and replace the 3 Clear lines on the 3 tag lists with the custom functions.
+	[HarmonyPatch(typeof(LegacyWorldListManager), "UpdateList")]
 	static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 	{
 		var codes = new List<CodeInstruction>(instructions);

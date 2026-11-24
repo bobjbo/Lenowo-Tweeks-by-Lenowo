@@ -8,6 +8,8 @@ using FrooxEngine.Undo;
 
 using HarmonyLib;
 
+using LenowoTweeks.Core;
+
 namespace LenowoTweeks.Inspectors.Patches;
 
 [HarmonyPatch]
@@ -25,25 +27,18 @@ public class MemberActionsPatches
 			return method != null;
 		});
 
-		return method == null ? null : AccessTools.AsyncMoveNext(method);
+		return method ?? null;
 	}
 
 	public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 	{
 		List<CodeInstruction> codes = [.. instructions];
 
-		bool afterGetResult = false;
 		int insertPoint = -1;
 
 		for (int i = 0; i < codes.Count; i++)
 		{
-			if (codes[i].operand?.ToString()?.Contains("GetResult") ?? false)
-			{
-				afterGetResult = true;
-				continue;
-			}
-
-			if (afterGetResult && (codes[i].opcode.Name?.StartsWith("stloc") ?? false))
+			if (codes[i].opcode == OpCodes.Stloc_0)
 			{
 				insertPoint = i;
 				break;
@@ -55,13 +50,15 @@ public class MemberActionsPatches
 
 		List<CodeInstruction> injected =
 		[
-			new(OpCodes.Ldloc_2),
-			new(OpCodes.Ldloc_1),
+			new(OpCodes.Ldloc_0),
+			new(OpCodes.Ldarg_0),
 			new(OpCodes.Ldfld, targetField),
 			new(OpCodes.Call, patchMethod)
 		];
 
 		codes.InsertRange(insertPoint + 1, injected);
+
+		Helpers.DumpIL("Temp", codes);
 
 		return codes;
 	}
