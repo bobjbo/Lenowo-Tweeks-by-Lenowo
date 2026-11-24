@@ -56,12 +56,12 @@ public class LenowoTweeks_General : LenowoTweak
 	public static ModConfigKey<bool> shareTheParty = new("Share The Party", "No fun in a party if you are alone!", false);
 	public static ModConfigKey<bool> noParty = new("No Party", ":(", false);
 
-	public static ModConfigKey<bool> attacherMessages = new("Node Attacher Messages", "Makes Node Attachers have little messages", true);
+	public static ModConfigKey<bool> attacherMessages = new("Node Attacher Messages", "Makes Node Attachers have little messages", false);
 	public static ModConfigKey<bool> changeBGColor = new("Override Node Attacher Background Color", "Makes Node Attachers have a custom backround color from your secondary UI Color", false);
 
 	public static ModConfigKey<bool> addSpacesInNames = new("Add Spaces In Names", "Adds spaces in the component names, like 'Cast_colorX_To_float4' with 'Cast color X To float4'", false);
 
-	public static ModConfigKey<bool> addDefaultTypes = new("Add Default Types", "When picking a generic type with this enabled, some types will be added by default at the top.", true);
+	public static ModConfigKey<bool> addDefaultTypes = new("Add Default Types", "When picking a generic type with this enabled, some types will be added by default at the top.", false);
 
 
 
@@ -103,8 +103,8 @@ public class LenowoTweeks_General : LenowoTweak
 				{ "Create New", [ smallPrimitives, smallPrimitiveScale, removeMeshDefaultGizmo ] },
 				{ "Component Selector",
 				[
-					partyMode, shareTheParty, noParty,
-					changeBGColor, attacherMessages, addSpacesInNames, addDefaultTypes,
+					/*partyMode, shareTheParty, noParty,*/
+					changeBGColor, attacherMessages, addSpacesInNames, /*addDefaultTypes,*/
 					categoryColor, groupingColor, genericFolderColor, normalColor, backgroundColorOverride,
 					defaultPreset, midPreset, darkPreset, brightPreset, rgbPreset, rosaPreset
 				] },
