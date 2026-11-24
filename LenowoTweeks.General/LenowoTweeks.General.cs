@@ -27,7 +27,7 @@ namespace LenowoTweeks.General;
 public class LenowoTweeks_General : LenowoTweak
 {
 	private static Assembly ModAssembly => typeof(LenowoTweeks_General).Assembly;
-	internal const string VERSION_CONSTANT = "2.1.0";
+	internal const string VERSION_CONSTANT = "2.1.1";
 	const string ModName = "Lenowo Tweeks (General)";
 
 	public override string ModuleName => "General";
