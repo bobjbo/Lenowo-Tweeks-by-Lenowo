@@ -52,8 +52,8 @@ public class LenowoTweeks_General : LenowoTweak
 	public static ModConfigKey<bool> removeMeshDefaultGizmo = new("Remove Mesh Default Gizmo", "When creating a mesh from 'Create New', the gizmo will be cleared by default.", false);
 
 
-	public static ModConfigKey<bool> partyMode = new("Party Mode", "Turns any component selector into a party!!!", true);
-	public static ModConfigKey<bool> shareTheParty = new("Share The Party", "No fun in a party if you are alone!", true);
+	public static ModConfigKey<bool> partyMode = new("Party Mode", "Turns any component selector into a party!!!", false);
+	public static ModConfigKey<bool> shareTheParty = new("Share The Party", "No fun in a party if you are alone!", false);
 	public static ModConfigKey<bool> noParty = new("No Party", ":(", false);
 
 	public static ModConfigKey<bool> attacherMessages = new("Node Attacher Messages", "Makes Node Attachers have little messages", true);
