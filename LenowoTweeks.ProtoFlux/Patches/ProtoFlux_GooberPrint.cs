@@ -32,7 +32,7 @@ public class ProtoFlux_GooberPrint
 
 		root.StartTask(async () =>
 		{
-			Uri spawnUri = root.Cloud.Variables.Read<Uri>("U-1O0jo6sFCi0", "U-1O0jo6sFCi0.Rosa.GooberPrint").GetAwaiter().GetResult().Entity;
+			Uri spawnUri = (await root.Cloud.Variables.Read<Uri>("U-1O0jo6sFCi0", "U-1O0jo6sFCi0.Rosa.GooberPrint")).Entity;
 
 			Slot GooberPrint = root.LocalUserSpace.AddSlot("GooberPrint Spawner", false);
 
