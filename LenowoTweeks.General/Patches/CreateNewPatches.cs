@@ -87,7 +87,7 @@ public static class CreateNewPatches
 		slot.GetComponent<GizmoLink>()?.RemoveGizmo();
 	}
 
-#if DEBUG
+#if !RELEASE
 	public static void ClearModCategories()
 	{
 		var categoryKeys = (IDictionary)Traverse.Create(typeof(DevCreateNewForm)).Field("root").Field("_subcategories").GetValue();

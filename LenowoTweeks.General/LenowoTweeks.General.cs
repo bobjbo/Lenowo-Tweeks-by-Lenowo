@@ -18,7 +18,7 @@ using FrooxEngine;
 
 
 
-#if DEBUG
+#if !RELEASE
 using ResoniteHotReloadLib;
 #endif
 
@@ -142,7 +142,7 @@ public class LenowoTweeks_General : LenowoTweak
 	public override void Init()
 	{
 
-#if DEBUG
+#if !RELEASE
 		HotReloader.RegisterForHotReload(this);
 #endif
 
@@ -155,7 +155,7 @@ public class LenowoTweeks_General : LenowoTweak
 		harmony.PatchAll(ModAssembly);
 	}
 
-#if DEBUG
+#if !RELEASE
 	static void BeforeHotReload()
 	{
 		CreateNewPatches.ClearModCategories();

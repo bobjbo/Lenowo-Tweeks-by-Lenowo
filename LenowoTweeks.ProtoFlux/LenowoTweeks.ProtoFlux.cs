@@ -14,7 +14,7 @@ using LenowoTweeks.Core;
 
 
 
-#if DEBUG
+#if !RELEASE
 using ResoniteHotReloadLib;
 #endif
 
@@ -79,7 +79,7 @@ public class LenowoTweeks_ProtoFlux : LenowoTweak
 	public static ModConfigKey<int> collapseThreshold = new("Protoflux Collapse Threshold", "How many inputs/outputs a node can have before it collapses", 2);
 	public static ModConfigKey<int> collapseAwakeDelay = new("WireManager Awake Update Delay", "How many updates to wait before running the onAwake function (this might need to be increased if users are lagging)", 5, "Wire Manager Awake Update Delay");
 
-#if DEBUG
+#if !RELEASE
 	// any settings for features that are being developed basically
 
 	public static ModConfigKey<bool> threedprotoflux = new("3D Protoflux", "make flux 3d. currently makes flux 2d because i havent started on that part yet (and its also hardcoded to not run)", false);
@@ -101,7 +101,7 @@ public class LenowoTweeks_ProtoFlux : LenowoTweak
 				{ "Collapsing", [ collapsibleProtoflux, collapseThreshold, collapseAwakeDelay ]}
 			}
 		},
-#if DEBUG
+#if !RELEASE
 		{
 			"Debug Settings", new()
 			{
@@ -142,7 +142,7 @@ public class LenowoTweeks_ProtoFlux : LenowoTweak
 	public override void Init()
 	{
 
-#if DEBUG
+#if !RELEASE
 		HotReloader.RegisterForHotReload(this);
 #endif
 
@@ -157,7 +157,7 @@ public class LenowoTweeks_ProtoFlux : LenowoTweak
 		harmony.PatchAll(ModAssembly);
 	}
 
-#if DEBUG
+#if !RELEASE
 	static void BeforeHotReload()
 	{
 		harmony.UnpatchAll(harmonyID);

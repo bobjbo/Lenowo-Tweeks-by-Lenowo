@@ -1,4 +1,4 @@
-#if DEBUG
+#if !RELEASE
 using Elements.Core;
 
 using FrooxEngine;

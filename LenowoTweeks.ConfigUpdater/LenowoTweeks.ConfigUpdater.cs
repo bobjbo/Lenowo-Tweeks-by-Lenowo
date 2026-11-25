@@ -10,7 +10,7 @@ using System.Globalization;
 
 
 
-#if DEBUG
+#if !RELEASE
 using ResoniteHotReloadLib;
 #endif
 
@@ -32,7 +32,7 @@ public class LenowoTweeks_ConfigUpdater : ResoniteMod
 	public override void OnEngineInit()
 	{
 
-#if DEBUG
+#if !RELEASE
 		HotReloader.RegisterForHotReload(this);
 #endif
 
@@ -162,7 +162,7 @@ public class LenowoTweeks_ConfigUpdater : ResoniteMod
 		File.Delete(fullOriginalPath);
 	}
 
-#if DEBUG
+#if !RELEASE
 	static void BeforeHotReload()
 	{
 	}

@@ -16,7 +16,7 @@ using LenowoTweeks.Inspectors.Patches;
 
 
 
-#if DEBUG
+#if !RELEASE
 using ResoniteHotReloadLib;
 #endif
 
@@ -136,7 +136,7 @@ public class LenowoTweeks_Inspectors : LenowoTweak
 	public override void Init()
 	{
 
-#if DEBUG
+#if !RELEASE
 		HotReloader.RegisterForHotReload(this);
 #endif
 
@@ -149,7 +149,7 @@ public class LenowoTweeks_Inspectors : LenowoTweak
 		harmony.PatchAll(ModAssembly);
 	}
 
-#if DEBUG
+#if !RELEASE
 	static void BeforeHotReload()
 	{
 		harmony.UnpatchAll(harmonyID);
