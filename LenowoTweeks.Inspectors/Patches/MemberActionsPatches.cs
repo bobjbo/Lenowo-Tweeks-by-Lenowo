@@ -96,6 +96,28 @@ public class MemberActionsPatches
 					});
 				};
 			}
+			else if (target is IField<colorX> colorField)
+			{
+				menu.AddItem("White", (Uri?)null, RadiantUI_Constants.Hero.PURPLE).Button.LocalPressed += (_, _) =>
+				{
+					colorField.UndoableSet(colorX.White);
+					menu.Close();
+				};
+				menu.AddItem("Black", (Uri?)null, RadiantUI_Constants.Hero.PURPLE).Button.LocalPressed += (_, _) =>
+				{
+					colorField.UndoableSet(colorX.Black);
+					menu.Close();
+				};
+				menu.AddItem("Custom Cloud Color", (Uri?)null, RadiantUI_Constants.Hero.PURPLE).Button.LocalPressed += (_, _) =>
+				{
+					menu.World.RootSlot.StartTask(async () =>
+					{
+						var color = (await menu.Cloud.Variables.Read<colorX>(menu.LocalUser.UserID, "G-Resonite.CustomUserColor")).Entity;
+						colorField.UndoableSet(color);
+					});
+					menu.Close();
+				};
+			}
 			if (target is IField field && !field.IsDriven && field.IsDrivable)
 			{
 				if (target is ISyncRef fieldRef)
@@ -145,16 +167,19 @@ public class MemberActionsPatches
 						};
 						if (LenowoTweeks_Inspectors.moreMemberActions.Value)
 						{
-							menu.AddItem("Create Numeric Override Gather", (Uri?)null, RadiantUI_Constants.Hero.GREEN).Button.LocalPressed += (_, _) =>
-							{
-								typeof(MemberActionsPatches).GetMethod(nameof(MakeNumericUserOverride)).MakeGenericMethod(field.ValueType).Invoke(null, [field]);
-								menu.Close();
-							};
 							if (field.ValueType == typeof(bool))
 							{
 								menu.AddItem("Create Boolean Override Gather", (Uri?)null, RadiantUI_Constants.Hero.GREEN).Button.LocalPressed += (_, _) =>
 								{
 									typeof(MemberActionsPatches).GetMethod(nameof(MakeBooleanUserOverride)).Invoke(null, [field]);
+									menu.Close();
+								};
+							}
+							else
+							{
+								menu.AddItem("Create Numeric Override Gather", (Uri?)null, RadiantUI_Constants.Hero.GREEN).Button.LocalPressed += (_, _) =>
+								{
+									typeof(MemberActionsPatches).GetMethod(nameof(MakeNumericUserOverride)).MakeGenericMethod(field.ValueType).Invoke(null, [field]);
 									menu.Close();
 								};
 							}
