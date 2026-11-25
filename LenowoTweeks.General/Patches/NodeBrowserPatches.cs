@@ -119,7 +119,10 @@ public class NodeBrowserPatches
 	public static void Catagory(Button button, ComponentSelector instance, UIBuilder ui, CategoryNode<Type> catagory)
 	{
 		button.Label.ParseRichText.Value = ShouldBeAParty(instance);
-		button.Label.Content.Value = catagory.Name + " (" + catagory.ElementCount + (ShouldBeAParty(instance) ? ") <color=hero.purple>:3" : ") >");
+		if (LenowoTweeks_General.showCategoryCounts.Value)
+		{	
+			button.Label.Content.Value = catagory.Name + " (" + catagory.ElementCount + (ShouldBeAParty(instance) ? ") <color=hero.purple>:3" : ") >");
+		}
 
 
 		ModifyButton(button, false);
