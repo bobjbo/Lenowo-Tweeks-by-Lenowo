@@ -58,8 +58,6 @@ public class MemberActionsPatches
 
 		codes.InsertRange(insertPoint + 1, injected);
 
-		Helpers.DumpIL("Temp", codes);
-
 		return codes;
 	}
 
