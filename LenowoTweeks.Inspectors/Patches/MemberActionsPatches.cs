@@ -175,7 +175,7 @@ public class MemberActionsPatches
 									menu.Close();
 								};
 							}
-							else
+							else if (coder.Property<bool>("SupportsAddSub").Value && coder.Property<bool>("SupportsMinMax").Value && coder.Property<bool>("SupportsDiv").Value)
 							{
 								menu.AddItem("Create Numeric Override Gather", (Uri?)null, RadiantUI_Constants.Hero.GREEN).Button.LocalPressed += (_, _) =>
 								{
