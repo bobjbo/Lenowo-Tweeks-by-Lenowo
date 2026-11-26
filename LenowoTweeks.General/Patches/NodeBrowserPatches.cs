@@ -196,9 +196,9 @@ public class NodeBrowserPatches
 		else
 		{
 			var bg = slot.FindChild("Image").GetComponent<Image>();
-			if (LenowoTweeks_General.backgroundColorOverride.Value.HasValue)
+			if (LenowoTweeks_General.backgroundColorOverride.Value != new colorX(0f, 0f))
 			{
-				bg.Tint.Value = LenowoTweeks_General.backgroundColorOverride.Value.Value;
+				bg.Tint.Value = LenowoTweeks_General.backgroundColorOverride.Value;
 			}
 			else if (LenowoTweeks_General.changeBGColor.Value)
 			{

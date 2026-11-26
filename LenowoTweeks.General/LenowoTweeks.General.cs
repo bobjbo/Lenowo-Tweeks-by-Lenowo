@@ -63,7 +63,7 @@ public class LenowoTweeks_General : LenowoTweak
 
 	public static ModConfigKey<bool> addSpacesInNames = new("Add Spaces In Names", "Adds spaces in the component names, like 'Cast_colorX_To_float4' with 'Cast color X To float4'", false);
 
-	public static ModConfigKey<bool> addDefaultTypes = new("Add Default Types", "When picking a generic type with this enabled, some types will be added by default at the top.", false);
+	public static ModConfigKey<bool> addDefaultTypes = new("Add Default Types", "When picking a generic type with this enabled, some types will be added by default at the top. These will be customizable later!", false);
 
 
 
@@ -72,7 +72,7 @@ public class LenowoTweeks_General : LenowoTweak
 	public static ModConfigKey<colorX> groupingColor = new("Node Group Color", "The color of node groups in the node browser", RadiantUI_Constants.Sub.PURPLE);
 	public static ModConfigKey<colorX> normalColor = new("Normal Color", "The color of normal types in the node browser", RadiantUI_Constants.Sub.CYAN);
 
-	public static ModConfigKey<colorX?> backgroundColorOverride = new("Background Color", "The color of the background in the node browser", null);
+	public static ModConfigKey<colorX> backgroundColorOverride = new("Background Color", "The color of the background in the node browser", new(0f, 0f));
 
 	// Color Presets
 	public static ModConfigButton defaultPreset = new("Preset: Default", () => SetBrowserColors(RadiantUI_Constants.Sub.YELLOW, RadiantUI_Constants.Sub.GREEN, RadiantUI_Constants.Sub.PURPLE, RadiantUI_Constants.Sub.CYAN));
@@ -90,7 +90,7 @@ public class LenowoTweeks_General : LenowoTweak
 		genericFolderColor.Value = generic;
 		groupingColor.Value = grouping;
 		normalColor.Value = normal;
-		backgroundColorOverride.Value = bg;
+		backgroundColorOverride.Value = bg ?? new colorX(0f, 0f);
 	}
 
 
@@ -105,8 +105,8 @@ public class LenowoTweeks_General : LenowoTweak
 				{ "Create New", [ smallPrimitives, smallPrimitiveScale, removeMeshDefaultGizmo ] },
 				{ "Component Selector",
 				[
-					/*partyMode, shareTheParty, noParty,*/
-					showCategoryCounts, changeBGColor, attacherMessages, addSpacesInNames, /*addDefaultTypes,*/
+					partyMode, shareTheParty, noParty,
+					showCategoryCounts, changeBGColor, attacherMessages, addSpacesInNames, addDefaultTypes,
 					categoryColor, groupingColor, genericFolderColor, normalColor, backgroundColorOverride,
 					defaultPreset, midPreset, darkPreset, brightPreset, rgbPreset, rosaPreset
 				] },
