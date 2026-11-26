@@ -140,6 +140,12 @@ public class MemberActionsPatches
 						typeof(MemberActionsPatches).GetMethod(nameof(MakeReferenceUserOverride)).MakeGenericMethod(fieldRef.TargetType).Invoke(null, [fieldRef]);
 						menu.Close();
 					};
+
+					menu.AddItem("Create Dynamic Driver", (Uri?)null, RadiantUI_Constants.Hero.PURPLE).Button.LocalPressed += (_, _) =>
+					{
+						typeof(MemberActionsPatches).GetMethod(nameof(MakeDynamicReferenceDriver)).MakeGenericMethod(fieldRef.TargetType).Invoke(null, [fieldRef]);
+						menu.Close();
+					};
 				}
 				else
 				{
@@ -153,7 +159,8 @@ public class MemberActionsPatches
 							menu.Close();
 						};
 					}
-					if (coder.Property<bool>("IsEnginePrimitive").Value) // boolean value drivers
+
+					if (coder.Property<bool>("IsEnginePrimitive").Value)
 					{
 						menu.AddItem("Create Boolean Value Driver", (Uri?)null, RadiantUI_Constants.Hero.GREEN).Button.LocalPressed += (_, _) =>
 						{
@@ -184,6 +191,12 @@ public class MemberActionsPatches
 								};
 							}
 						}
+
+						menu.AddItem("Create Dynamic Driver", (Uri?)null, RadiantUI_Constants.Hero.PURPLE).Button.LocalPressed += (_, _) =>
+						{
+							typeof(MemberActionsPatches).GetMethod(nameof(MakeDynamicValueDriver)).MakeGenericMethod(field.ValueType).Invoke(null, [field]);
+							menu.Close();
+						};
 					}
 				}
 			}
@@ -370,5 +383,45 @@ public class MemberActionsPatches
 			field.World.EndUndoBatch();
 		}
 
+	}
+
+	public static void MakeDynamicReferenceDriver<T>(SyncRef<T> field) where T : class, IWorldElement
+	{
+		try
+		{
+			field.World.BeginUndoBatch("Create Dynamic Reference Driver");
+
+			var vuo = field.FindNearestParent<Slot>().AttachComponent<DynamicReferenceVariableDriver<T>>();
+
+			vuo.CreateSpawnUndoPoint();
+			vuo.Target.Target = field;
+
+		} catch (Exception e)
+		{
+			UniLog.Error($"Lenowo Tweaks / Exception in MakeDynamicReferenceDriver:\n{e}");
+		} finally
+		{
+			field.World.EndUndoBatch();
+		}
+	}
+
+	public static void MakeDynamicValueDriver<T>(IField<T> field)
+	{
+		try
+		{
+			field.World.BeginUndoBatch("Create Dynamic Value Driver");
+
+			var vuo = field.FindNearestParent<Slot>().AttachComponent<DynamicValueVariableDriver<T>>();
+
+			vuo.CreateSpawnUndoPoint();
+			vuo.Target.Target = field;
+
+		} catch (Exception e)
+		{
+			UniLog.Error($"Lenowo Tweaks / Exception in MakeDynamicValueDriver:\n{e}");
+		} finally
+		{
+			field.World.EndUndoBatch();
+		}
 	}
 }
