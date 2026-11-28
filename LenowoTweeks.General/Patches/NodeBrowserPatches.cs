@@ -207,6 +207,13 @@ public class NodeBrowserPatches
 		}
 	}
 
+	public static List<Type> FavTypes = [
+		typeof(Slot), typeof(User),
+		typeof(IAssetProvider<Material>), typeof(IAssetProvider<ITexture2D>), typeof(IAssetProvider<AudioClip>), typeof(StaticAudioClip), typeof(IWorldAudioDataSource),
+		typeof(string), typeof(IWorldElement), typeof(RefID),
+		typeof(IField<float3>), typeof(IField<float>), typeof(IField<floatQ>),
+		typeof(float3), typeof(floatQ)
+	];
 
 	public static void AddDefaults(ComponentSelector instance, UIBuilder ui, Type baseType)
 	{
@@ -298,15 +305,15 @@ public class NodeBrowserPatches
 
 		if (LenowoTweeks_General.addDefaultTypes.Value)
 		{
-			List<Type> DefaultTypes = [
-				typeof(Slot), typeof(User),
-				typeof(IAssetProvider<Material>), typeof(IAssetProvider<ITexture2D>), typeof(IAssetProvider<AudioClip>), typeof(StaticAudioClip), typeof(IWorldAudioDataSource),
-				typeof(string), typeof(IWorldElement), typeof(RefID),
-				typeof(IField<float3>), typeof(IField<float>), typeof(IField<floatQ>),
-				typeof(float3), typeof(floatQ)
-			];
+			var favButton = ui.Button("*");
+			var favSlot = favButton.Slot;
+			Slot pickerSlot = favSlot.Parent.Children.LastOrDefault(s=>s.Name == "Panel");
+			
+			pickerSlot.Children[pickerSlot.ChildrenCount - 1].GetComponent<RectTransform>().AnchorMax.Value = new(0.94f, 1f);
+			favSlot.Parent = pickerSlot;
+			favSlot.GetComponent<RectTransform>().AnchorMin.Value = new(0.945f, 0f);
 
-			foreach (var type in DefaultTypes)
+			foreach (var type in FavTypes)
 			{
 				try
 				{
@@ -420,12 +427,14 @@ public class NodeBrowserPatches
 
 			var getLabelMethod = typeof(Button).GetMethod("get_Label");
 			object find1 = null;
+			bool found = false;
 			for (int i = 0; i < codes.Count; i++)
 			{
 				var code = codes[i];
-				if (code.opcode == OpCodes.Ldfld && codes[i - 1].opcode == OpCodes.Ldarg_0)
+				if (!found && code.opcode == OpCodes.Ldfld && codes[i - 1].opcode == OpCodes.Ldarg_0)
 				{
 					find1 = code.operand;
+					found = true;
 				}
 				if (code.Calls(getLabelMethod))
 				{
@@ -456,7 +465,76 @@ public class NodeBrowserPatches
 			// this is default but i remove the rest of the normal code so like, gotta do it here
 			button.Label.ParseRichText.Value = false;
 
-			//button.Label.Content.Value = button.Label.Content.Value.Replace("_","");
+			try
+			{
+				if (LenowoTweeks_General.addDefaultTypes.Value)
+				{
+					if (innerType.GenericTypeArguments.Length == 1)
+					{
+						var genericArg = innerType.GenericTypeArguments[0];
+						var buttonHolder = button.Slot.Parent.AddSlot($"{button.LabelText}");
+						var bhrt = buttonHolder.AttachComponent<RectTransform>();
+						var layout = buttonHolder.AttachComponent<LayoutElement>();
+						var hl = buttonHolder.AttachComponent<HorizontalLayout>();
+						hl.ForceExpandWidth.Value = false;
+						layout.MinHeight.Value = 32;
+						hl.Spacing.Value = 4;
+						button.Slot.Parent = buttonHolder;
+						button.Slot.GetComponent<LayoutElement>().FlexibleWidth.Value = 1;
+
+						ui.NestInto(bhrt);
+						var fav = ui.Button(new Uri("resdb:///44e8c56596b266e0099b0f6f9f014dc8929b0ea4eef16fcaa2faba8a079a4e71.png"));
+						fav.Slot.Name = "FAVIOURBNOTYBESAOG H";
+						var tex1 = fav.Icon.Slot.GetComponent<StaticTexture2D>();
+						var tex2 = fav.Icon.Slot.AttachComponent<StaticTexture2D>();
+						tex2.URL.Value = new("resdb:///76b194bd2a8bd4c57ea5fbf1b35bf179a23945f13ed723162d2268a43c63a605.png");
+						var bad = fav.Icon.Slot.AttachComponent<BooleanAssetDriver<ITexture2D>>();
+						bad.FalseTarget.Target = tex1;
+						bad.TrueTarget.Target = tex2;
+						bad.Target.Target = fav.Icon.Slot.GetComponent<SpriteProvider>().Texture;
+						var favl = fav.Slot.GetComponentOrAttach<LayoutElement>();
+						favl.MinWidth.Value = 32;
+						ui.NestOut();
+
+						Slot buttonHolderHolder = buttonHolder.Parent.FindChildOrAdd("TypeHolder");
+						buttonHolderHolder.GetComponentOrAttach<RectTransform>();
+						var vl = buttonHolderHolder.GetComponentOrAttach<VerticalLayout>();
+						vl.ForceExpandHeight.Value = false;
+						vl.Spacing.Value = 8;
+						buttonHolder.Parent = buttonHolderHolder;
+						
+						buttonHolder.OrderOffset = buttonHolderHolder.ChildrenCount - 1;
+
+						if (FavTypes.Contains(genericArg))
+						{
+							bad.State.Value = true;
+							buttonHolder.OrderOffset = -1000000;
+						}
+
+
+						fav.LocalPressed += (_, _) =>
+						{
+							if (FavTypes.Contains(genericArg))
+							{
+								FavTypes.Remove(genericArg);
+								bad.State.Value = false;
+								buttonHolder.OrderOffset += 1000000;
+							}
+							else
+							{
+								FavTypes.Add(genericArg);
+								bad.State.Value = true;
+								buttonHolder.OrderOffset -= 1000000;
+							}
+						};
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				UniLog.Error($"EPIC!!!!\n{e}");
+			}
+
 
 			ModifyButton(button, true);
 		}
